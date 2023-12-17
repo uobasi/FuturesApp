@@ -1070,7 +1070,7 @@ def update_graph_live(n_intervals, data):
     
     
     timeFrame = [[i,'']+timeDict[i] for i in timeDict]
-    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 4)['SUPERTd_5_4.0'].replace(-1,0)
+    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 3.8)['SUPERTd_5_3.8'].replace(-1,0)
     
     fg = plotChart(df, [hs[1],ntList[:5]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[], mlst=mlst) #trends=FindTrends(df,n=10)
         
