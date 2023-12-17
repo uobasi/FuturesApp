@@ -903,7 +903,7 @@ app.layout = html.Div([
 )
 
 def update_output(n_clicks, value):
-    value = str(value).upper() 
+    value = str(value).upper().strip()
     if value in symbolNameList:
         print('The input symbol was "{}" '.format(value))
         return str(value).upper(), str(value).upper()
