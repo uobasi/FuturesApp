@@ -890,7 +890,7 @@ app.layout = html.Div([
 
     html.Div(dcc.Input(id='input-on-submit', type='text')),
     html.Button('Submit', id='submit-val', n_clicks=0),
-    html.Div(id='container-button-basic',children="Enter a symbol from list ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'ZNH4', 'ZTH4', 'YMH4', '6EH4'] and submit"),
+    html.Div(id='container-button-basic',children="Enter a symbol from |ESH4 NQH4 CLG4 GCG4 NGG4 HGH4 ZNH4 ZTH4 YMH4 6EH4| and submit"),
     dcc.Store(id='stkName-value')
 ])
 
@@ -1070,7 +1070,7 @@ def update_graph_live(n_intervals, data):
     
     
     timeFrame = [[i,'']+timeDict[i] for i in timeDict]
-    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 3.5)['SUPERTd_5_3.5'].replace(-1,0)
+    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 4)['SUPERTd_5_4.0'].replace(-1,0)
     
     fg = plotChart(df, [hs[1],ntList[:5]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[], mlst=mlst) #trends=FindTrends(df,n=10)
         
