@@ -352,6 +352,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     #fig.add_trace(go.Scatter(x=df['time'], y=df['vma'], mode='lines', name='VMA'), row=2, col=1)
     
+    '''
     for i in range(df.first_valid_index()+1,len(df.index)):
         prev = i - 1
         try:
@@ -368,10 +369,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                 ),)  
         except(KeyError):
             pass
-
+    '''
     
-    localMin = argrelextrema(df.close.values, np.less_equal, order=50)[0] 
-    localMax = argrelextrema(df.close.values, np.greater_equal, order=50)[0]
+    localMin = argrelextrema(df.close.values, np.less_equal, order=100)[0] 
+    localMax = argrelextrema(df.close.values, np.greater_equal, order=100)[0]
      
     if len(localMin) > 0:
         mcount = 0 
@@ -1070,7 +1071,7 @@ def update_graph_live(n_intervals, data):
     
     
     timeFrame = [[i,'']+timeDict[i] for i in timeDict]
-    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 3.8)['SUPERTd_5_3.8'].replace(-1,0)
+    #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 3.8)['SUPERTd_5_3.8'].replace(-1,0)
     
     fg = plotChart(df, [hs[1],ntList[:5]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[], mlst=mlst) #trends=FindTrends(df,n=10)
         
