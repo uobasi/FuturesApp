@@ -494,12 +494,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         colors = ['rgba(255,0,0,'+str(round([i[7], i[8], i[9]][[i[7], i[8], i[9]].index(max([i[7], i[8], i[9]]))]/sum([i[7], i[8], i[9]]),2))+')' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 0  #'rgba(255,0,0,'+str(round(i[6][:4][i[6][:4].index(max(i[6][:4]))]/sum(i[6]),2))+')' if i[5] == 'red' 
                   else 'rgba(0,139,139,'+str(round([i[7], i[8], i[9]][[i[7], i[8], i[9]].index(max([i[7], i[8], i[9]]))]/sum([i[7], i[8], i[9]]),2))+')' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 1
                   else '#778899' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 2
-                  else i for i in sortadlist2]#['darkcyan', ] * len(sortadlist2)#
+                  else 'gray' for i in sortadlist2]#['darkcyan', ] * len(sortadlist2)#
     except(ZeroDivisionError):
         colors = [     'rgba(255,0,0)' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 0
                   else 'rgba(0,139,139)'if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 1
                   else '#778899' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 2
-                  else i for i in sortadlist2]
+                  else 'gray' for i in sortadlist2]
         
     
     #print(colors)
