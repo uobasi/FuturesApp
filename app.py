@@ -490,7 +490,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                   )
 
     
-    
+    '''
     try:
         colors = ['rgba(255,0,0,'+str(round([i[7], i[8], i[9]][[i[7], i[8], i[9]].index(max([i[7], i[8], i[9]]))]/sum([i[7], i[8], i[9]]),2))+')' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 0  #'rgba(255,0,0,'+str(round(i[6][:4][i[6][:4].index(max(i[6][:4]))]/sum(i[6]),2))+')' if i[5] == 'red' 
                   else 'rgba(0,139,139,'+str(round([i[7], i[8], i[9]][[i[7], i[8], i[9]].index(max([i[7], i[8], i[9]]))]/sum([i[7], i[8], i[9]]),2))+')' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 1
@@ -501,7 +501,21 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                   else 'rgba(0,139,139)'if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 1
                   else '#778899' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 2
                   else 'gray' for i in sortadlist2]
-        
+    '''
+    colors = []
+    for i in sortadlist2:
+        thList = [i[7], i[8], i[9]]
+        if sum(thList) > 0:
+            if thList.index(max(thList)) == 0: 
+                colors.append('rgba(255,0,0,'+str(round(thList[0]/sum(thList),2))+')')
+            elif thList.index(max(thList)) == 1: 
+                colors.append('rgba(0,139,139,'+str(round(thList[1]/sum(thList),2))+')')  
+            elif thList.index(max(thList)) == 2: 
+                colors.append('#778899'+str(round(thList[1]/sum(thList),2))+')')
+        elif sum(thList) == 0:
+            colors.append('gray')
+
+
     
     #print(colors)
     #colors[0] = 'crimson'
