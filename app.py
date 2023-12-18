@@ -884,8 +884,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 314863 == ES == ESZ3
 ['ESZ3','NQZ3','CLF4', 'GCG4', 'NGF4', 'HGH4', 'ZNH4', 'ZTH4', 'ZFH4']
 '''
-symbolNumList = ['17077', '750', '686071', '41512', '56065', '31863', '110030', '4131634', '204839', '156627']
-symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'ZNH4', 'ZTH4', 'YMH4', '6EH4']
+symbolNumList = ['17077', '750', '686071', '41512', '56065', '31863', '4131634', '204839', '156627']
+symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'ZTH4', 'YMH4', '6EH4']
 #stkName = 'GCG4'
 
 #symbolNum = symbolNumList[symbolNameList.index(stkName)]
