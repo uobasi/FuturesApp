@@ -892,7 +892,7 @@ symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'ZTH4', 'YMH4', 
 
 
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 63000
+inter = 69000
 app = Dash()
 app.layout = html.Div([
     
