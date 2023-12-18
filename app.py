@@ -511,7 +511,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             elif thList.index(max(thList)) == 1: 
                 colors.append('rgba(0,139,139,'+str(round(thList[1]/sum(thList),2))+')')  
             elif thList.index(max(thList)) == 2: 
-                colors.append('#778899'+str(round(thList[1]/sum(thList),2))+')')
+                colors.append('#778899')
         elif sum(thList) == 0:
             colors.append('gray')
 
