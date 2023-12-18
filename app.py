@@ -882,7 +882,6 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 78460 == OIL == CLF4 
 260937 == NQ == NQZ3
 314863 == ES == ESZ3
-['ESZ3','NQZ3','CLF4', 'GCG4', 'NGF4', 'HGH4', 'ZNH4', 'ZTH4', 'ZFH4']
 '''
 symbolNumList = ['17077', '750', '686071', '41512', '56065', '31863', '4131634', '204839', '156627']
 symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'ZTH4', 'YMH4', '6EH4']
@@ -905,7 +904,7 @@ app.layout = html.Div([
 
     html.Div(dcc.Input(id='input-on-submit', type='text')),
     html.Button('Submit', id='submit-val', n_clicks=0),
-    html.Div(id='container-button-basic',children="Enter a symbol from |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'ZNH4' 'ZTH4' 'YMH4' '6EH4'| and submit"),
+    html.Div(id='container-button-basic',children="Enter a symbol from |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'ZTH4' 'YMH4' '6EH4'| and submit"),
     dcc.Store(id='stkName-value')
 ])
 
