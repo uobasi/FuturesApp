@@ -617,9 +617,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     putCand = [i for i in OptionTimeFrame if int(i[2]) > int(i[3]) if int(i[4]) < len(df)]
     callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)]
     #MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
-    indsAbove = [i for i in OptionTimeFrame if i[5] >= 0.65 and int(i[4]) < len(df)] #[(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(int(i[10]),i[1]) for i in sord if i[11] == stockName and i[1] == 'AboveAsk(BUY)']]
+    indsAbove = [i for i in OptionTimeFrame if i[5] > 0.60 and int(i[4]) < len(df)] #[(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(int(i[10]),i[1]) for i in sord if i[11] == stockName and i[1] == 'AboveAsk(BUY)']]
     
-    indsBelow = [i for i in OptionTimeFrame if i[6] >= 0.65 and int(i[4]) < len(df)]#imbalance = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[13] == 'Imbalance' and i[1] != 'BelowBid(SELL)' and i[1] != 'AboveAsk(BUY)']]
+    indsBelow = [i for i in OptionTimeFrame if i[6] > 0.60 and int(i[4]) < len(df)]#imbalance = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[13] == 'Imbalance' and i[1] != 'BelowBid(SELL)' and i[1] != 'AboveAsk(BUY)']]
     #indsHAbove = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Ask(BUY)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
     #indsHBelow  = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Bid(SELL)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
     
@@ -721,7 +721,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsAbove],
             increasing={'line': {'color': '#00FFFF'}},
             decreasing={'line': {'color': '#00FFFF'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in OptionTimeFrame if i[5] >= 0.65], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in OptionTimeFrame if i[5] > 0.60], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Bid' ),
         row=1, col=1)
         trcount+=1
@@ -735,7 +735,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsBelow],
             increasing={'line': {'color': '#FF1493'}},
             decreasing={'line': {'color': '#FF1493'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in OptionTimeFrame if i[6] >= 0.65], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in OptionTimeFrame if i[6] > 0.60], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Ask' ),
         row=1, col=1)
         trcount+=1
