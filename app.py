@@ -925,7 +925,7 @@ def update_graph_live(n_intervals, data):
         
     
     
-    aggs = []  
+    aggs = [ ]  
     newOHLC = [] 
     btemp = [i for i in csv_rows if i[1] == symbolNum]
     if len(btemp) > 2:
