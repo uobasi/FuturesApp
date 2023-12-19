@@ -735,7 +735,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsBelow],
             increasing={'line': {'color': '#FF1493'}},
             decreasing={'line': {'color': '#FF1493'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in OptionTimeFrame if i[5] > 0.60], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in OptionTimeFrame if i[6] > 0.60], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Ask' ),
         row=1, col=1)
         trcount+=1
