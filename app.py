@@ -931,8 +931,6 @@ def update_graph_live(n_intervals, data):
     if len(btemp) > 2:
         newOHLC = []
         for i in range(0, len(btemp)-1, 2):
-            print(i)
-            Time.sleep(3)
             newOHLC.append([btemp[i][0], btemp[i][1], btemp[i][2], str(max(int(btemp[0][3]),int(btemp[0+1][3]))), str(min(int(btemp[0][4]),int(btemp[0+1][4]))), btemp[i+1][5], int(btemp[i][6])+int(btemp[i+1][6])])
 
     for i in newOHLC:
