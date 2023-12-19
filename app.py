@@ -802,7 +802,7 @@ symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'YMH4', 'BTCZ3',
 
 
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 62000
+inter = 60000
 app = Dash()
 app.layout = html.Div([
     
@@ -886,13 +886,13 @@ def update_graph_live(n_intervals, data):
             aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
             
             
-    newAggs = []
-    for i in aggs:
-        if i not in newAggs:
-            newAggs.append(i)
+    #newAggs = []
+    #for i in aggs:
+        #if i not in newAggs:
+            #newAggs.append(i)
             
           
-    df = pd.DataFrame(newAggs, columns = ['open', 'high', 'low', 'close', 'volume', 'time', 'timestamp', 'name',])
+    df = pd.DataFrame(aggs, columns = ['open', 'high', 'low', 'close', 'volume', 'time', 'timestamp', 'name',])
     
     
     vwap(df)
