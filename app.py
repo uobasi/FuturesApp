@@ -623,7 +623,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     #indsHAbove = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Ask(BUY)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
     #indsHBelow  = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Bid(SELL)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
     
-
+    '''
     if len(optionOrderList) > 0:
         oppDict = {}
         for opp in optionOrderList:
@@ -644,7 +644,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                 newOpp[i].append(1)
         newOpp[len(newOpp)-1].append(1)
         
-        '''
+        
         if newOpp[len(newOpp)-1][0][1:] == newOpp[len(newOpp)-2][0][1:]:
             total = newOpp[len(newOpp)-1][1]+newOpp[len(newOpp)-2][1]
             newOpp[len(newOpp)-1].append(round(newOpp[len(newOpp)-1][1]/total,3))
@@ -924,19 +924,29 @@ def update_graph_live(n_intervals, data):
         csv_rows.append(row)
         
     
-    aggs = []   
-    for i in csv_rows:
+    
+    aggs = []  
+    newOHLC = [] 
+    btemp = [i for i in csv_rows if i[1] == symbolNum]
+    if len(btemp) > 2:
+        newOHLC = []
+        for i in range(0, len(btemp)-1, 2):
+            print(i)
+            Time.sleep(3)
+            newOHLC.append([btemp[i][0], btemp[i][1], btemp[i][2], str(max(int(btemp[0][3]),int(btemp[0+1][3]))), str(min(int(btemp[0][4]),int(btemp[0+1][4]))), btemp[i+1][5], int(btemp[i][6])+int(btemp[i+1][6])])
+
+    for i in newOHLC:
         #if int(i[0]) >= 1702508400000000000: 
-            if i[1] == symbolNum:
-                hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
-                if hourss < 10:
-                    hourss = '0'+str(hourss)
-                minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
-                if minss < 10:
-                    minss = '0'+str(minss)
-                opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
-                aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
-                
+            #if i[1] == symbolNum:
+            hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
+            if hourss < 10:
+                hourss = '0'+str(hourss)
+            minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
+            if minss < 10:
+                minss = '0'+str(minss)
+            opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
+            aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
+            
             
     newAggs = []
     for i in aggs:
@@ -966,19 +976,19 @@ def update_graph_live(n_intervals, data):
         csv_rows.append(row)
         
     
-    
+    STrades = [i for i in csv_rows if i[4] == symbolNum]
     AllTrades = []
-    for i in csv_rows:
+    for i in STrades:
         #if int(i[0]) >= 1702508400000000000: 
-            if i[4] == symbolNum:
-                hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
-                if hourss < 10:
-                    hourss = '0'+str(hourss)
-                minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
-                if minss < 10:
-                    minss = '0'+str(minss)
-                opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
-                AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
+            #if i[4] == symbolNum:
+            hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
+            if hourss < 10:
+                hourss = '0'+str(hourss)
+            minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
+            if minss < 10:
+                minss = '0'+str(minss)
+            opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
+            AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
             
             
     
