@@ -883,8 +883,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 260937 == NQ == NQZ3
 314863 == ES == ESZ3
 '''
-symbolNumList = ['17077', '750', '686071', '41512', '56065', '31863', '4131634', '204839', '156627']
-symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'ZTH4', 'YMH4', '6EH4']
+symbolNumList = ['17077', '750', '686071', '41512', '56065', '31863', '204839', '75685', '7062']
+symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'YMH4', 'BTCZ3', 'RTYH4']
 #stkName = 'GCG4'
 
 #symbolNum = symbolNumList[symbolNameList.index(stkName)]
@@ -904,7 +904,7 @@ app.layout = html.Div([
 
     html.Div(dcc.Input(id='input-on-submit', type='text')),
     html.Button('Submit', id='submit-val', n_clicks=0),
-    html.Div(id='container-button-basic',children="Enter a symbol from |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'ZTH4' 'YMH4' '6EH4'| and submit"),
+    html.Div(id='container-button-basic',children="Enter a symbol from |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'| and submit"),
     dcc.Store(id='stkName-value')
 ])
 
@@ -922,7 +922,7 @@ def update_output(n_clicks, value):
         print('The input symbol was "{}" '.format(value))
         return str(value).upper(), str(value).upper()
     else:
-        return 'The input symbol was '+str(value)+' is not accepted please try different symbol ', 'The input symbol was '+str(value)+' is not accepted please try different symbol '
+        return 'The input symbol was '+str(value)+" is not accepted please try different symbol from  |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'|  ", 'The input symbol was '+str(value)+" is not accepted please try different symbol  |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'|  "
 
 @callback(Output('graph', 'figure'),
           Input('interval', 'n_intervals'),
