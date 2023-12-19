@@ -804,10 +804,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 
     fig.add_trace(go.Scatter(x=df['time'],
                              y= [(num1 + num2)/2]*len(df['time']) ,
-                             line_color= 'purple',
-                             text = 'ValueArea MidPoint',
+                             line_color= '#FF99FF',
+                             text = 'VA MidPoint',
                              textposition="bottom left",
-                             name='ValueArea MidPoint',
+                             name='VA MidPoint',
                              showlegend=False,
                              visible=False,
                              mode= 'lines',
