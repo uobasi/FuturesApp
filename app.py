@@ -243,7 +243,7 @@ def valueAreaV1(lst):
 
     return [lst[topIndex][0], lst[dwnIndex][0], lst[pocIndex][0]]
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName='', prevdtstr:str='', sord:list=[], trends:list=[], lstVwap:list=[], bigOrders:list=[], pea:bool=False, timeStamp:int=None, previousDay:bool=False, OptionTimeFrame:list=[], overall:list=[], mlst:list=[]):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName='', prevdtstr:str='', sord:list=[], trends:list=[], lstVwap:list=[], bigOrders:list=[], pea:bool=False, timeStamp:int=None, previousDay:bool=False, OptionTimeFrame:list=[], overall:list=[]):
   
     '''
     average = round(np.average(df_dx), 3)
@@ -623,6 +623,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     #indsHAbove = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Ask(BUY)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
     #indsHBelow  = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Bid(SELL)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
     
+
     if len(putCand) > 0:
         fig.add_trace(go.Candlestick(
             x=[df['time'][i[4]] for i in putCand],
@@ -660,7 +661,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsAbove],
             increasing={'line': {'color': '#00FFFF'}},
             decreasing={'line': {'color': '#00FFFF'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in OptionTimeFrame if i[5] > 0.60], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in indsAbove], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Bid' ),
         row=1, col=1)
         trcount+=1
@@ -674,7 +675,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsBelow],
             increasing={'line': {'color': '#FF1493'}},
             decreasing={'line': {'color': '#FF1493'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in OptionTimeFrame if i[6] > 0.60], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in indsBelow], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Ask' ),
         row=1, col=1)
         trcount+=1
@@ -769,7 +770,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     
     fig.update_layout(height=800, xaxis_rangeslider_visible=False, showlegend=False)
-
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsMid'], mode='lines', name='BbandsMid'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsUpp'], mode='lines', name='BbandsUpp'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsLow'], mode='lines', name='BbandsLow'))
 
 
     
@@ -799,7 +802,7 @@ symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'YMH4', 'BTCZ3',
 
 
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 63000
+inter = 62000
 app = Dash()
 app.layout = html.Div([
     
@@ -861,19 +864,27 @@ def update_graph_live(n_intervals, data):
         csv_rows.append(row)
         
     
-    aggs = []   
-    for i in csv_rows:
+    
+    aggs = [ ]  
+    newOHLC = [] 
+    btemp = [i for i in csv_rows if i[1] == symbolNum]
+    if len(btemp) > 2:
+        newOHLC = []
+        for i in range(0, len(btemp)-1, 2):
+            newOHLC.append([btemp[i][0], btemp[i][1], btemp[i][2], str(max(int(btemp[i][3]),int(btemp[i+1][3]))), str(min(int(btemp[i][4]),int(btemp[i+1][4]))), btemp[i+1][5], int(btemp[i][6])+int(btemp[i+1][6])])
+
+    for i in newOHLC:
         #if int(i[0]) >= 1702508400000000000: 
-            if i[1] == symbolNum:
-                hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
-                if hourss < 10:
-                    hourss = '0'+str(hourss)
-                minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
-                if minss < 10:
-                    minss = '0'+str(minss)
-                opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
-                aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
-                
+            #if i[1] == symbolNum:
+            hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
+            if hourss < 10:
+                hourss = '0'+str(hourss)
+            minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
+            if minss < 10:
+                minss = '0'+str(minss)
+            opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
+            aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
+            
             
     newAggs = []
     for i in aggs:
@@ -903,19 +914,19 @@ def update_graph_live(n_intervals, data):
         csv_rows.append(row)
         
     
-    
+    STrades = [i for i in csv_rows if i[4] == symbolNum]
     AllTrades = []
-    for i in csv_rows:
+    for i in STrades:
         #if int(i[0]) >= 1702508400000000000: 
-            if i[4] == symbolNum:
-                hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
-                if hourss < 10:
-                    hourss = '0'+str(hourss)
-                minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
-                if minss < 10:
-                    minss = '0'+str(minss)
-                opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
-                AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
+            #if i[4] == symbolNum:
+            hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
+            if hourss < 10:
+                hourss = '0'+str(hourss)
+            minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
+            if minss < 10:
+                minss = '0'+str(minss)
+            opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
+            AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
             
             
     
@@ -949,8 +960,8 @@ def update_graph_live(n_intervals, data):
     for i in mTrade:
         newwT.append([i[0],i[1],i[2],i[5], i[4],i[3],i[6]])
     
-    mlst = sorted(mTrade, key=lambda d: d[6], reverse=False) 
-    mlst = [i for i in mlst if i[1] >= 100]
+    #mlst = sorted(mTrade, key=lambda d: d[6], reverse=False) 
+    #mlst = [i for i in mlst if i[1] >= 100]
     
     ntList = []
     checkDup = []
@@ -1001,7 +1012,7 @@ def update_graph_live(n_intervals, data):
     timeFrame = [[i,'']+timeDict[i] for i in timeDict]
     #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 3.8)['SUPERTd_5_3.8'].replace(-1,0)
     
-    fg = plotChart(df, [hs[1],ntList[:2]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[], mlst=mlst) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],ntList[:2]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
         
     return fg
 
