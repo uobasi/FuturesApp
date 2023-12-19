@@ -770,11 +770,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     if len(indsBelow) > 0:
         fig.add_trace(go.Candlestick(
-            x=[df['time'][i[0]] for i in indsBelow],
-            open=[df['open'][i[0]] for i in indsBelow],
-            high=[df['high'][i[0]] for i in indsBelow],
-            low=[df['low'][i[0]] for i in indsBelow],
-            close=[df['close'][i[0]] for i in indsBelow],
+            x=[df['time'][i[4]] for i in indsBelow],
+            open=[df['open'][i[4]] for i in indsBelow],
+            high=[df['high'][i[4]] for i in indsBelow],
+            low=[df['low'][i[4]] for i in indsBelow],
+            close=[df['close'][i[4]] for i in indsBelow],
             increasing={'line': {'color': '#FF1493'}},
             decreasing={'line': {'color': '#FF1493'}},
             hovertext=[str(i[5])+' '+str('Bid')+' '+str(i[6])+' Ask'  for i in OptionTimeFrame if i[5] >= 0.70], #+i[12].replace('], ', '],<br>')+'<br>'
