@@ -802,6 +802,20 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                   row=1, col=1
                  )
 
+    fig.add_trace(go.Scatter(x=df['time'],
+                             y= [(num1 + num2)/2]*len(df['time']) ,
+                             line_color= 'purple',
+                             text = 'ValueArea MidPoint',
+                             textposition="bottom left",
+                             name='ValueArea MidPoint',
+                             showlegend=False,
+                             visible=False,
+                             mode= 'lines',
+                            
+                            ),
+                  row=1, col=1
+                 )
+
     for v in range(len(sortadlist)):
         res = [0,0,0]
         fig.add_trace(go.Scatter(x=df['time'],
@@ -1086,7 +1100,7 @@ def update_graph_live(n_intervals, data):
     timeFrame = [[i,'']+timeDict[i] for i in timeDict]
     #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 3.8)['SUPERTd_5_3.8'].replace(-1,0)
     
-    fg = plotChart(df, [hs[1],ntList[:3]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[], mlst=mlst) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],ntList[:2]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[], mlst=mlst) #trends=FindTrends(df,n=10)
         
     return fg
 
