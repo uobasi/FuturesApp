@@ -802,7 +802,7 @@ symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'YMH4', 'BTCZ3',
 
 
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 52000
+inter = 60000
 app = Dash()
 app.layout = html.Div([
     
@@ -866,13 +866,14 @@ def update_graph_live(n_intervals, data):
     
     
     aggs = [ ]  
-    newOHLC = [] 
+    newOHLC = [i for i in csv_rows if i[1] == symbolNum]
+    '''
     btemp = [i for i in csv_rows if i[1] == symbolNum]
     if len(btemp) > 2:
         newOHLC = []
         for i in range(0, len(btemp)-1, 2):
             newOHLC.append([btemp[i][0], btemp[i][1], btemp[i][2], str(max(int(btemp[i][3]),int(btemp[i+1][3]))), str(min(int(btemp[i][4]),int(btemp[i+1][4]))), btemp[i+1][5], int(btemp[i][6])+int(btemp[i+1][6])])
-
+    '''
     for i in newOHLC:
         #if int(i[0]) >= 1702508400000000000: 
             #if i[1] == symbolNum:
@@ -886,13 +887,13 @@ def update_graph_live(n_intervals, data):
             aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
             
             
-    #newAggs = []
-    #for i in aggs:
-        #if i not in newAggs:
-            #newAggs.append(i)
+    newAggs = []
+    for i in aggs:
+        if i not in newAggs:
+            newAggs.append(i)
             
           
-    df = pd.DataFrame(aggs, columns = ['open', 'high', 'low', 'close', 'volume', 'time', 'timestamp', 'name',])
+    df = pd.DataFrame(newAggs, columns = ['open', 'high', 'low', 'close', 'volume', 'time', 'timestamp', 'name',])
     
     
     vwap(df)
