@@ -617,9 +617,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     putCand = [i for i in OptionTimeFrame if int(i[2]) > int(i[3]) if int(i[4]) < len(df)] # if int(i[4]) < len(df)
     callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df)
     #MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
-    indsAbove = [i for i in OptionTimeFrame if i[5] > 0.60 and int(i[4]) < len(df) and int(i[2]) >= (sum([i[2]+i[3] for i in OptionTimeFrame]) / len(OptionTimeFrame))] # and int(i[4]) < len(df) [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(int(i[10]),i[1]) for i in sord if i[11] == stockName and i[1] == 'AboveAsk(BUY)']]
+    indsAbove = [i for i in OptionTimeFrame if i[6] > 0.60 and int(i[4]) < len(df) and int(i[2]) >= (sum([i[2]+i[3]+i[5] for i in OptionTimeFrame]) / len(OptionTimeFrame))] # and int(i[4]) < len(df) [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(int(i[10]),i[1]) for i in sord if i[11] == stockName and i[1] == 'AboveAsk(BUY)']]
     
-    indsBelow = [i for i in OptionTimeFrame if i[6] > 0.60 and int(i[4]) < len(df) and int(i[3]) >= (sum([i[3]+i[2] for i in OptionTimeFrame]) / len(OptionTimeFrame))] # and int(i[4]) < len(df) imbalance = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[13] == 'Imbalance' and i[1] != 'BelowBid(SELL)' and i[1] != 'AboveAsk(BUY)']]
+    indsBelow = [i for i in OptionTimeFrame if i[7] > 0.60 and int(i[4]) < len(df) and int(i[3]) >= (sum([i[3]+i[2]+i[5] for i in OptionTimeFrame]) / len(OptionTimeFrame))] # and int(i[4]) < len(df) imbalance = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[13] == 'Imbalance' and i[1] != 'BelowBid(SELL)' and i[1] != 'AboveAsk(BUY)']]
     #indsHAbove = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Ask(BUY)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
     #indsHBelow  = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Bid(SELL)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
     
@@ -661,7 +661,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsAbove],
             increasing={'line': {'color': '#00FFFF'}},
             decreasing={'line': {'color': '#00FFFF'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in indsAbove], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask'  for i in indsAbove], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Bid' ),
         row=1, col=1)
         trcount+=1
@@ -675,7 +675,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsBelow],
             increasing={'line': {'color': '#FF1493'}},
             decreasing={'line': {'color': '#FF1493'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[5],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[6],2))+' Ask'  for i in indsBelow], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask'  for i in indsBelow], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Ask' ),
         row=1, col=1)
         trcount+=1
@@ -979,35 +979,36 @@ def update_graph_live(n_intervals, data):
     
     timeDict = {}
     for ttm in dtime:
-        bidcount = 0
-        askcount = 0
         for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
             if datetime.strptime(tradMade[6], "%H:%M:%S") > datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=1):
                 try:
-                    timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm])]
+                    timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
                 except(KeyError,ZeroDivisionError):
-                    timeDict[ttm] = [0,0]
+                    timeDict[ttm] = [0,0,0]
                 break
             
             if ttm not in timeDict:
-                timeDict[ttm] = [0,0]
+                timeDict[ttm] = [0,0,0]
             if ttm in timeDict:
                 if tradMade[5] == 'B':
                     timeDict[ttm][0] += tradMade[0] * tradMade[1]
                 elif tradMade[5] == 'A':
                     timeDict[ttm][1] += tradMade[0] * tradMade[1] 
+                elif tradMade[5] == 'N':
+                    timeDict[ttm][2] += tradMade[0] * tradMade[1] 
+                
     
     try:
-        timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm])]
+        timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
     except(ZeroDivisionError):
-        timeDict[ttm] += [0, 0]
+        timeDict[ttm] += [0, 0,0]
 
     for i in timeDict:
-        if len(timeDict[i]) == 2:
+        if len(timeDict[i]) == 3:
             try:
-                timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i])]
+                timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[ttm][2]/sum(timeDict[ttm])]
             except(ZeroDivisionError):
-                timeDict[i] += [0, 0]
+                timeDict[i] += [0, 0,0]
     
     
     timeFrame = [[i,'']+timeDict[i] for i in timeDict]
