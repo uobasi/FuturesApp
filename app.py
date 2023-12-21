@@ -32,6 +32,7 @@ def ema(df):
     df['40ema'] = df['close'].ewm(span=40, adjust=False).mean()
     df['28ema'] = df['close'].ewm(span=28, adjust=False).mean()
     df['50ema'] = df['close'].ewm(span=50, adjust=False).mean()
+    df['100ema'] = df['close'].ewm(span=50, adjust=False).mean()
     df['1ema'] = df['close'].ewm(span=1, adjust=False).mean()
 
 def vwap(df):
@@ -449,8 +450,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     '''
     
     if pea:
-        peak, _ = signal.find_peaks(df['50ema'])
-        bottom, _ = signal.find_peaks(-df['50ema'])
+        peak, _ = signal.find_peaks(df['100ema'])
+        bottom, _ = signal.find_peaks(-df['100ema'])
     
         if len(peak) > 0:
             for p in peak:
