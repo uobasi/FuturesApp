@@ -288,7 +288,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
             
     for pott in OptionTimeFrame:
-        pott.insert(4,df['time'].searchsorted(pott[0]))
+        pott.insert(4,df['timestamp'].searchsorted(pott[8]))
+        #pott.insert(4,df['time'].searchsorted(pott[0]))
         #print(pott)
         
     optColor = [     'green' if float(i[2]) > float(i[3])
@@ -971,6 +972,7 @@ def update_graph_live(n_intervals, data):
             ntList.append(i)
     
     dtime = df['time'].values.tolist()
+    dtimeEpoch = df['timestamp'].values.tolist()
     
     
     tempTrades = [i for i in AllTrades]
@@ -997,11 +999,12 @@ def update_graph_live(n_intervals, data):
                 elif tradMade[5] == 'N':
                     timeDict[ttm][2] += tradMade[0] * tradMade[1] 
                 
-    
+    '''
     try:
         timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
     except(ZeroDivisionError):
         timeDict[ttm] += [0, 0,0]
+    '''
 
     for i in timeDict:
         if len(timeDict[i]) == 3:
@@ -1012,6 +1015,9 @@ def update_graph_live(n_intervals, data):
     
     
     timeFrame = [[i,'']+timeDict[i] for i in timeDict]
+
+    for i in range(len(timeFrame)):
+        timeFrame[i].append(dtimeEpoch[i])
     #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 3.8)['SUPERTd_5_3.8'].replace(-1,0)
     
     fg = plotChart(df, [hs[1],ntList[:2]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
