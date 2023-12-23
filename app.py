@@ -293,7 +293,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                                  # hoverinfo='text',
                                  name="OHLC"),
                                  
-                  secondary_y=False, row=1, col=1)
+                  row=1, col=1)
             
     for pott in OptionTimeFrame:
         pott.insert(4,df['timestamp'].searchsorted(pott[8]))
@@ -476,7 +476,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                     # color="#ffffff"
                 ),)
     #fig.update_layout(title=df['name'][0])
-    fig.update(layout_xaxis_rangeslider_visible=False)
+    #fig.update(layout_xaxis_rangeslider_visible=False)
     #lst2 = histor(df)
 
     
