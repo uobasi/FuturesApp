@@ -785,7 +785,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     
     fig.update_layout(height=800, xaxis_rangeslider_visible=False, showlegend=False)
-    fig.update_layout(dict(yaxis2={'anchor': 'x', 'overlaying': 'y', 'side': 'left', 'showgrid':False},))
+    fig.update_layout(dict(yaxis2={'anchor': 'x', 'overlaying': 'y', 'side': 'right', 'showgrid':False},))
     #fig.update_layout(yaxis2 = dict(showgrid=False))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsMid'], mode='lines', name='BbandsMid'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsUpp'], mode='lines', name='BbandsUpp'))
