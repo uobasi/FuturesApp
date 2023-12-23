@@ -293,7 +293,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                                  # hoverinfo='text',
                                  name="OHLC"),
                                  
-                  row=1, col=1)
+                  secondary_y=False, row=1, col=1)
             
     for pott in OptionTimeFrame:
         pott.insert(4,df['timestamp'].searchsorted(pott[8]))
@@ -785,7 +785,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     
     fig.update_layout(height=800, xaxis_rangeslider_visible=False, showlegend=False)
-    fig.update_layout(dict(yaxis2={'anchor': 'x', 'overlaying': 'y', 'side': 'left'},))
+    fig.update_layout(dict(yaxis2={'anchor': 'x', 'overlaying': 'y', 'side': 'right'},))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsMid'], mode='lines', name='BbandsMid'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsUpp'], mode='lines', name='BbandsUpp'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsLow'], mode='lines', name='BbandsLow'))
