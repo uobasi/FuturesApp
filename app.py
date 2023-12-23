@@ -566,21 +566,21 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP'))
     
     #if 2 in lstVwap:
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.2, name='UPPERVWAP2'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N2'], mode='lines', opacity=0.2, name='LOWERVWAP2'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.2, name='UPPERVWAP2', color='black'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N2'], mode='lines', opacity=0.2, name='LOWERVWAP2', color='black'))
     #if 0 in lstVwap:
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_25'], mode='lines', opacity=0.2, name='UPPERVWAP2.5'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N25'], mode='lines', opacity=0.2, name='LOWERVWAP2.5'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_25'], mode='lines', opacity=0.2, name='UPPERVWAP2.5', color='black'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N25'], mode='lines', opacity=0.2, name='LOWERVWAP2.5', color='black'))
     #if 1 in lstVwap:    
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_1'], mode='lines', opacity=0.2, name='UPPERVWAP1'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N1'], mode='lines', opacity=0.2, name='LOWERVWAP1'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_1'], mode='lines', opacity=0.2, name='UPPERVWAP1', color='black'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N1'], mode='lines', opacity=0.2, name='LOWERVWAP1', color='black'))
         
     #if 1.5 in lstVwap:     
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_15'], mode='lines', opacity=0.2, name='UPPERVWAP1.5'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N15'], mode='lines', opacity=0.2, name='LOWERVWAP1.5'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_15'], mode='lines', opacity=0.2, name='UPPERVWAP1.5', color='black'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N15'], mode='lines', opacity=0.2, name='LOWERVWAP1.5', color='black'))
 
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_0'], mode='lines', opacity=0.2, name='UPPERVWAP0.5'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N0'], mode='lines', opacity=0.2, name='LOWERVWAP0.5'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_0'], mode='lines', opacity=0.2, name='UPPERVWAP0.5', color='black'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N0'], mode='lines', opacity=0.2, name='LOWERVWAP0.5', color='black'))
 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', opacity=0.19, name='1ema',marker_color='rgba(0,0,0)'))
     
