@@ -293,7 +293,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                                  # hoverinfo='text',
                                  name="OHLC"),
                                  
-                  secondary_y=True, row=1, col=1)
+                  secondary_y=False, row=1, col=1)
             
     for pott in OptionTimeFrame:
         pott.insert(4,df['timestamp'].searchsorted(pott[8]))
@@ -316,7 +316,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
         ),
-        secondary_y=False, row=1, col=1
+        secondary_y=True, row=1, col=1
     )
         
     fig.add_trace(
@@ -333,7 +333,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
         ),
-        secondary_y=False, row=1, col=1
+        secondary_y=True, row=1, col=1
     )
     ''' 
     pms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(4).mean()
