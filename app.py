@@ -281,17 +281,25 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         
 
     fig = make_subplots(rows=1, cols=2, shared_xaxes=True, shared_yaxes=True,
-                        specs=[[{}, {},],], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
+                        specs=[[{{"secondary_y": True}}, {},],], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
                         horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName + ' '+strTrend+'('+str('')+')' +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') ', 'Volume Profile ' + str(datetime.now()), ),
                          column_widths=[0.7,0.3], ) #row_width=[0.15, 0.85,],row_width=[0.30, 0.70,]
 
-    
+    fig.add_trace(go.Candlestick(x=df['time'],
+                                 open=df['open'],
+                                 high=df['high'],
+                                 low=df['low'],
+                                 close=df['close'],
+                                 # hoverinfo='text',
+                                 name="OHLC"),
+                                 
+                  secondary_y=True, row=1, col=1)
             
     for pott in OptionTimeFrame:
         pott.insert(4,df['timestamp'].searchsorted(pott[8]))
         #pott.insert(4,df['time'].searchsorted(pott[0]))
         #print(pott)
-    '''    
+       
     optColor = [     'green' if float(i[2]) > float(i[3])
                 else 'red' if float(i[3]) > float(i[2])
                 else 'gray' if float(i[3]) == float(i[2])
@@ -308,7 +316,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
         ),
-        row=2, col=1
+        secondary_y=False, row=1, col=1
     )
         
     fig.add_trace(
@@ -325,9 +333,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
         ),
-        row=2, col=1
+        secondary_y=False, row=1, col=1
     )
-
+    ''' 
     pms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(4).mean()
     cms = pd.Series([i[3] for i in OptionTimeFrame]).rolling(4).mean()
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=pms, line=dict(color='green'), mode='lines', name='Put VMA'), row=2, col=1)
@@ -338,14 +346,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     #strr = df['time'][0]+'\n' +'Open: '+ str(df['open'[0]])+'\n'
     #hovertext.append(str(df.bidAskString[i])+' '+str(df.bidAsk[i]))
 
-    fig.add_trace(go.Candlestick(x=df['time'],
-                                 open=df['open'],
-                                 high=df['high'],
-                                 low=df['low'],
-                                 close=df['close'],
-                                 # hoverinfo='text',
-                                 name="OHLC"),
-                  row=1, col=1)
+    
     
     
     
