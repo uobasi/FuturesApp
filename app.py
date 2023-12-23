@@ -1007,11 +1007,11 @@ def update_graph_live(n_intervals, data):
                 timeDict[ttm] = [0,0,0]
             if ttm in timeDict:
                 if tradMade[5] == 'B':
-                    timeDict[ttm][0] += tradMade[0] * tradMade[1]
+                    timeDict[ttm][0] += tradMade[1]
                 elif tradMade[5] == 'A':
-                    timeDict[ttm][1] += tradMade[0] * tradMade[1] 
+                    timeDict[ttm][1] += tradMade[1] 
                 elif tradMade[5] == 'N':
-                    timeDict[ttm][2] += tradMade[0] * tradMade[1] 
+                    timeDict[ttm][2] += tradMade[1] 
                 
     '''
     try:
