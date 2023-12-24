@@ -281,7 +281,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         
 
     fig = make_subplots(rows=1, cols=2, shared_xaxes=True, shared_yaxes=True,
-                        specs=[[{}, {},],], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
+                        specs=[[{'secondary_y':True}, {},],], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
                         horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName + ' '+strTrend+'('+str('')+')' +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') ', 'Volume Profile ' + str(datetime.now()), ),
                          column_widths=[0.7,0.3], ) #row_width=[0.15, 0.85,],row_width=[0.30, 0.70,]
 
@@ -291,10 +291,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         pott.insert(4,df['timestamp'].searchsorted(pott[8]))
         #pott.insert(4,df['time'].searchsorted(pott[0]))
         #print(pott)
-    '''    
-    optColor = [     'green' if float(i[2]) > float(i[3])
-                else 'red' if float(i[3]) > float(i[2])
-                else 'gray' if float(i[3]) == float(i[2])
+       
+    optColor = [     'rgba(0,128,0,0.40)' if float(i[2]) > float(i[3])
+                else 'rgba(255,0,0,0.40)' if float(i[3]) > float(i[2])
+                else 'rgba(128,128,128,0.40)' if float(i[3]) == float(i[2])
                 else i for i in OptionTimeFrame]
 
     fig.add_trace(
@@ -308,7 +308,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
         ),
-        row=2, col=1
+        secondary_y= True, row=1, col=1
     )
         
     fig.add_trace(
@@ -318,16 +318,16 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             #textposition='auto',
             #orientation='h',
             #width=0.2,
-            marker_color= [     'red' if float(i[2]) > float(i[3])
-                        else 'green' if float(i[3]) > float(i[2])
-                        else 'gray' if float(i[3]) == float(i[2])
+            marker_color= [  'rgba(255,0,0,0.40)' if float(i[2]) > float(i[3])
+                        else 'rgba(0,128,0,0.40)' if float(i[3]) > float(i[2])
+                        else 'rgba(128,128,128,0.40)' if float(i[3]) == float(i[2])
                         else i for i in OptionTimeFrame],
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
         ),
-        row=2, col=1
+        secondary_y= True, row=1, col=1
     )
-
+    ''' 
     pms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(4).mean()
     cms = pd.Series([i[3] for i in OptionTimeFrame]).rolling(4).mean()
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=pms, line=dict(color='green'), mode='lines', name='Put VMA'), row=2, col=1)
@@ -1006,11 +1006,11 @@ def update_graph_live(n_intervals, data):
                 timeDict[ttm] = [0,0,0]
             if ttm in timeDict:
                 if tradMade[5] == 'B':
-                    timeDict[ttm][0] += tradMade[0] * tradMade[1]
+                    timeDict[ttm][0] += tradMade[1]#tradMade[0] * tradMade[1]
                 elif tradMade[5] == 'A':
-                    timeDict[ttm][1] += tradMade[0] * tradMade[1] 
+                    timeDict[ttm][1] += tradMade[1]#tradMade[0] * tradMade[1] 
                 elif tradMade[5] == 'N':
-                    timeDict[ttm][2] += tradMade[0] * tradMade[1] 
+                    timeDict[ttm][2] += tradMade[1]#tradMade[0] * tradMade[1] 
                 
     '''
     try:
