@@ -787,7 +787,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsMid'], mode='lines', name='BbandsMid'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsUpp'], mode='lines', name='BbandsUpp'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsLow'], mode='lines', name='BbandsLow'))
-    fig.update_layout(plot_bgcolor='gray')
+    #fig.update_layout(plot_bgcolor='gray')
 
     
     
