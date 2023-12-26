@@ -861,7 +861,7 @@ def update_graph_live(n_intervals, data):
         stkName = data
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
     else:
-        stkName = 'ESH4'  
+        stkName = 'NQH4'  
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
 
     gclient = storage.Client(project="stockapp-401615")
