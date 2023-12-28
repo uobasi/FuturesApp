@@ -867,9 +867,13 @@ def update_graph_live(n_intervals, data):
     if data in symbolNameList:
         stkName = data
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
+    elif data in currSymbolNameList:
+        stkName = data
+        symbolNum = currSymbolNumList[currSymbolNameList.index(stkName)]
     else:
         stkName = 'NQH4'  
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
+        
         
     
     if stkName in symbolNameList:
