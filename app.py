@@ -197,7 +197,7 @@ def valueAreaV1(lst):
 
     # print(pocIndex,topVol,dwnVol,topIndex,dwnIndex)
     while sPercent > total:
-        if topVol > dwnVol:
+        if topVol >= dwnVol:
             total += topVol
             if total > sPercent:
                 break
