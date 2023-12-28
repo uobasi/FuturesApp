@@ -810,6 +810,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 '''
 symbolNumList = ['17077', '750', '686071', '41512', '56065', '31863', '204839', '75685', '7062']
 symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'YMH4', 'BTCZ3', 'RTYH4']
+
+currSymbolNameList = ['6AH4','6BH4','6CH4', '6EH4', '6JH4', '6MH4', '6NH4']
+currSymbolNumList = ['156755', '156618', '1545', '156627', '156657','5082', '2259']
+
 #stkName = 'GCG4'
 
 #symbolNum = symbolNumList[symbolNameList.index(stkName)]
@@ -861,13 +865,21 @@ def update_graph_live(n_intervals, data):
         stkName = data
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
     else:
-        stkName = 'NQH4'  
+         = 'NQH4'  
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
-
-    gclient = storage.Client(project="stockapp-401615")
-    bucket = gclient.get_bucket("stockapp-storage")
-    blob = Blob('FuturesOHLC', bucket) 
-    FuturesOHLC = blob.download_as_text()
+        
+    
+    if stkName in symbolNameList:
+        gclient = storage.Client(project="stockapp-401615")
+        bucket = gclient.get_bucket("stockapp-storage")
+        blob = Blob('FuturesOHLC', bucket) 
+        FuturesOHLC = blob.download_as_text()
+        
+    elif stkName in currSymbolNameList:
+        gclient = storage.Client(project="stockapp-401615")
+        bucket = gclient.get_bucket("stockapp-storage")
+        blob = Blob('FuturesCurrencyOHLC', bucket) 
+        FuturesOHLC = blob.download_as_text()
     
     
     
@@ -914,11 +926,16 @@ def update_graph_live(n_intervals, data):
     ema(df)
     PPP(df)
     
-    
-    gclient = storage.Client(project="stockapp-401615")
-    bucket = gclient.get_bucket("stockapp-storage")
-    blob = Blob('FuturesTrades', bucket) 
-    FuturesTrades = blob.download_as_text()
+    if stkName in symbolNameList:
+        gclient = storage.Client(project="stockapp-401615")
+        bucket = gclient.get_bucket("stockapp-storage")
+        blob = Blob('FuturesTrades', bucket) 
+        FuturesTrades = blob.download_as_text()
+    elif stkName in currSymbolNameList:
+        gclient = storage.Client(project="stockapp-401615")
+        bucket = gclient.get_bucket("stockapp-storage")
+        blob = Blob('FuturesCurrencyTrades', bucket) 
+        FuturesTrades = blob.download_as_text()
     
     
     
@@ -944,7 +961,6 @@ def update_graph_live(n_intervals, data):
             AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
             
             
-    
     
     hs = historV1(df,50,{},AllTrades,[])
     
