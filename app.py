@@ -850,6 +850,9 @@ def update_output(n_clicks, value):
     if value in symbolNameList:
         print('The input symbol was "{}" '.format(value))
         return str(value).upper(), str(value).upper()
+    elif value in currSymbolNameList:
+        print('The input symbol was "{}" '.format(value))
+        return str(value).upper(), str(value).upper()
     else:
         return 'The input symbol was '+str(value)+" is not accepted please try different symbol from  |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'|  ", 'The input symbol was '+str(value)+" is not accepted please try different symbol  |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'|  "
 
