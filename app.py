@@ -744,7 +744,23 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                       row=1, col=1
                      )
         
+    for trd in sortadlist:
+        trd.append(df['timestamp'].searchsorted(trd[2]))
         
+    
+    for trds in sortadlist:
+        fig.add_annotation(x=df['time'][trds[7]], y=df['close'][trds[7]],
+                           text= str(sortadlist[v][4]) + ' ' + str(sortadlist[v][1]) + ' ' + str(sortadlist[v][3]) ,
+                           showarrow=True,
+                           arrowhead=4,
+                           font=dict(
+            #family="Courier New, monospace",
+            size=10,
+            # color="#ffffff"
+        ),)
+
+        
+       
     
 
 
