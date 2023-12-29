@@ -750,7 +750,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     for trds in sortadlist:
         fig.add_annotation(x=df['time'][trds[7]], y=df['close'][trds[7]],
-                           text= str(sortadlist[v][4]) + ' ' + str(sortadlist[v][1]) + ' ' + str(sortadlist[v][3]) ,
+                           text= str(trds[4]) + ' ' + str(trds[1]) + ' ' + str(trds[3]) ,
                            showarrow=True,
                            arrowhead=4,
                            font=dict(
