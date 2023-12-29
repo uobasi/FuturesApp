@@ -371,7 +371,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         except(KeyError):
             pass
     '''
-    
+    '''
     localMin = argrelextrema(df.close.values, np.less_equal, order=100)[0] 
     localMax = argrelextrema(df.close.values, np.greater_equal, order=100)[0]
      
@@ -401,7 +401,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                 # color="#ffffff"
             ),)
             mcount+=1
-    
+    '''
     '''
     fig.add_trace(go.Scatter(x=df['time'].iloc[df['time'].searchsorted('09:30:00'):] , y=pd.Series([round(i[2] / (i[2]+i[3]),2) for i in overall]), mode='lines',name='Put Volume'), row=2, col=1)
     fig.add_trace(go.Scatter(x=df['time'].iloc[df['time'].searchsorted('09:30:00'):] , y=pd.Series([round(i[3] / (i[2]+i[3]),2) for i in overall]), mode='lines',name='Call Volume'), row=2, col=1)
@@ -755,7 +755,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                            arrowhead=4,
                            font=dict(
             #family="Courier New, monospace",
-            size=10,
+            size=18,
             # color="#ffffff"
         ),)
 
