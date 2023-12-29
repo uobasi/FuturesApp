@@ -745,7 +745,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                      )
         
     for trd in sortadlist:
-        trd.append(df['timestamp'].searchsorted(trd[2]))
+        trd.append(df['timestamp'].searchsorted(trd[2])-1)
         
     
     for trds in sortadlist:
