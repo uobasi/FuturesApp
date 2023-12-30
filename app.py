@@ -749,13 +749,19 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         
     
     for trds in sortadlist:
+        if str(trds[3]) == 'A':
+            vallue = 'Sell'
+        elif str(trds[3]) == 'B':
+            vallue = 'BUY'
+        else:
+            vallue = 'Mid'
         fig.add_annotation(x=df['time'][trds[7]], y=df['close'][trds[7]],
-                           text= str(trds[4]) + ' ' + str(trds[1]) + ' ' + str(trds[3]) ,
+                           text= str(trds[4]) + ' ' + str(trds[1]) + ' ' + vallue ,
                            showarrow=True,
                            arrowhead=4,
                            font=dict(
             #family="Courier New, monospace",
-            size=18,
+            size=15,
             # color="#ffffff"
         ),)
 
