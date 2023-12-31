@@ -1079,7 +1079,7 @@ def update_graph_live(n_intervals, data):
     #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 3.8)['SUPERTd_5_3.8'].replace(-1,0)
     
     if stkName in symbolNameList: 
-        fg = plotChart(df, [hs[1],ntList[:3]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+        fg = plotChart(df, [hs[1],ntList[:5]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
     elif stkName in currSymbolNameList:
         fg = plotChart(df, [hs[1],ntList[:9]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=currSymbolNameList[currSymbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
     
