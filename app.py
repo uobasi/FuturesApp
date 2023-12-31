@@ -568,8 +568,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.15, name='UPPERVWAP2', line=dict(color='black')))
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N2'], mode='lines', opacity=0.15, name='LOWERVWAP2', line=dict(color='black')))
     #if 0 in lstVwap:
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_25'], mode='lines', opacity=0.15, name='UPPERVWAP2.5', line=dict(color='black')))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N25'], mode='lines', opacity=0.15, name='LOWERVWAP2.5', line=dict(color='black')))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_25'], mode='lines', opacity=0.15, name='UPPERVWAP2.5', line=dict(color='black')))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N25'], mode='lines', opacity=0.15, name='LOWERVWAP2.5', line=dict(color='black')))
     #if 1 in lstVwap:    
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_1'], mode='lines', opacity=0.15, name='UPPERVWAP1', line=dict(color='black')))
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N1'], mode='lines', opacity=0.15, name='LOWERVWAP1', line=dict(color='black')))
@@ -796,7 +796,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         active=10,
         currentvalue={"prefix": "Price: "},
         pad={"t": 10},
-        steps=steps[13+trcount:]#[8::3]
+        steps=steps[11+trcount:]#[8::3]
     )]
 
     fig.update_layout(
