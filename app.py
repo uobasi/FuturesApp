@@ -712,7 +712,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                             ),
                   row=1, col=1
                  )
-
+    '''
     fig.add_trace(go.Scatter(x=df['time'],
                              y= [(num1 + num2)/2]*len(df['time']) ,
                              line_color= '#FF99FF',
@@ -726,7 +726,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                             ),
                   row=1, col=1
                  )
-
+    '''
     for v in range(len(sortadlist)):
         res = [0,0,0]
         fig.add_trace(go.Scatter(x=df['time'],
@@ -799,7 +799,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         active=10,
         currentvalue={"prefix": "Price: "},
         pad={"t": 10},
-        steps=steps[11+trcount:]#[8::3]
+        steps=steps[8+trcount:]#[8::3]
     )]
 
     fig.update_layout(
