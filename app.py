@@ -327,6 +327,23 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         ),
         secondary_y= True, row=1, col=1
     )
+
+
+    fig.add_trace(
+        go.Bar(
+            x=pd.Series([OptionTimeFrame[0][0]]),
+            y=pd.Series([max([i[2] for i in OptionTimeFrame]+ [i[3] for i in OptionTimeFrame]) * 5]),
+            #textposition='auto',
+            #orientation='h',
+            #width=0.2,
+            marker_color= '#FFFFFF',
+            hovertext='',
+            
+        ),
+        secondary_y= True, row=1, col=1
+    )
+
+
     ''' 
     pms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(4).mean()
     cms = pd.Series([i[3] for i in OptionTimeFrame]).rolling(4).mean()
