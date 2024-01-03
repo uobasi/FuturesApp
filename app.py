@@ -332,7 +332,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     fig.add_trace(
         go.Bar(
             x=pd.Series([OptionTimeFrame[0][0]]),
-            y=pd.Series([max([i[2] for i in OptionTimeFrame]+ [i[3] for i in OptionTimeFrame]) * 5]),
+            y=pd.Series([max([i[2] for i in OptionTimeFrame]+ [i[3] for i in OptionTimeFrame]) * 2.5]),
             #textposition='auto',
             #orientation='h',
             #width=0.2,
