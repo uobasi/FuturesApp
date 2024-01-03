@@ -292,9 +292,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         #pott.insert(4,df['time'].searchsorted(pott[0]))
         #print(pott)
        
-    optColor = [     'rgba(0,128,0,0.25)' if float(i[2]) > float(i[3])
-                else 'rgba(255,0,0,0.25)' if float(i[3]) > float(i[2])
-                else 'rgba(128,128,128,0.25)' if float(i[3]) == float(i[2])
+    optColor = [     'rgba(0,128,0,0.50)' if float(i[2]) > float(i[3])
+                else 'rgba(255,0,0,0.50)' if float(i[3]) > float(i[2])
+                else 'rgba(128,128,128,0.50)' if float(i[3]) == float(i[2])
                 else i for i in OptionTimeFrame]
 
     fig.add_trace(
@@ -318,9 +318,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             #textposition='auto',
             #orientation='h',
             #width=0.2,
-            marker_color= [  'rgba(255,0,0,0.25)' if float(i[2]) > float(i[3])
-                        else 'rgba(0,128,0,0.25)' if float(i[3]) > float(i[2])
-                        else 'rgba(128,128,128,0.25)' if float(i[3]) == float(i[2])
+            marker_color= [  'rgba(255,0,0,0.50)' if float(i[2]) > float(i[3])
+                        else 'rgba(0,128,0,0.50)' if float(i[3]) > float(i[2])
+                        else 'rgba(128,128,128,0.50)' if float(i[3]) == float(i[2])
                         else i for i in OptionTimeFrame],
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
