@@ -791,7 +791,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                            arrowhead=4,
                            font=dict(
             #family="Courier New, monospace",
-            size=13,
+            size=10,
             # color="#ffffff"
         ),)
 
