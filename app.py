@@ -90,7 +90,7 @@ def VMA(df):
       
 
 def historV1(df, num, quodict, trad:list=[], quot:list=[]):
-    trad = AllTrades
+    #trad = AllTrades
     pzie = [(i[0],i[1]) for i in trad]
     dct ={}
     for i in pzie:
@@ -138,7 +138,7 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[]):
     
     return [cptemp,sortadlist] 
 
-    
+
 def countCandle(trad,quot,num1,num2, stkName, quodict):
     enum = ['Bid(SELL)','BelowBid(SELL)','Ask(BUY)','AboveAsk(BUY)','Between']
     color = ['red','darkRed','green','darkGreen','black']
