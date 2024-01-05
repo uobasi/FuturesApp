@@ -91,7 +91,7 @@ def VMA(df):
 
 def historV1(df, num, quodict, trad:list=[], quot:list=[]):
     #trad = AllTrades
-    pzie = [(i[0],i[1]) for i in trad]
+    pzie = [(i[0],i[1]) for i in trad if i[1] >= 10]
     dct ={}
     for i in pzie:
         if i[0] not in dct:
@@ -100,7 +100,7 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[]):
             dct[i[0]] +=  i[1]
             
     
-    pzie = [i for i in dct if dct[i]]#  > 500 list(set(pzie))
+    pzie = [i for i in dct ]#  > 500 list(set(pzie))
     
     hist, bin_edges = np.histogram(pzie, bins=num)
     
