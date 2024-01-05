@@ -90,7 +90,7 @@ def VMA(df):
       
 
 def historV1(df, num, quodict, trad:list=[], quot:list=[]):
-    #trad = AllTrades
+    trad = AllTrades
     pzie = [(i[0],i[1]) for i in trad]
     dct ={}
     for i in pzie:
@@ -114,13 +114,13 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[]):
         ncount = 0
         for x in trad:
             if bin_edges[i] <= x[0] < bin_edges[i+1]:
-                pziCount += (x[1]*x[0])
+                pziCount += (x[1])
                 if x[4] == 'A':
-                    acount += (x[1]*x[0])
+                    acount += (x[1])
                 elif x[4] == 'B':
-                    bcount += (x[1]*x[0])
+                    bcount += (x[1])
                 elif x[4] == 'N':
-                    ncount += (x[1]*x[0])
+                    ncount += (x[1])
                 
         #if pziCount > 100:
         cptemp.append([bin_edges[i],pziCount,cntt,bin_edges[i+1]])
@@ -128,7 +128,7 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[]):
         cntt+=1
         
     for i in cptemp:
-        i+=countCandle(trad,quot,i[0],i[3],df['name'][0],quodict)
+        i+=countCandle(trad,[],i[0],i[3],df['name'][0],{})
 
     for i in range(len(cptemp)):
         cptemp[i] += zipList[i]
@@ -136,9 +136,9 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[]):
     
     sortadlist = sorted(cptemp, key=lambda stock: float(stock[1]), reverse=True)
     
-    return [cptemp,sortadlist]  
-#hs[1]
+    return [cptemp,sortadlist] 
 
+    
 def countCandle(trad,quot,num1,num2, stkName, quodict):
     enum = ['Bid(SELL)','BelowBid(SELL)','Ask(BUY)','AboveAsk(BUY)','Between']
     color = ['red','darkRed','green','darkGreen','black']
