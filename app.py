@@ -89,9 +89,9 @@ def VMA(df):
     df['vma'] = df['volume'].rolling(4).mean()
       
 
-def historV1(df, num, quodict, trad:list=[], quot:list=[]):
+def historV1(df, num, quodict, trad:list=[], quot:list=[], rangt:int=1):
     #trad = AllTrades
-    pzie = [(i[0],i[1]) for i in trad if i[1] >= 50]
+    pzie = [(i[0],i[1]) for i in trad if i[1] >= rangt]
     dct ={}
     for i in pzie:
         if i[0] not in dct:
