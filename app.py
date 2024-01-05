@@ -91,7 +91,7 @@ def VMA(df):
 
 def historV1(df, num, quodict, trad:list=[], quot:list=[]):
     #trad = AllTrades
-    pzie = [(i[0],i[1]) for i in trad if i[1] >= 20]
+    pzie = [(i[0],i[1]) for i in trad if i[1] >= 50]
     dct ={}
     for i in pzie:
         if i[0] not in dct:
