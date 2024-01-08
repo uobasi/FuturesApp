@@ -863,8 +863,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 symbolNumList = ['17077', '750', '686071', '41512', '56065', '31863', '204839', '75685', '7062']
 symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'YMH4', 'BTCZ3', 'RTYH4']
 
-currSymbolNameList = ['6AH4','6BH4','6CH4', '6EH4', '6JH4', '6SH4','6NH4']
-currSymbolNumList = ['156755', '156618', '1545', '156627', '156657','156650', '2259']
+currSymbolNameList = ['6AH4','6BH4','6CH4', '6EH4', '6JH4', '6SH4','6NH4', 'ZTH4', '6MH4', '6LG4']
+currSymbolNumList = ['156755', '156618', '1545', '156627', '156657','156650', '2259', '4131634','5082', '13123']
 
 #stkName = 'GCG4'
 
