@@ -1021,7 +1021,7 @@ def update_graph_live(n_intervals, data):
             
             
     
-    hs = historV1(df,70,{},AllTrades,[])
+    hs = historV1(df,60,{},AllTrades,[])
     
     va = valueAreaV1(hs[0])
     
