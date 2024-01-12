@@ -6,7 +6,7 @@ Created on Wed Dec 13 01:11:16 2023
 """
 import csv
 import io
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, time
 import pandas as pd 
 import numpy as np
 import math
@@ -25,7 +25,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 import plotly.io as pio
 pio.renderers.default='browser'
 import bisect
-import pandas_ta as ta
+import yfinance as yf
+import dateutil.parser
 
 def ema(df):
     df['30ema'] = df['close'].ewm(span=30, adjust=False).mean()
@@ -760,7 +761,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                                 ),
                       row=1, col=1
                      )
-        
+     
+    
     for trd in sortadlist:
         trd.append(df['timestamp'].searchsorted(trd[2])-1)
 
@@ -776,24 +778,27 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         
     
     for trds in sortadlist:
-        if str(trds[3]) == 'A':
-            vallue = 'Sell'
-            sidev = df['close'][trds[7]]
-        elif str(trds[3]) == 'B':
-            vallue = 'BUY'
-            sidev = df['open'][trds[7]]
-        else:
-            vallue = 'Mid'
-            sidev = df['open'][trds[7]]
-        fig.add_annotation(x=df['time'][trds[7]], y=sidev,
-                           text= str(trds[4]) + ' ' + str(trds[1]) + ' ' + vallue ,
-                           showarrow=True,
-                           arrowhead=4,
-                           font=dict(
-            #family="Courier New, monospace",
-            size=10,
-            # color="#ffffff"
-        ),)
+        try:
+            if str(trds[3]) == 'A':
+                vallue = 'Sell'
+                sidev = df['close'][trds[7]]
+            elif str(trds[3]) == 'B':
+                vallue = 'BUY'
+                sidev = df['open'][trds[7]]
+            else:
+                vallue = 'Mid'
+                sidev = df['open'][trds[7]]
+            fig.add_annotation(x=df['time'][trds[7]], y=sidev,
+                               text= str(trds[4]) + ' ' + str(trds[1]) + ' ' + vallue ,
+                               showarrow=True,
+                               arrowhead=4,
+                               font=dict(
+                #family="Courier New, monospace",
+                size=10,
+                # color="#ffffff"
+            ),)
+        except(KeyError):
+            continue 
 
         
        
@@ -853,6 +858,19 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     return fig
 
 
+def is_time_between(start_time, end_time, target_time):
+    start_datetime = datetime.combine(datetime.today(), start_time)
+    end_datetime = datetime.combine(datetime.today(), end_time)
+    target_datetime = datetime.combine(datetime.today(), target_time)
+
+    return start_datetime <= target_datetime <= end_datetime
+
+# Define the start and end times
+start_time = time(0, 0)  # 12:00 AM
+end_time = time(9, 30)   # 9:30 AM
+
+# Check if the current time is between start and end times
+current_time = datetime.now().time()
 
 '''
 31863 == COOPER == HGH4
@@ -862,12 +880,14 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 260937 == NQ == NQZ3
 314863 == ES == ESZ3
 '''
-symbolNumList = ['17077', '750', '686071', '41512', '56065', '31863', '204839', '75685', '7062']
+symbolNumList = ['17077', '750', '686071', '41512', '56065', '31863', '204839', '75685', '7062', ]
 symbolNameList = ['ESH4','NQH4','CLG4', 'GCG4', 'NGG4', 'HGH4', 'YMH4', 'BTCZ3', 'RTYH4']
 
-currSymbolNameList = ['6AH4','6BH4','6CH4', '6EH4', '6JH4', '6SH4','6NH4', 'ZTH4', '6MH4', '6LG4']
-currSymbolNumList = ['156755', '156618', '1545', '156627', '156657','156650', '2259', '4131634','5082', '13123']
+currSymbolNameList = ['6AH4','6BH4','6CH4', '6EH4', '6JH4', '6SH4','6NH4', 'ZTH4', '6MH4', '6LG4', ]
+currSymbolNumList = ['156755', '156618', '1545', '156627', '156657','156650', '2259', '4131634','5082', '13123', ]
 
+StockSymbolList = ['QQQ', 'SPY']
+StockSymbolNumList = ['13340', '15144']
 #stkName = 'GCG4'
 
 #symbolNum = symbolNumList[symbolNameList.index(stkName)]
@@ -901,12 +921,19 @@ app.layout = html.Div([
 
 def update_output(n_clicks, value):
     value = str(value).upper().strip()
+    
     if value in symbolNameList:
         print('The input symbol was "{}" '.format(value))
         return str(value).upper(), str(value).upper()
+    
     elif value in currSymbolNameList:
         print('The input symbol was "{}" '.format(value))
         return str(value).upper(), str(value).upper()
+    
+    elif value in StockSymbolList:
+        print('The input symbol was "{}" '.format(value))
+        return str(value).upper(), str(value).upper()
+    
     else:
         return 'The input symbol was '+str(value)+" is not accepted please try different symbol from  |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'|  ", 'The input symbol was '+str(value)+" is not accepted please try different symbol  |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'|  "
 
@@ -924,6 +951,9 @@ def update_graph_live(n_intervals, data):
     elif data in currSymbolNameList:
         stkName = data
         symbolNum = currSymbolNumList[currSymbolNameList.index(stkName)]
+    elif data in StockSymbolList:
+        stkName = data
+        symbolNum = StockSymbolNumList[StockSymbolList.index(stkName)]    
     else:
         stkName = 'NQH4'  
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
@@ -941,47 +971,77 @@ def update_graph_live(n_intervals, data):
         bucket = gclient.get_bucket("stockapp-storage")
         blob = Blob('FuturesCurrencyOHLC', bucket) 
         FuturesOHLC = blob.download_as_text()
+        
+    #elif stkName in StockSymbolList:
+        #gclient = storage.Client(project="stockapp-401615")
+        #bucket = gclient.get_bucket("stockapp-storage")
+        #blob = Blob('StockOHLC', bucket) 
+        #FuturesOHLC = blob.download_as_text()
     
     
-    
-    csv_reader  = csv.reader(io.StringIO(FuturesOHLC))
-    
-    csv_rows = []
-    for row in csv_reader:
-        csv_rows.append(row)
+    if stkName in symbolNameList or stkName in currSymbolNameList:
+        csv_reader  = csv.reader(io.StringIO(FuturesOHLC))
+        
+        csv_rows = []
+        for row in csv_reader:
+            csv_rows.append(row)
+            
+        
+        
+        aggs = [ ]  
+        newOHLC = [i for i in csv_rows if i[1] == symbolNum]
+        '''
+        btemp = [i for i in csv_rows if i[1] == symbolNum]
+        if len(btemp) > 2:
+            newOHLC = []
+            for i in range(0, len(btemp)-1, 2):
+                newOHLC.append([btemp[i][0], btemp[i][1], btemp[i][2], str(max(int(btemp[i][3]),int(btemp[i+1][3]))), str(min(int(btemp[i][4]),int(btemp[i+1][4]))), btemp[i+1][5], int(btemp[i][6])+int(btemp[i+1][6])])
+        '''
+        for i in newOHLC:
+            #if int(i[0]) >= 1702508400000000000: 
+                #if i[1] == symbolNum:
+                hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
+                if hourss < 10:
+                    hourss = '0'+str(hourss)
+                minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
+                if minss < 10:
+                    minss = '0'+str(minss)
+                opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
+                aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
+                
+                
+        newAggs = []
+        for i in aggs:
+            if i not in newAggs:
+                newAggs.append(i)
+                
+              
+        df = pd.DataFrame(newAggs, columns = ['open', 'high', 'low', 'close', 'volume', 'time', 'timestamp', 'name',])
         
     
-    
-    aggs = [ ]  
-    newOHLC = [i for i in csv_rows if i[1] == symbolNum]
-    '''
-    btemp = [i for i in csv_rows if i[1] == symbolNum]
-    if len(btemp) > 2:
-        newOHLC = []
-        for i in range(0, len(btemp)-1, 2):
-            newOHLC.append([btemp[i][0], btemp[i][1], btemp[i][2], str(max(int(btemp[i][3]),int(btemp[i+1][3]))), str(min(int(btemp[i][4]),int(btemp[i+1][4]))), btemp[i+1][5], int(btemp[i][6])+int(btemp[i+1][6])])
-    '''
-    for i in newOHLC:
-        #if int(i[0]) >= 1702508400000000000: 
-            #if i[1] == symbolNum:
-            hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
-            if hourss < 10:
-                hourss = '0'+str(hourss)
-            minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
-            if minss < 10:
-                minss = '0'+str(minss)
-            opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
-            aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
+    elif stkName in StockSymbolList:
+        df = yf.Ticker(stkName).history(period='1d', interval='1m')  
+        if not df.empty:
+            df.reset_index(drop=False, inplace=True)
             
-            
-    newAggs = []
-    for i in aggs:
-        if i not in newAggs:
-            newAggs.append(i)
-            
-          
-    df = pd.DataFrame(newAggs, columns = ['open', 'high', 'low', 'close', 'volume', 'time', 'timestamp', 'name',])
-    
+            #df['time'] = [i for i in range(len(df))]
+            #df['time'] = [i.strftime('%m-%d-%Y') for i in df['Date']]
+            df['time'] = [i.strftime('%H:%M:%S') for i in df['Datetime']]
+            if 'Dividends' in df:
+                del df['Dividends']
+            del df['Stock Splits']
+            if 'Capital Gains' in df:
+                del df['Capital Gains']
+            del df['Datetime']
+            df['name'] = [stkName] * (len(df))
+            if not is_time_between(start_time, end_time, datetime.now().time()):
+                df['timestamp'] = df['time'].apply(lambda iput: int(str(int(dateutil.parser.parse(datetime.now().date().strftime('%Y-%m-%d') + 'T' + iput).timestamp() * 1e9))))
+            else:
+                df['timestamp'] = df['time'].apply(lambda iput: int(str(int(dateutil.parser.parse((datetime.today().date() - timedelta(days=1)).strftime('%Y-%m-%d') + 'T' + iput).timestamp() * 1e9))))
+                
+            df.columns = ['open', 'high', 'low', 'close', 'volume','time','name','timestamp' ]
+        
+        
     
     vwap(df)
     ema(df)
@@ -997,7 +1057,11 @@ def update_graph_live(n_intervals, data):
         bucket = gclient.get_bucket("stockapp-storage")
         blob = Blob('FuturesCurrencyTrades', bucket) 
         FuturesTrades = blob.download_as_text()
-    
+    elif stkName in StockSymbolList:
+        gclient = storage.Client(project="stockapp-401615")
+        bucket = gclient.get_bucket("stockapp-storage")
+        blob = Blob('StockTrades', bucket) 
+        FuturesTrades = blob.download_as_text()
     
     
     csv_reader  = csv.reader(io.StringIO(FuturesTrades))
@@ -1022,24 +1086,12 @@ def update_graph_live(n_intervals, data):
             AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
             
             
-    
+    if stkName in StockSymbolList:
+        AllTrades= [i for i in AllTrades if i[4] != 'N']
     hs = historV1(df,60,{},AllTrades,[])
     
     va = valueAreaV1(hs[0])
-    
-    '''
-    x = np.array([i for i in range(len(df))])
-    y = np.array([i for i in df['50ema']])
-    
-    
-    
-    # Simple interpolation of x and y
-    f = interp1d(x, y)
-    x_fake = np.arange(0.1, len(df)-1, 1)  #0.10
-    
-    # derivative of y with respect to x
-    df_dx = derivative(f, x_fake, dx=1e-6)
-    '''
+
     
     mTrade = [i for i in AllTrades ]#if i[1] >= 50
     
@@ -1069,6 +1121,7 @@ def update_graph_live(n_intervals, data):
     tempTrades = sorted(tempTrades, key=lambda d: d[6], reverse=False) 
     tradeTimes = [i[6] for i in tempTrades]
     
+    #if stkName in symbolNameList+currSymbolNameList:
     timeDict = {}
     for ttm in dtime:
         for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
@@ -1100,7 +1153,7 @@ def update_graph_live(n_intervals, data):
         if len(timeDict[i]) == 3:
             try:
                 timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[ttm][2]/sum(timeDict[ttm])]
-            except(ZeroDivisionError):
+            except(ZeroDivisionError,KeyError):
                 timeDict[i] += [0, 0,0]
     
     
@@ -1108,12 +1161,14 @@ def update_graph_live(n_intervals, data):
 
     for i in range(len(timeFrame)):
         timeFrame[i].append(dtimeEpoch[i])
-    #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], 5, 3.8)['SUPERTd_5_3.8'].replace(-1,0)
+    
     
     if stkName in symbolNameList: 
         fg = plotChart(df, [hs[1],ntList[:6]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
     elif stkName in currSymbolNameList:
         fg = plotChart(df, [hs[1],ntList[:6]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=currSymbolNameList[currSymbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+    elif stkName in StockSymbolList:
+        fg = plotChart(df, [hs[1],ntList[:6]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=StockSymbolList[StockSymbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
     
     return fg
 
@@ -1121,3 +1176,4 @@ def update_graph_live(n_intervals, data):
 if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0', port=8080)
     #app.run_server(debug=False, use_reloader=False)
+    
