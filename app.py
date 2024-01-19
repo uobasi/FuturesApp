@@ -775,9 +775,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             fig.add_hline(y=mk[0], line=dict(color='rgb(0,0,0,0.3)'), row=1, col=2)
 
 
-    if len(sortadlist2) > 0:
-        mzk = [i[1] for i in sortadlist2]
-        fig.add_vline(x=int(sum(mzk) / len(mzk)),line=dict(color='rgb(0,0,0,0.3)'), row=1, col=2)
+    #if len(sortadlist2) > 0:
+    #    mzk = [i[1] for i in sortadlist2]
+    #    fig.add_vline(x=int(sum(mzk) / len(mzk)),line=dict(color='rgb(0,0,0,0.3)'), row=1, col=2)
 
 
         
