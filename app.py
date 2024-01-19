@@ -1077,7 +1077,7 @@ def update_graph_live(n_intervals, data):
         csv_rows.append(row)
         
     
-    STrades = [i for i in csv_rows if i[4] == symbolNum and int(i[2]) >= 50]
+    STrades = [i for i in csv_rows if i[4] == symbolNum]
     AllTrades = []
     for i in STrades:
         #if int(i[0]) >= 1702508400000000000: 
