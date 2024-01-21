@@ -1170,7 +1170,7 @@ def update_graph_live(n_intervals, data):
     
     
     if stkName in symbolNameList: 
-        fg = plotChart(df, [hs[1],ntList[:5]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+        fg = plotChart(df, [hs[1],ntList[:4]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
     elif stkName in currSymbolNameList:
         fg = plotChart(df, [hs[1],ntList[:6]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=currSymbolNameList[currSymbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
     elif stkName in StockSymbolList:
