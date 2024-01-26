@@ -767,6 +767,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     for trd in sortadlist:
         trd.append(df['timestamp'].searchsorted(trd[2])-1)
 
+    '''
     for mk in sortadlist:
         if mk[3] ==  'B':
             fig.add_hline(y=mk[0], line=dict(color='rgb(0,104,139,0.3)'), row=1, col=2)
@@ -774,7 +775,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             fig.add_hline(y=mk[0], line=dict(color='rgb(188,56,0,0.3)'), row=1, col=2)
         else:
             fig.add_hline(y=mk[0], line=dict(color='rgb(0,0,0,0.3)'), row=1, col=2)
-
+    '''
 
     #if len(sortadlist2) > 0:
     #    mzk = [i[1] for i in sortadlist2]
