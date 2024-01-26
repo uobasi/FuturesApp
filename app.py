@@ -281,10 +281,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         CallDec = round(NumCall / sum([float(i[3])+float(i[2]) for i in OptionTimeFrame]),2)
         
 
-    fig = make_subplots(rows=1, cols=2, shared_xaxes=True, shared_yaxes=True,
-                        specs=[[{'secondary_y':True}, {},],], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
+    fig = make_subplots(rows=2, cols=2, shared_xaxes=True, shared_yaxes=True,
+                        specs=[[{}, {}],
+                               [{"colspan": 1},{}]], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
                         horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName + ' '+strTrend+'('+str('')+')' +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') ', 'Volume Profile ' + str(datetime.now()), ),
-                         column_widths=[0.75,0.25], ) #row_width=[0.15, 0.85,],row_width=[0.30, 0.70,]
+                         column_widths=[0.75,0.25], row_width=[0.20, 0.80,] ) #,row_width=[0.30, 0.70,]
 
     
             
@@ -293,9 +294,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         #pott.insert(4,df['time'].searchsorted(pott[0]))
         #print(pott)
        
-    optColor = [     'rgba(0,128,0,0.50)' if float(i[2]) > float(i[3])
-                else 'rgba(255,0,0,0.50)' if float(i[3]) > float(i[2])
-                else 'rgba(128,128,128,0.50)' if float(i[3]) == float(i[2])
+    optColor = [     'rgba(0,128,0,1.0)' if float(i[2]) > float(i[3])
+                else 'rgba(255,0,0,1.0)' if float(i[3]) > float(i[2])
+                else 'rgba(128,128,128,1.0)' if float(i[3]) == float(i[2])
                 else i for i in OptionTimeFrame]
 
     fig.add_trace(
@@ -309,7 +310,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
         ),
-        secondary_y= True, row=1, col=1
+         row=2, col=1
     )
         
     fig.add_trace(
@@ -319,17 +320,17 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             #textposition='auto',
             #orientation='h',
             #width=0.2,
-            marker_color= [  'rgba(255,0,0,0.50)' if float(i[2]) > float(i[3])
-                        else 'rgba(0,128,0,0.50)' if float(i[3]) > float(i[2])
-                        else 'rgba(128,128,128,0.50)' if float(i[3]) == float(i[2])
+            marker_color= [  'rgba(255,0,0,1.0)' if float(i[2]) > float(i[3])
+                        else 'rgba(0,128,0,1.0)' if float(i[3]) > float(i[2])
+                        else 'rgba(128,128,128,1.0)' if float(i[3]) == float(i[2])
                         else i for i in OptionTimeFrame],
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
         ),
-        secondary_y= True, row=1, col=1
+        row=2, col=1
     )
 
-
+    '''
     fig.add_trace(
         go.Bar(
             x=pd.Series([OptionTimeFrame[0][0]]),
@@ -343,7 +344,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         ),
         secondary_y= True, row=1, col=1
     )
-
+    '''
 
     ''' 
     pms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(4).mean()
