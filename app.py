@@ -784,7 +784,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         
         
     
-    for trds in sortadlist:
+    for trds in sortadlist[:4]:
         try:
             if str(trds[3]) == 'A':
                 vallue = 'Sell'
@@ -1171,7 +1171,7 @@ def update_graph_live(n_intervals, data):
     
     
     if stkName in symbolNameList: 
-        fg = plotChart(df, [hs[1],ntList[:4]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+        fg = plotChart(df, [hs[1],ntList[:50]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
     elif stkName in currSymbolNameList:
         fg = plotChart(df, [hs[1],ntList[:6]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=currSymbolNameList[currSymbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
     elif stkName in StockSymbolList:
