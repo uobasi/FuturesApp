@@ -869,8 +869,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 
 
 
-symbolNumList = ['17077', '750', '463194', '44740', '56065', '31863', '204839', '75685', '7062', ]
-symbolNameList = ['ESH4','NQH4','CLH4', 'GCJ4', 'NGG4', 'HGH4', 'YMH4', 'BTCG4', 'RTYH4']
+symbolNumList = ['17077', '750', '463194', '44740', '31863', '204839', '42007360', '7062', ]
+symbolNameList = ['ESH4','NQH4','CLH4', 'GCJ4', 'HGH4', 'YMH4', 'BTCG4', 'RTYH4']
 
 
 from dash import Dash, dcc, html, Input, Output, callback, State
