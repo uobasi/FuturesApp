@@ -872,6 +872,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 symbolNumList = ['17077', '750', '463194', '44740', '31863', '204839', '42007360', '7062', ]
 symbolNameList = ['ESH4','NQH4','CLH4', 'GCJ4', 'HGH4', 'YMH4', 'BTCG4', 'RTYH4']
 
+gclient = storage.Client(project="stockapp-401615")
+bucket = gclient.get_bucket("stockapp-storage")
 
 from dash import Dash, dcc, html, Input, Output, callback, State
 inter = 50000
@@ -924,8 +926,7 @@ def update_graph_live(n_intervals, data):
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
         
-    gclient = storage.Client(project="stockapp-401615")
-    bucket = gclient.get_bucket("stockapp-storage")
+    
     blob = Blob('FuturesOHLC'+str(symbolNum), bucket) 
     FuturesOHLC = blob.download_as_text()
         
@@ -964,9 +965,6 @@ def update_graph_live(n_intervals, data):
     ema(df)
     PPP(df)
     
-
-    gclient = storage.Client(project="stockapp-401615")
-    bucket = gclient.get_bucket("stockapp-storage")
     blob = Blob('FuturesTrades'+str(symbolNum), bucket) 
     FuturesTrades = blob.download_as_text()
     
