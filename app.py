@@ -800,7 +800,22 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     #    fig.add_vline(x=int(sum(mzk) / len(mzk)),line=dict(color='rgb(0,0,0,0.3)'), row=1, col=2)
 
 
-        
+    for i in range(df.first_valid_index()+1,len(df.index)):
+            prev = i - 1
+            try:
+                if df['superTrend'][i] != df['superTrend'][prev] and not np.isnan(df['superTrend'][i]) :
+                    #print(i,df['inUptrend'][i])
+                    fig.add_annotation(x=df['time'][i], y=df['open'][i],
+                                       text = 'BUY'  if df['superTrend'][i] else 'SELL',
+                                       showarrow=True,
+                                       arrowhead=6,
+                                       font=dict(
+                        #family="Courier New, monospace",
+                        size=12,
+                        #color="#ffffff"
+                    ),)  
+            except(KeyError):
+                continue    
         
     
     for trds in sortadlist[:4]:
@@ -894,6 +909,7 @@ symbolNameList = ['ESH4','NQH4','CLH4', 'GCJ4', 'HGH4', 'YMH4', 'BTCG4', 'RTYH4'
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
 
+import pandas_ta as ta
 from dash import Dash, dcc, html, Input, Output, callback, State
 inter = 50000
 app = Dash()
@@ -1072,6 +1088,10 @@ def update_graph_live(n_intervals, data):
 
     for i in range(len(timeFrame)):
         timeFrame[i].append(dtimeEpoch[i])
+        
+    
+    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=3.5)['SUPERTd_4_3.5']
+    df['superTrend'][df['superTrend'] < 0] = 0
     
     
     fg = plotChart(df, [hs[1],ntList[:40]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
