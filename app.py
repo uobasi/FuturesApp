@@ -1041,7 +1041,7 @@ def update_graph_live(n_intervals, data):
         AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
             
             
-    hs = historV1(df,60,{},AllTrades,[])
+    hs = historV1(df,100,{},AllTrades,[])
     
     va = valueAreaV1(hs[0])
 
