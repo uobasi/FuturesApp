@@ -245,7 +245,7 @@ def valueAreaV1(lst):
 
     return [lst[topIndex][0], lst[dwnIndex][0], lst[pocIndex][0]]
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName='', prevdtstr:str='', sord:list=[], trends:list=[], lstVwap:list=[], bigOrders:list=[], pea:bool=False, timeStamp:int=None, previousDay:bool=False, OptionTimeFrame:list=[], overall:list=[]):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName='', prevdtstr:str='', sord:list=[], trends:list=[], lstVwap:list=[], bigOrders:list=[], pea:bool=False, timeStamp:int=None, previousDay:list=[], OptionTimeFrame:list=[], overall:list=[]):
   
     '''
     average = round(np.average(df_dx), 3)
@@ -762,6 +762,23 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         ),
         row=1, col=3
     )
+    
+    if len(previousDay) > 0:
+        fig.add_trace(go.Scatter(x=df['time'],
+                                 y= [float(previousDay[2])]*len(df['time']) ,
+                                 line_color='cyan'
+                                 text = str(previousDay[2]),
+                                 textposition="bottom left",
+                                 name='POC '+ str(previousDay[2]),
+                                 showlegend=False,
+                                 visible=False,
+                                 mode= 'lines',
+                                
+                                ),
+                      row=1, col=1
+                     )
+        trcount+=1
+        
      
     
     for v in range(len(sortadlist)):
@@ -1090,11 +1107,24 @@ def update_graph_live(n_intervals, data):
         timeFrame[i].append(dtimeEpoch[i])
         
     
-    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=3.8)['SUPERTd_2_3.8']
+    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=3.5)['SUPERTd_4_3.5']
     df['superTrend'][df['superTrend'] < 0] = 0
     
+    blob = Blob('PrevDay', bucket) 
+    PrevDay = blob.download_as_text()
+        
+
+    csv_reader  = csv.reader(io.StringIO(PrevDay))
+
+    csv_rows = []
+    for row in csv_reader:
+        csv_rows.append(row)
+        
+        
+    previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
     
-    fg = plotChart(df, [hs[1],ntList[:30]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=False, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+    
+    fg = plotChart(df, [hs[1],ntList[:40]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
 
     return fg
 
