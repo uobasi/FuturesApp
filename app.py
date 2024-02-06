@@ -816,7 +816,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     #    mzk = [i[1] for i in sortadlist2]
     #    fig.add_vline(x=int(sum(mzk) / len(mzk)),line=dict(color='rgb(0,0,0,0.3)'), row=1, col=2)
 
-
+    '''
     for i in range(df.first_valid_index()+1,len(df.index)):
             prev = i - 1
             try:
@@ -834,7 +834,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             except(KeyError):
                 continue    
         
-    '''
+    
     for trds in sortadlist[:4]:
         try:
             if str(trds[3]) == 'A':
