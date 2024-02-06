@@ -281,11 +281,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         CallDec = round(NumCall / sum([float(i[3])+float(i[2]) for i in OptionTimeFrame]),2)
         
 
-    fig = make_subplots(rows=2, cols=3, shared_xaxes=True, shared_yaxes=True,
-                        specs=[[{}, {}, {}],
-                               [{"colspan": 1},{},{}]], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
+    fig = make_subplots(rows=2, cols=2, shared_xaxes=True, shared_yaxes=True,
+                        specs=[[{}, {} ],
+                               [{"colspan": 1},{}]], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
                         horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName + ' '+strTrend+'('+str('')+')' +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') ', 'Volume Profile ' + str(datetime.now()), ),
-                         column_widths=[0.70,0.15,0.15], row_width=[0.20, 0.80,] ) #,row_width=[0.30, 0.70,]
+                         column_widths=[0.80,0.20], row_width=[0.20, 0.80,] ) #,row_width=[0.30, 0.70,]
 
     
             
@@ -745,7 +745,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                             ),
                   row=1, col=1
                  )
-    '''
+    
             
     mp = df['close'].value_counts()
  
@@ -762,7 +762,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         ),
         row=1, col=3
     )
-    
+    '''
     if len(previousDay) > 0:
         fig.add_trace(go.Scatter(x=df['time'],
                                  y= [float(previousDay[2])]*len(df['time']) ,
@@ -900,7 +900,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     fig.update_layout(height=800, xaxis_rangeslider_visible=False, showlegend=False)
     fig.update_xaxes(autorange="reversed", row=1, col=2)
-    fig.update_xaxes(autorange="reversed", row=1, col=3)
+    #fig.update_xaxes(autorange="reversed", row=1, col=3)
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsMid'], mode='lines', name='BbandsMid'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsUpp'], mode='lines', name='BbandsUpp'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsLow'], mode='lines', name='BbandsLow'))
