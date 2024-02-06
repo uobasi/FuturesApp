@@ -766,7 +766,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     if len(previousDay) > 0:
         fig.add_trace(go.Scatter(x=df['time'],
                                  y= [float(previousDay[2])]*len(df['time']) ,
-                                 line_color='cyan'
+                                 line_color='cyan',
                                  text = str(previousDay[2]),
                                  textposition="bottom left",
                                  name='POC '+ str(previousDay[2]),
