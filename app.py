@@ -834,7 +834,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             except(KeyError):
                 continue    
         
-    
+    '''
     for trds in sortadlist[:4]:
         try:
             if str(trds[3]) == 'A':
@@ -857,7 +857,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             ),)
         except(KeyError):
             continue 
-
+    '''
         
        
     
@@ -1107,7 +1107,7 @@ def update_graph_live(n_intervals, data):
         timeFrame[i].append(dtimeEpoch[i])
         
     
-    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=4)['SUPERTd_2_4.0']
+    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=1.5)['SUPERTd_2_1.5']
     df['superTrend'][df['superTrend'] < 0] = 0
     
     blob = Blob('PrevDay', bucket) 
