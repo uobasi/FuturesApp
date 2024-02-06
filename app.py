@@ -1107,8 +1107,8 @@ def update_graph_live(n_intervals, data):
         timeFrame[i].append(dtimeEpoch[i])
         
     
-    df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=1.5)['SUPERTd_2_1.5']
-    df['superTrend'][df['superTrend'] < 0] = 0
+    #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=1.5)['SUPERTd_2_1.5']
+    #df['superTrend'][df['superTrend'] < 0] = 0
     
     blob = Blob('PrevDay', bucket) 
     PrevDay = blob.download_as_text()
