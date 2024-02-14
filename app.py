@@ -1124,7 +1124,7 @@ def update_graph_live(n_intervals, data):
     previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
     
     
-    fg = plotChart(df, [hs[1],ntList[:40]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],ntList[:4]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
 
     return fg
 
