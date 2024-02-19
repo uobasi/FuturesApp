@@ -915,7 +915,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         active=10,
         currentvalue={"prefix": "Price: "},
         pad={"t": 10},
-        steps=steps[15+trcount:]#[8::3]
+        steps=steps[16+trcount:]#[8::3]
     )]
 
     fig.update_layout(
