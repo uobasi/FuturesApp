@@ -811,7 +811,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         res = [0,0,0]
         fig.add_trace(go.Scatter(x=df['time'],
                                  y= [sortadlist[v][0]]*len(df['time']) ,
-                                 line_color= 'brown' if (str(sortadlist[v][3]) == 'B') else 'rgb(0,104,139)' if (str(sortadlist[v][3]) == 'A') else 'rgb(0,0,0)',
+                                 line_color= 'rgb(0,104,139)' if (str(sortadlist[v][3]) == 'B') else 'brown' if (str(sortadlist[v][3]) == 'A') else 'rgb(0,0,0)',
                                  text = str(sortadlist[v][4]) + ' ' + str(sortadlist[v][1]) + ' ' + str(sortadlist[v][3])  + ' ' + str(sortadlist[v][6]),
                                  #text='('+str(priceDict[sortadlist[v][0]]['ASKAVG'])+'/'+str(priceDict[sortadlist[v][0]]['BIDAVG']) +')'+ '('+str(priceDict[sortadlist[v][0]]['ASK'])+'/'+str(priceDict[sortadlist[v][0]]['BID']) +')'+  '('+ sortadlist[v][3] +') '+str(sortadlist[v][4]),
                                  textposition="bottom left",
