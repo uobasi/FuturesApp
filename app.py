@@ -902,7 +902,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                 vallue = 'Mid'
                 sidev = df['open'][trds[7]]
             fig.add_annotation(x=df['time'][trds[7]], y=sidev,
-                               text= str(trds[4]) + ' ' + str(trds[1]) + ' ' + vallue ,
+                               text= str(trds[4]) + ' ' + str(trds[1]), #+ ' ' + vallue ,
                                showarrow=True,
                                arrowhead=4,
                                font=dict(
