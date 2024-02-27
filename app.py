@@ -805,9 +805,35 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                      )
         trcount+=1
         
+        
+        
+    fig.add_trace(go.Scatter(x=df['time'],
+                             y= [df['STDEV_2'].mean()]*len(df['time']) ,
+                             line_color='chartreuse',
+                             text = str(df['STDEV_2'].mean()),
+                             textposition="bottom left",
+                             name='Avg UVWAP '+ str(df['STDEV_2'].mean()),
+                             showlegend=False,
+                             visible=False,
+                             mode= 'lines',
+                            ),
+                 )
+    
+    fig.add_trace(go.Scatter(x=df['time'],
+                             y= [df['STDEV_N2'].mean()]*len(df['time']) ,
+                             line_color='chartreuse',
+                             text = str(df['STDEV_N2'].mean()),
+                             textposition="bottom left",
+                             name='Avg LVWAP '+ str(df['STDEV_N2'].mean()),
+                             showlegend=False,
+                             visible=False,
+                             mode= 'lines',
+                            ),
+                 )
+    
      
     
-    for v in range(len(sortadlist)):
+    for v in range(len(sortadlist[:4])):
         res = [0,0,0]
         fig.add_trace(go.Scatter(x=df['time'],
                                  y= [sortadlist[v][0]]*len(df['time']) ,
@@ -823,6 +849,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                                 ),
                       row=1, col=1
                      )
+
+    
+    
 
     
     for trd in sortadlist:
@@ -860,15 +889,15 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             except(KeyError):
                 continue    
         
-    
-    for trds in sortadlist[:4]:
+    '''
+    for trds in sortadlist:
         try:
             if str(trds[3]) == 'A':
                 vallue = 'Sell'
-                sidev = df['close'][trds[7]]
+                sidev = trds[0]
             elif str(trds[3]) == 'B':
                 vallue = 'BUY'
-                sidev = df['open'][trds[7]]
+                sidev = trds[0]
             else:
                 vallue = 'Mid'
                 sidev = df['open'][trds[7]]
@@ -883,7 +912,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             ),)
         except(KeyError):
             continue 
-    '''
+    
         
        
     
@@ -1149,7 +1178,7 @@ def update_graph_live(n_intervals, data):
     previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
     
     
-    fg = plotChart(df, [hs[1],ntList[:4]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],ntList[:10]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
 
     return fg
 
