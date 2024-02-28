@@ -582,7 +582,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     #fig.add_trace(go.Scatter(x=x_fake, y=df_dx, mode='lines',name='Derivative'), row=2, col=2)
     
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP'))
-    
+    '''
     #if 2 in lstVwap:
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.15, name='UPPERVWAP2', line=dict(color='black')))
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N2'], mode='lines', opacity=0.15, name='LOWERVWAP2', line=dict(color='black')))
@@ -599,7 +599,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_0'], mode='lines', opacity=0.15, name='UPPERVWAP0.5', line=dict(color='black')))
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N0'], mode='lines', opacity=0.15, name='LOWERVWAP0.5', line=dict(color='black')))
-
+    '''
     #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', opacity=0.19, name='1ema',marker_color='rgba(0,0,0)'))
     
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', name='UPPERVWAP'))
@@ -805,7 +805,17 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                      )
         trcount+=1
         
-        
+    fig.add_trace(go.Scatter(x=df['time'],
+                             y= [df['vwap'].mean()]*len(df['time']) ,
+                             line_color='#FF1493',
+                             text = str(df['vwap'].mean()),
+                             textposition="bottom left",
+                             name='Avg VWAP '+ str(df['vwap'].mean()),
+                             showlegend=False,
+                             visible=False,
+                             mode= 'lines',
+                            ),
+                 )    
         
     fig.add_trace(go.Scatter(x=df['time'],
                              y= [df['STDEV_2'].mean()]*len(df['time']) ,
@@ -893,20 +903,22 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     for trds in sortadlist:
         try:
             if str(trds[3]) == 'A':
-                vallue = 'sell'
+                vallue = 'Sell'
                 sidev = trds[0]
             elif str(trds[3]) == 'B':
-                vallue = 'buy'
+                vallue = 'BUY'
                 sidev = trds[0]
             else:
                 vallue = 'Mid'
                 sidev = df['open'][trds[7]]
             fig.add_annotation(x=df['time'][trds[7]], y=sidev,
-                               text= str(trds[4]) + ' (' + str(trds[1]) + ') ' + vallue ,
+                               text= str(trds[4]) + ' ' + str(trds[1]) + ' ' + vallue ,
                                showarrow=True,
                                arrowhead=4,
                                font=dict(
+                #family="Courier New, monospace",
                 size=10,
+                # color="#ffffff"
             ),)
         except(KeyError):
             continue 
@@ -942,7 +954,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         active=10,
         currentvalue={"prefix": "Price: "},
         pad={"t": 10},
-        steps=steps[14+trcount:]#[8::3]
+        steps=steps[7+trcount:]#[8::3]
     )]
 
     fig.update_layout(
