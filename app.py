@@ -284,7 +284,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     fig = make_subplots(rows=2, cols=2, shared_xaxes=True, shared_yaxes=True,
                         specs=[[{}, {} ],
                                [{"colspan": 1},{}]], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
-                        horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName + ' '+strTrend+'('+str('')+')' +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') ', 'Volume Profile ' + str(datetime.now()), ),
+                        horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') ', 'Volume Profile ' + str(datetime.now()), ),
                          column_widths=[0.80,0.20], row_width=[0.20, 0.80,] ) #,row_width=[0.30, 0.70,]
 
     
