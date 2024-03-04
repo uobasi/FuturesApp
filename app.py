@@ -902,7 +902,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                 continue    
         
     '''
-    for trds in sortadlist:
+    for trds in sortadlist[:10]:
         try:
             if str(trds[3]) == 'A':
                 vallue = 'Sell'
@@ -1191,7 +1191,7 @@ def update_graph_live(n_intervals, data):
     except(ValueError):
         previousDay = []
     
-    fg = plotChart(df, [hs[1],ntList[:10]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],ntList[:40]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
 
     return fg
 
