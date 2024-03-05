@@ -766,46 +766,49 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     )
     '''
     if len(previousDay) > 0:
-        fig.add_trace(go.Scatter(x=df['time'],
-                                 y= [float(previousDay[2])]*len(df['time']) ,
-                                 line_color='cyan',
-                                 text = str(previousDay[2]),
-                                 textposition="bottom left",
-                                 name='POC '+ str(previousDay[2]),
-                                 showlegend=False,
-                                 visible=False,
-                                 mode= 'lines',
-                                
-                                ),
-                      row=1, col=1
-                     )
-        trcount+=1
+        if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.25:
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [float(previousDay[2])]*len(df['time']) ,
+                                    line_color='cyan',
+                                    text = str(previousDay[2]),
+                                    textposition="bottom left",
+                                    name='POC '+ str(previousDay[2]),
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    
+                                    ),
+                        row=1, col=1
+                        )
+            trcount+=1
 
-        fig.add_trace(go.Scatter(x=df['time'],
-                                 y= [float(previousDay[0])]*len(df['time']) ,
-                                 line_color='green',
-                                 text = str(previousDay[0]),
-                                 textposition="bottom left",
-                                 name='Previous LVA '+ str(previousDay[0]),
-                                 showlegend=False,
-                                 visible=False,
-                                 mode= 'lines',
-                                ),
-                     )
-        trcount+=1
+        if (abs(float(previousDay[0]) - df['1ema'][len(df)-1]) / ((float(previousDay[0]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.25:
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [float(previousDay[0])]*len(df['time']) ,
+                                    line_color='green',
+                                    text = str(previousDay[0]),
+                                    textposition="bottom left",
+                                    name='Previous LVA '+ str(previousDay[0]),
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ),
+                        )
+            trcount+=1
 
-        fig.add_trace(go.Scatter(x=df['time'],
-                                 y= [float(previousDay[1])]*len(df['time']) ,
-                                 line_color='purple',
-                                 text = str(previousDay[1]),
-                                 textposition="bottom left",
-                                 name='Previous HVA '+ str(previousDay[1]),
-                                 showlegend=False,
-                                 visible=False,
-                                 mode= 'lines',
-                                ),
-                     )
-        trcount+=1
+        if (abs(float(previousDay[1]) - df['1ema'][len(df)-1]) / ((float(previousDay[1]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.25:
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [float(previousDay[1])]*len(df['time']) ,
+                                    line_color='purple',
+                                    text = str(previousDay[1]),
+                                    textposition="bottom left",
+                                    name='Previous HVA '+ str(previousDay[1]),
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ),
+                        )
+            trcount+=1
         
     fig.add_trace(go.Scatter(x=df['time'],
                              y= [df['vwap'].mean()]*len(df['time']) ,
