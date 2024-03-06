@@ -909,7 +909,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             trcount+=1
     
      
-    
+    '''
     for v in range(len(sortadlist[:4])):
         res = [0,0,0]
         fig.add_trace(go.Scatter(x=df['time'],
@@ -927,7 +927,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                       row=1, col=1
                      )
 
-    
+    '''
     
 
     
