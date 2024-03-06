@@ -876,14 +876,15 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     mazz = max([len(i) for i in cdata])
     for i in cdata:
         if len(i) >= 3:
+            opac = round((len(i)/mazz)/1.2,2)
             fig.add_shape(type="rect",
                       y0=i[0], y1=i[len(i)-1], x0=-1, x1=len(df),
                       fillcolor="darkcyan",
-                      opacity=(len(i)/mazz)/1.2)
+                      opacity=)
             
             fig.add_trace(go.Scatter(x=df['time'],
                                  y= [i[0]]*len(df['time']) ,
-                                 line_color='darkcyan',
+                                 line_color='rgba(0,139,139,'+str(opac)+')',
                                  text = str(i[0]),
                                  textposition="bottom left",
                                  name=str(i[0]),
@@ -896,7 +897,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 
             fig.add_trace(go.Scatter(x=df['time'],
                                  y= [i[len(i)-1]]*len(df['time']) ,
-                                 line_color='darkcyan',
+                                 line_color='rgba(0,139,139,'+str(opac)+')',
                                  text = str(i[len(i)-1]),
                                  textposition="bottom left",
                                  name=str(i[len(i)-1]),
