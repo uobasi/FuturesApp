@@ -866,10 +866,50 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                              mode= 'lines',
                             ),
                  )
+
+    data = [i[0] for i in sortadlist]
+    data.sort(reverse=True)
+    differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
+    average_difference = sum(differences) / len(differences)
+    cdata = find_clusters(data, average_difference)
+    
+    mazz = max([len(i) for i in cdata])
+    for i in cdata:
+        if len(i) >= 3:
+            fig.add_shape(type="rect",
+                      y0=i[0], y1=i[len(i)-1], x0=-1, x1=len(df),
+                      fillcolor="darkcyan",
+                      opacity=(len(i)/mazz)/1.2)
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                 y= [i[0]]*len(df['time']) ,
+                                 line_color='darkcyan',
+                                 text = str(i[0]),
+                                 textposition="bottom left",
+                                 name=str(i[0]),
+                                 showlegend=False,
+                                 mode= 'lines',
+                                
+                                ),
+                      row=1, col=1)
+            trcount+=1
+
+            fig.add_trace(go.Scatter(x=df['time'],
+                                 y= [i[len(i)-1]]*len(df['time']) ,
+                                 line_color='darkcyan',
+                                 text = str(i[len(i)-1]),
+                                 textposition="bottom left",
+                                 name=str(i[len(i)-1]),
+                                 showlegend=False,
+                                 mode= 'lines',
+                                
+                                ),
+                      row=1, col=1)
+            trcount+=1
     
      
     
-    for v in range(len(sortadlist[:8])):
+    for v in range(len(sortadlist[:4])):
         res = [0,0,0]
         fig.add_trace(go.Scatter(x=df['time'],
                                  y= [sortadlist[v][0]]*len(df['time']) ,
@@ -926,19 +966,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                 continue    
         
     '''
-    data = [i[0] for i in sortadlist]
-    data.sort(reverse=True)
-    differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
-    average_difference = sum(differences) / len(differences)
-    cdata = find_clusters(data, average_difference)
     
-    mazz = max([len(i) for i in cdata])
-    for i in cdata:
-        if len(i) >= 3:
-            fig.add_shape(type="rect",
-                      y0=i[0], y1=i[len(i)-1], x0=-1, x1=len(df),
-                      fillcolor="darkcyan",
-                      opacity=(len(i)/mazz)/1.2)
     
     
     for trds in sortadlist[:10]:
