@@ -245,6 +245,27 @@ def valueAreaV1(lst):
 
     return [lst[topIndex][0], lst[dwnIndex][0], lst[pocIndex][0]]
 
+
+def find_clusters(numbers, threshold):
+    clusters = []
+    current_cluster = [numbers[0]]
+
+    # Iterate through the numbers
+    for i in range(1, len(numbers)):
+        # Check if the current number is within the threshold distance from the last number in the cluster
+        if abs(numbers[i] - current_cluster[-1]) <= threshold:
+            current_cluster.append(numbers[i])
+        else:
+            # If the current number is outside the threshold, store the current cluster and start a new one
+            clusters.append(current_cluster)
+            current_cluster = [numbers[i]]
+
+    # Append the last cluster
+    clusters.append(current_cluster)
+    
+    return clusters
+
+
 def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName='', prevdtstr:str='', sord:list=[], trends:list=[], lstVwap:list=[], bigOrders:list=[], pea:bool=False, timeStamp:int=None, previousDay:list=[], OptionTimeFrame:list=[], overall:list=[]):
   
     '''
@@ -848,7 +869,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
      
     
-    for v in range(len(sortadlist)):
+    for v in range(len(sortadlist[:4])):
         res = [0,0,0]
         fig.add_trace(go.Scatter(x=df['time'],
                                  y= [sortadlist[v][0]]*len(df['time']) ,
@@ -905,6 +926,21 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                 continue    
         
     '''
+    data = [i[0] for i in sortadlist]
+    data.sort(reverse=True)
+    differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
+    average_difference = sum(differences) / len(differences)
+    cdata = find_clusters(data, average_difference)
+    
+    mazz = max([len(i) for i in cdata])
+    for i in cdata:
+        if len(i) >= 3:
+            fig.add_shape(type="rect",
+                      y0=i[0], y1=i[len(i)-1], x0=-1, x1=len(df),
+                      fillcolor="darkcyan",
+                      opacity=(len(i)/mazz)/1.2)
+    
+    
     for trds in sortadlist[:10]:
         try:
             if str(trds[3]) == 'A':
