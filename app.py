@@ -966,7 +966,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             except(KeyError):
                 continue    
         
-    '''
+    
     
     
     
@@ -993,7 +993,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         except(KeyError):
             continue 
     
-        
+    '''   
        
     
 
