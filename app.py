@@ -1062,7 +1062,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 
 import pandas_ta as ta
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 90000
+inter = 85000
 app = Dash()
 app.layout = html.Div([
     
