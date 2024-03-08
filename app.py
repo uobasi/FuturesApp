@@ -885,9 +885,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             fig.add_trace(go.Scatter(x=df['time'],
                                  y= [i[0]]*len(df['time']) ,
                                  line_color='rgba(0,139,139,'+str(opac)+')',
-                                 text = str(i[0]),
+                                 text =str(i[0]) + ' ' + str(len(i)),
                                  textposition="bottom left",
-                                 name=str(i[0]),
+                                 name=str(i[0]) + ' ' + str(len(i)),
                                  showlegend=False,
                                  mode= 'lines',
                                 
@@ -898,9 +898,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             fig.add_trace(go.Scatter(x=df['time'],
                                  y= [i[len(i)-1]]*len(df['time']) ,
                                  line_color='rgba(0,139,139,'+str(opac)+')',
-                                 text = str(i[len(i)-1]),
+                                 text = str(i[len(i)-1]) + ' ' + str(len(i)),
                                  textposition="bottom left",
-                                 name=str(i[len(i)-1]),
+                                 name=str(i[len(i)-1]) + ' ' + str(len(i)),
                                  showlegend=False,
                                  mode= 'lines',
                                 
