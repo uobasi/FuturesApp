@@ -1062,7 +1062,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 
 import pandas_ta as ta
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 85000
+inter = 80000
 app = Dash()
 app.layout = html.Div([
     
@@ -1259,7 +1259,7 @@ def update_graph_live(n_intervals, data):
     except(ValueError):
         previousDay = []
     
-    fg = plotChart(df, [hs[1],ntList[:40]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],ntList[:30]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
 
     return fg
 
