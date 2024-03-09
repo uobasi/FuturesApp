@@ -867,7 +867,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                             ),
                  )
 
-    data = [i[0] for i in sortadlist]
+    data = [i[0] for i in sortadlist[:40]]
     data.sort(reverse=True)
     differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
     average_difference = sum(differences) / len(differences)
@@ -882,12 +882,24 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                       fillcolor="darkcyan",
                       opacity=opac)
             
+            bidCount = 0
+            askCount = 0
+            for x in sortadlist:
+                if x[0] >= i[len(i)-1] and x[0] <= i[0]:
+                    if x[3] == 'B':
+                        bidCount+= x[1]
+                    elif x[3] == 'A':
+                        askCount+= x[1]
+                        
+            askDec = round(askCount/(bidCount+askCount),2)
+            bidDec = round(bidCount/(bidCount+askCount),2)
+            
             fig.add_trace(go.Scatter(x=df['time'],
                                  y= [i[0]]*len(df['time']) ,
                                  line_color='rgba(0,139,139,'+str(opac)+')',
-                                 text =str(i[0])+ ' (' + str(len(i))+ ')',
+                                 text =str(i[0])+ ' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
                                  textposition="bottom left",
-                                 name=str(i[0])+ ' (' + str(len(i))+ ')',
+                                 name=str(i[0])+ ' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
                                  showlegend=False,
                                  mode= 'lines',
                                 
@@ -898,9 +910,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             fig.add_trace(go.Scatter(x=df['time'],
                                  y= [i[len(i)-1]]*len(df['time']) ,
                                  line_color='rgba(0,139,139,'+str(opac)+')',
-                                 text = str(i[len(i)-1])+ ' (' + str(len(i))+ ')',
+                                 text = str(i[len(i)-1])+ ' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
                                  textposition="bottom left",
-                                 name=str(i[len(i)-1]) + ' (' + str(len(i))+ ')',
+                                 name= str(i[len(i)-1])+ ' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
                                  showlegend=False,
                                  mode= 'lines',
                                 
@@ -931,10 +943,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
 
     
-    for trd in sortadlist:
-        trd.append(df['timestamp'].searchsorted(trd[2])-1)
+    
 
     '''
+    for trd in sortadlist:
+        trd.append(df['timestamp'].searchsorted(trd[2])-1)
+    
     for mk in sortadlist:
         if mk[3] ==  'B':
             fig.add_hline(y=mk[0], line=dict(color='rgb(0,104,139,0.3)'), row=1, col=2)
@@ -1259,7 +1273,7 @@ def update_graph_live(n_intervals, data):
     except(ValueError):
         previousDay = []
     
-    fg = plotChart(df, [hs[1],ntList[:40]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],ntList[:100]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
 
     return fg
 
