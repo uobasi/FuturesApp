@@ -890,9 +890,15 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                         bidCount+= x[1]
                     elif x[3] == 'A':
                         askCount+= x[1]
-                        
-            askDec = round(askCount/(bidCount+askCount),2)
-            bidDec = round(bidCount/(bidCount+askCount),2)
+
+            if bidCount+askCount > 0:       
+                askDec = round(askCount/(bidCount+askCount),2)
+                bidDec = round(bidCount/(bidCount+askCount),2)
+            else:
+                askDec = 0
+                bidDec = 0
+
+
             
             fig.add_trace(go.Scatter(x=df['time'],
                                  y= [i[0]]*len(df['time']) ,
