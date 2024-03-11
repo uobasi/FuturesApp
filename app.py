@@ -1128,7 +1128,7 @@ def update_graph_live(n_intervals, data):
         stkName = data
         symbolNum = symbolNumList[symbolNameList.index(stkName)]   
     else:
-        stkName = 'NQH4'  
+        stkName = 'NQ'  
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
         
