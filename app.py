@@ -1082,7 +1082,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 
 import pandas_ta as ta
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 80001
+inter = 30000#80001
 app = Dash()
 app.layout = html.Div([
     
@@ -1146,7 +1146,7 @@ def update_graph_live(n_intervals, data):
     
     
     aggs = [ ]  
-    newOHLC = [i for i in csv_rows if i[1] == symbolNum]
+    newOHLC = [i for i in csv_rows]
 
     for i in newOHLC:
         hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
@@ -1171,30 +1171,23 @@ def update_graph_live(n_intervals, data):
     ema(df)
     PPP(df)
     
-    blob = Blob('FuturesTrades'+str(symbolNum), bucket) 
-    FuturesTrades = blob.download_as_text()
-    
-    
-    csv_reader  = csv.reader(io.StringIO(FuturesTrades))
-    
+    blob = Blob('AllTrades'+symbolNum, bucket) 
+    aTrades = blob.download_as_text()
+        
+
+    csv_reader  = csv.reader(io.StringIO(aTrades))
+
     csv_rows = []
     for row in csv_reader:
         csv_rows.append(row)
         
+    AllTrades=csv_rows
     
-    STrades = [i for i in csv_rows if i[4] == symbolNum]
-    AllTrades = []
-    for i in STrades:
-        hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
-        if hourss < 10:
-            hourss = '0'+str(hourss)
-        minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
-        if minss < 10:
-            minss = '0'+str(minss)
-        opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
-        AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
-            
-            
+    for attt in AllTrades:
+        attt[0] = float(attt[0])
+        attt[1] = int(attt[1])
+        attt[2] = int(attt[2])
+        
     hs = historV1(df,60,{},AllTrades,[])
     
     va = valueAreaV1(hs[0])
@@ -1208,7 +1201,7 @@ def update_graph_live(n_intervals, data):
     [mTrade[i].insert(4,i) for i in range(len(mTrade))] 
     
     newwT = []
-    for i in mTrade:
+    for i in mTrade[:100]:
         newwT.append([i[0],i[1],i[2],i[5], i[4],i[3],i[6]])
     
 
@@ -1218,52 +1211,7 @@ def update_graph_live(n_intervals, data):
         if i[0] not in checkDup:
             ntList.append(i)
     
-    dtime = df['time'].values.tolist()
-    dtimeEpoch = df['timestamp'].values.tolist()
-    
-    
-    tempTrades = [i for i in AllTrades]
-    tempTrades = sorted(tempTrades, key=lambda d: d[6], reverse=False) 
-    tradeTimes = [i[6] for i in tempTrades]
-    
-    timeDict = {}
-    for ttm in dtime:
-        for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
-            if datetime.strptime(tradMade[6], "%H:%M:%S") > datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=1):
-                try:
-                    timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
-                except(KeyError,ZeroDivisionError):
-                    timeDict[ttm] = [0,0,0]
-                break
-            
-            if ttm not in timeDict:
-                timeDict[ttm] = [0,0,0]
-            if ttm in timeDict:
-                if tradMade[5] == 'B':
-                    timeDict[ttm][0] += tradMade[1]#tradMade[0] * tradMade[1]
-                elif tradMade[5] == 'A':
-                    timeDict[ttm][1] += tradMade[1]#tradMade[0] * tradMade[1] 
-                elif tradMade[5] == 'N':
-                    timeDict[ttm][2] += tradMade[1]#tradMade[0] * tradMade[1] 
-                
-
-    for i in timeDict:
-        if len(timeDict[i]) == 3:
-            try:
-                timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[ttm][2]/sum(timeDict[ttm])]
-            except(ZeroDivisionError,KeyError):
-                timeDict[i] += [0, 0,0]
-    
-    
-    timeFrame = [[i,'']+timeDict[i] for i in timeDict]
-
-    for i in range(len(timeFrame)):
-        timeFrame[i].append(dtimeEpoch[i])
-        
-    
-    #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=1.5)['SUPERTd_2_1.5']
-    #df['superTrend'][df['superTrend'] < 0] = 0
-    
+  
     blob = Blob('PrevDay', bucket) 
     PrevDay = blob.download_as_text()
         
@@ -1278,6 +1226,28 @@ def update_graph_live(n_intervals, data):
         previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
     except(ValueError):
         previousDay = []
+        
+    blob = Blob('TimeFrame'+symbolNum, bucket) 
+    tframe = blob.download_as_text()
+        
+
+    csv_reader  = csv.reader(io.StringIO(tframe))
+
+    csv_rows = []
+    for row in csv_reader:
+        csv_rows.append(row)
+        
+    timeFrame=csv_rows
+    
+    for ttf in timeFrame:
+        ttf[2] = int(ttf[2])
+        ttf[3] = int(ttf[3])
+        ttf[4] = int(ttf[4])
+        ttf[5] = float(ttf[5])
+        ttf[6] = float(ttf[6])
+        ttf[7] = float(ttf[7])
+        ttf[8] = int(ttf[8])
+    
     
     fg = plotChart(df, [hs[1],ntList[:100]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
 
