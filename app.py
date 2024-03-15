@@ -867,7 +867,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                             ),
                  )
 
-    data = [i[0] for i in sortadlist[:40]]
+    data = [i[0] for i in sortadlist[:100]]
     data.sort(reverse=True)
     differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
     average_difference = sum(differences) / len(differences)
