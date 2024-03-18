@@ -952,8 +952,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
 
     '''
-    for trd in sortadlist:
-        trd.append(df['timestamp'].searchsorted(trd[2])-1)
+    
     
     for mk in sortadlist:
         if mk[3] ==  'B':
@@ -989,8 +988,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     
     
-    
-    for trds in sortadlist[:10]:
+    ''' 
+    for trd in sortadlist:
+        trd.append(df['timestamp'].searchsorted(trd[2])-1)
+
+    for trds in sortadlist[:5]:
         try:
             if str(trds[3]) == 'A':
                 vallue = 'Sell'
@@ -1013,7 +1015,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         except(KeyError):
             continue 
     
-    '''   
+      
        
     
 
