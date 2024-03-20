@@ -1184,9 +1184,9 @@ def update_graph_live(n_intervals, data):
         csv_rows.append(row)
         
     
-    STrades = [i for i in csv_rows]
+    #STrades = [i for i in csv_rows]
     AllTrades = []
-    for i in STrades:
+    for i in csv_rows:
         hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
         if hourss < 10:
             hourss = '0'+str(hourss)
