@@ -1148,7 +1148,7 @@ def update_graph_live(n_intervals, data):
     
     
     aggs = [ ]  
-    newOHLC = [i for i in csv_rows if i[1] == symbolNum]
+    newOHLC = [i for i in csv_rows]
 
     for i in newOHLC:
         hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
@@ -1184,7 +1184,7 @@ def update_graph_live(n_intervals, data):
         csv_rows.append(row)
         
     
-    STrades = [i for i in csv_rows if i[4] == symbolNum]
+    STrades = [i for i in csv_rows]
     AllTrades = []
     for i in STrades:
         hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
@@ -1212,13 +1212,7 @@ def update_graph_live(n_intervals, data):
     newwT = []
     for i in mTrade:
         newwT.append([i[0],i[1],i[2],i[5], i[4],i[3],i[6]])
-    
 
-    ntList = []
-    checkDup = []
-    for i in newwT:
-        if i[0] not in checkDup:
-            ntList.append(i)
     
     dtime = df['time'].values.tolist()
     dtimeEpoch = df['timestamp'].values.tolist()
@@ -1281,7 +1275,7 @@ def update_graph_live(n_intervals, data):
     except(ValueError):
         previousDay = []
     
-    fg = plotChart(df, [hs[1],ntList[:100]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:100]], va[0], va[1], [], [], bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[]) #trends=FindTrends(df,n=10)
 
     return fg
 
