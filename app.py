@@ -1076,8 +1076,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 
 
 
-symbolNumList = ['5602', '13743', '44740', '1101', '80420', '2552',  '4122', '109044', '948' ]
-symbolNameList = ['ES','NQ', 'GC', 'HG', 'YM', 'RTY',  'SI', 'CL', 'NG'  ]
+symbolNumList = ['5602', '13743', '669', '1101', '80420', '2552',  '4122', '109044', '946']
+symbolNameList = ['ES','NQ', 'GC', 'HG', 'YM', 'RTY',  'SI', 'CL', 'NG']
 
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
