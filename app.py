@@ -161,7 +161,11 @@ def splitHun(stkName, trad, quot, num1, num2, quodict):
  
 
 def valueAreaV1(lst):
-    #lst = [i for i in lst if i[1] > 0]
+    lst = [i for i in lst if i[1] > 0]
+    for xm in range(len(lst)):
+        lst[xm][2] = xm
+        
+        
     pocIndex = sorted(lst, key=lambda stock: float(stock[1]), reverse=True)[0][2]
     sPercent = sum([i[1] for i in lst]) * .70
     pocVolume = lst[lst[pocIndex][2]][1]
@@ -295,17 +299,26 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     putDec = 0
     CallDec = 0
-    NumPut = sum([float(i[3]) for i in OptionTimeFrame ])
-    NumCall = sum([float(i[2]) for i in OptionTimeFrame])
+    NumPut = sum([float(i[3]) for i in OptionTimeFrame[len(OptionTimeFrame)-11:]])
+    NumCall = sum([float(i[2]) for i in OptionTimeFrame[len(OptionTimeFrame)-11:]])
+    
+    thputDec = 0
+    thCallDec = 0
+    thNumPut = sum([float(i[3]) for i in OptionTimeFrame[len(OptionTimeFrame)-5:]])
+    thNumCall = sum([float(i[2]) for i in OptionTimeFrame[len(OptionTimeFrame)-5:]])
+    
     if len(OptionTimeFrame) > 0:
-        putDec = round(NumPut / sum([float(i[3])+float(i[2]) for i in OptionTimeFrame]),2)
-        CallDec = round(NumCall / sum([float(i[3])+float(i[2]) for i in OptionTimeFrame]),2)
+        putDec = round(NumPut / sum([float(i[3])+float(i[2]) for i in OptionTimeFrame[len(OptionTimeFrame)-11:]]),2)
+        CallDec = round(NumCall / sum([float(i[3])+float(i[2]) for i in OptionTimeFrame[len(OptionTimeFrame)-11:]]),2)
+        
+        thputDec = round(thNumPut / sum([float(i[3])+float(i[2]) for i in OptionTimeFrame[len(OptionTimeFrame)-5:]]),2)
+        thCallDec = round(thNumCall / sum([float(i[3])+float(i[2]) for i in OptionTimeFrame[len(OptionTimeFrame)-5:]]),2)
         
 
     fig = make_subplots(rows=2, cols=2, shared_xaxes=True, shared_yaxes=True,
                         specs=[[{}, {} ],
                                [{"colspan": 1},{}]], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
-                        horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') ', 'Volume Profile ' + str(datetime.now()), ),
+                        horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n ', 'Volume Profile ' + str(datetime.now()), ),
                          column_widths=[0.80,0.20], row_width=[0.20, 0.80,] ) #,row_width=[0.30, 0.70,]
 
     
@@ -870,7 +883,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     data = [i[0] for i in sortadlist[:100]]
     data.sort(reverse=True)
     differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
-    average_difference = sum(differences) / len(differences)
+    average_difference = (sum(differences) / len(differences))
     cdata = find_clusters(data, average_difference)
     
     mazz = max([len(i) for i in cdata])
@@ -1004,7 +1017,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                 vallue = 'Mid'
                 sidev = df['open'][trds[7]]
             fig.add_annotation(x=df['time'][trds[7]], y=sidev,
-                               text= str(trds[4]) + ' ' + str(trds[1]) + ' ' + vallue ,
+                               text= str(trds[4]) + ' ' + str(trds[1]) + ' ' + vallue + ' '+ str(trds[0]) ,
                                showarrow=True,
                                arrowhead=4,
                                font=dict(
@@ -1019,7 +1032,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
        
     
 
-
+    '''
     for tmr in range(0,len(fig.data)): 
         fig.data[tmr].visible = True
         
@@ -1052,10 +1065,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     fig.update_layout(
         sliders=sliders
     )
+    '''
     
     
-    
-    fig.update_layout(height=800, xaxis_rangeslider_visible=False, showlegend=False)
+    fig.update_layout(height=850, xaxis_rangeslider_visible=False, showlegend=False)
     fig.update_xaxes(autorange="reversed", row=1, col=2)
     #fig.update_xaxes(autorange="reversed", row=1, col=3)
     #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsMid'], mode='lines', name='BbandsMid'))
@@ -1084,7 +1097,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 
 import pandas_ta as ta
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 300000#80001
+inter = 150001#250000#80001
 app = Dash()
 app.layout = html.Div([
     
@@ -1197,7 +1210,7 @@ def update_graph_live(n_intervals, data):
         AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
             
             
-    hs = historV1(df,60,{},AllTrades,[])
+    hs = historV1(df,80,{},AllTrades,[])
     
     va = valueAreaV1(hs[0])
 
