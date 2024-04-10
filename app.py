@@ -857,11 +857,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                  )    
         
     fig.add_trace(go.Scatter(x=df['time'],
-                             y= [df['STDEV_2'].mean()]*len(df['time']) ,
+                             y= [df['STDEV_25'].mean()]*len(df['time']) ,
                              line_color='chartreuse',
-                             text = str(df['STDEV_2'].mean()),
+                             text = str(df['STDEV_25'].mean()),
                              textposition="bottom left",
-                             name='Avg UVWAP '+ str(df['STDEV_2'].mean()),
+                             name='Avg UVWAP '+ str(df['STDEV_25'].mean()),
                              showlegend=False,
                              visible=False,
                              mode= 'lines',
@@ -869,11 +869,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                  )
     
     fig.add_trace(go.Scatter(x=df['time'],
-                             y= [df['STDEV_N2'].mean()]*len(df['time']) ,
+                             y= [df['STDEV_N25'].mean()]*len(df['time']) ,
                              line_color='chartreuse',
-                             text = str(df['STDEV_N2'].mean()),
+                             text = str(df['STDEV_N25'].mean()),
                              textposition="bottom left",
-                             name='Avg LVWAP '+ str(df['STDEV_N2'].mean()),
+                             name='Avg LVWAP '+ str(df['STDEV_N25'].mean()),
                              showlegend=False,
                              visible=False,
                              mode= 'lines',
@@ -1005,7 +1005,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     for trd in sortadlist:
         trd.append(df['timestamp'].searchsorted(trd[2])-1)
 
-    for trds in sortadlist[:5]:
+    for trds in sortadlist[:50]:
         try:
             if str(trds[3]) == 'A':
                 vallue = 'Sell'
