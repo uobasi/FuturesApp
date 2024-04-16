@@ -337,7 +337,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                         specs=[[{}, {},],
                                [{"colspan": 1},{},],
                                [{"colspan": 1},{},]], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
-                        horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '+strTrend + '('+str(average)+')', 'Volume Profile ' + str(datetime.now().time()) ), #,str(Ask)+'(Sell:'+str(dAsk)+') | '+str(Bid)+ '(Buy'+str(dBid)+') '
+                        horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '+strTrend + '('+str(average)+') '+ str(now), 'Volume Profile ' + str(datetime.now().time()) ), #,str(Ask)+'(Sell:'+str(dAsk)+') | '+str(Bid)+ '(Buy'+str(dBid)+') '
                          column_widths=[0.70,0.30], row_width=[0.15,0.15, 0.70,] ) #,row_width=[0.30, 0.70,]
 
     
@@ -486,32 +486,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     fig.add_trace(go.Scatter(x=df['time'], y=df_dx, mode='lines',name='Derivative'), row=2, col=2)
     fig.add_hline(y=0, row=2, col=2, line_color='black')
         
-    localDevMin = argrelextrema(df_dx, np.less_equal, order=60)[0] 
-    localDevMax = argrelextrema(df_dx, np.greater_equal, order=60)[0]
     
-    if len(localDevMin) > 0:
-        for p in localDevMin:
-            fig.add_annotation(x=x_fake[p], y=df_dx[p],
-                               text='<b>' + 'lMin' + '</b>',
-                               showarrow=True,
-                               arrowhead=4,
-                               font=dict(
-                #family="Courier New, monospace",
-                size=10,
-                # color="#ffffff"
-            ),row=2, col=2)
-            
-    if len(localDevMax) > 0:
-        for b in localDevMax:
-            fig.add_annotation(x=x_fake[b], y=df_dx[b],
-                               text='<b>' + 'lMax' + '</b>',
-                               showarrow=True,
-                               arrowhead=4,
-                               font=dict(
-                #family="Courier New, monospace",
-                size=10,
-                # color="#ffffff"
-            ),row=2, col=2)
     
     for ps in mlst:
         ps.append(df['time'].searchsorted(ps[6])-1)
@@ -963,6 +938,33 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=df_dx, mode='lines',name='Derivative'), row=3, col=1)
     fig.add_hline(y=0, row=3, col=1)
     
+    localDevMin = argrelextrema(df_dx, np.less_equal, order=80)[0] 
+    localDevMax = argrelextrema(df_dx, np.greater_equal, order=80)[0]
+    
+    if len(localDevMin) > 0:
+        for p in localDevMin:
+            fig.add_annotation(x=x_fake[p], y=df_dx[p],
+                               text='lMin' + str(round(df_dx[p],3)),
+                               showarrow=True,
+                               arrowhead=0,
+                               font=dict(
+                #family="Courier New, monospace",
+                size=8,
+                # color="#ffffff"
+            ),row=3, col=1)
+            
+    if len(localDevMax) > 0:
+        for b in localDevMax:
+            fig.add_annotation(x=x_fake[b], y=df_dx[b],
+                               text='lMax ' + str(round(df_dx[b],3)) ,
+                               showarrow=True,
+                               arrowhead=0,
+                               font=dict(
+                #family="Courier New, monospace",
+                size=8,
+                # color="#ffffff"
+            ),row=3, col=1)
+    
     '''
     fig.add_trace(
         go.Bar(
@@ -1129,16 +1131,23 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     return fig
 
 
-
+'''
+html.Div(dcc.Input(id='input-on-interv', type='text')),
+html.Button('Submit', id='submit-interv', n_clicks=0),
+html.Div(id='interv-button-basic',children="Enter interval from |'1' '2' '3' '5' '10' '15'| and submit"),
+dcc.Store(id='interv-value')
+'''
 symbolNumList = ['5602', '13743', '669', '80420', '2552',  '4122', '109044', '42007074']
 symbolNameList = ['ES','NQ', 'GC',  'YM', 'RTY',  'SI', 'CL', 'BTC' ]
+
+intList = ['1','2','3','5','10','15']
 
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
 
 import pandas_ta as ta
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 280000#250000#80001
+inter = 150000#250000#80001
 app = Dash()
 app.layout = html.Div([
     
@@ -1152,7 +1161,9 @@ app.layout = html.Div([
     html.Div(dcc.Input(id='input-on-submit', type='text')),
     html.Button('Submit', id='submit-val', n_clicks=0),
     html.Div(id='container-button-basic',children="Enter a symbol from |'ES' 'NQ' 'GC' 'HG' 'YM' 'RTY' 'SI' 'CL' 'NG' | and submit"),
-    dcc.Store(id='stkName-value')
+    dcc.Store(id='stkName-value'),
+    
+    
 ])
 
 @callback(
@@ -1170,14 +1181,32 @@ def update_output(n_clicks, value):
         print('The input symbol was "{}" '.format(value))
         return str(value).upper(), str(value).upper()
     else:
-        return 'The input symbol was '+str(value)+" is not accepted please try different symbol from  |'ES' 'NQ' 'GC' 'HG' 'YM' 'RTY' 'SI' 'CL' 'NG'|", 'The input symbol was '+str(value)+" is not accepted please try different symbol  |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'|  "
+        return 'The input symbol '+str(value)+" is not accepted please try different symbol from  |'ES' 'NQ' 'GC' 'HG' 'YM' 'RTY' 'SI' 'CL' 'NG'|", 'The input symbol was '+str(value)+" is not accepted please try different symbol  |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'|  "
+'''
+@callback(
+    Output('interv-value', 'interv'),
+    Output('interv-button-basic', 'children'),
+    Input('submit-interv', 'n_clicks'),
+    State('input-on-interv', 'interv'),
+    prevent_initial_call=True
+)
+def update_interval(n_clicks, interv):
+    interv = str(interv)
+    
+    if interv in intList:
+        print('The input interval was "{}" '.format(interv))
+        return str(interv), str(interv), 
+    else:
+        return 'The input interval '+str(interv)+" is not accepted please try different interval from  |'1' '2' '3' '5' '10' '15'|", 'The input interval '+str(interv)+" is not accepted please try different interval from  |'1' '2' '3' '5' '10' '15'|"
 
+'''
 @callback(Output('graph', 'figure'),
           Input('interval', 'n_intervals'),
-          State('stkName-value', 'data'))
+          State('stkName-value', 'data'), )
+          #State('interv-value', 'interv'))
 
     
-def update_graph_live(n_intervals, data):
+def update_graph_live(n_intervals, data, ): #interv
     print('inFunction')	
 
     if data in symbolNameList:
@@ -1186,6 +1215,10 @@ def update_graph_live(n_intervals, data):
     else:
         stkName = 'NQ'  
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
+        
+    #if interv not in intList:
+     #   interv = '5'
+        
         
         
     
@@ -1227,7 +1260,7 @@ def update_graph_live(n_intervals, data):
     
     df.set_index('strTime', inplace=True)
     df['volume'] = pd.to_numeric(df['volume'], downcast='integer')
-    df_resampled = df.resample('2T').agg({
+    df_resampled = df.resample('5T').agg({
         'timestamp': 'first',
         'name': 'last',
         'open': 'first',
