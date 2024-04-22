@@ -25,8 +25,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 import plotly.io as pio
 pio.renderers.default='browser'
 import bisect
-import yfinance as yf
-import dateutil.parser
+#import yfinance as yf
+#import dateutil.parser
 
 def ema(df):
     df['30ema'] = df['close'].ewm(span=30, adjust=False).mean()
@@ -338,7 +338,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                                [{"colspan": 1},{},],
                                [{"colspan": 1},{},]], #[{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
                         horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '+strTrend + '('+str(average)+') '+ str(now), 'Volume Profile ' + str(datetime.now().time()) ), #,str(Ask)+'(Sell:'+str(dAsk)+') | '+str(Bid)+ '(Buy'+str(dBid)+') '
-                         column_widths=[0.70,0.30], row_width=[0.15,0.15, 0.70,] ) #,row_width=[0.30, 0.70,]
+                         column_widths=[0.80,0.20], row_width=[0.15,0.15, 0.70,] ) #,row_width=[0.30, 0.70,]
 
     
             
@@ -631,7 +631,6 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N0'], mode='lines', opacity=0.15, name='LOWERVWAP0.5', line=dict(color='black')))
     '''
     #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', opacity=0.19, name='1ema',marker_color='rgba(0,0,0)'))
-    
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', name='UPPERVWAP'))
     
     '''
@@ -661,6 +660,27 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
  
     trcount = 0
+    
+    for trd in sortadlist:
+        trd.append(df['timestamp'].searchsorted(trd[2])-1)
+        
+    '''    
+    candleDict = {}
+    for ttttt in sortadlist:
+        if ttttt[7] not in candleDict:
+            candleDict[ttttt[7]] = [ttttt]
+        else:
+            candleDict[ttttt[7]].append(ttttt)
+            
+    
+    for cdt in candleDict:
+        OptionTimeFrame[cdt].append(candleDict[cdt])
+        
+    for opy in range(len(OptionTimeFrame)):
+        if len(OptionTimeFrame[opy]) < 11:
+            OptionTimeFrame[opy].append([0,0,0,0,0])
+    '''
+    
     #indsBuy = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Ask(BUY)']]
     #indsSell = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Bid(SELL)']]
     #indsBetw = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Between']]
@@ -672,6 +692,18 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     indsBelow = [i for i in OptionTimeFrame if round(i[7],2) >= 0.61 and int(i[4]) < len(df) and float(i[3]) >= (sum([i[3]+i[2] for i in OptionTimeFrame]) / len(OptionTimeFrame))] # and int(i[4]) < len(df) imbalance = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[13] == 'Imbalance' and i[1] != 'BelowBid(SELL)' and i[1] != 'AboveAsk(BUY)']]
     #indsHAbove = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Ask(BUY)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
     #indsHBelow  = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Bid(SELL)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
+    for i in OptionTimeFrame:
+        tvy = ''
+        for xp in i[10]:
+            mks = ''
+            for vb in i[10][xp]:
+                mks+= str(vb)+' '+ '\n'
+            
+            tvy += str(xp) +' | ' + mks 
+            #tvy +='\n'
+        i.append(tvy)
+        #i.append('\n'.join([f'{key}: {value}\n' for key, value in i[10].items()]))
+    
     
     if len(MidCand) > 0:
        fig.add_trace(go.Candlestick(
@@ -682,7 +714,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
            close=[df['close'][i[4]] for i in MidCand],
            increasing={'line': {'color': 'gray'}},
            decreasing={'line': {'color': 'gray'}},
-           hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask'  for i in MidCand],
+           hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask\n' + i[11]  for i in MidCand] ,
            name='highlight' ),
        row=1, col=1)
        trcount+=1
@@ -696,7 +728,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in putCand],
             increasing={'line': {'color': 'teal'}},
             decreasing={'line': {'color': 'teal'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask'  for i in putCand],
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask\n' + i[11]  for i in putCand],
             name='highlight' ),
         row=1, col=1)
         trcount+=1
@@ -710,7 +742,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in callCand],
             increasing={'line': {'color': 'pink'}},
             decreasing={'line': {'color': 'pink'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask'  for i in callCand],
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask\n' + i[11]  for i in callCand],
             name='highlight' ),
         row=1, col=1)
         trcount+=1
@@ -724,7 +756,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsAbove],
             increasing={'line': {'color': '#00FFFF'}},
             decreasing={'line': {'color': '#00FFFF'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask'  for i in indsAbove], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask\n' + i[11]  for i in indsAbove], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Bid' ),
         row=1, col=1)
         trcount+=1
@@ -738,7 +770,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsBelow],
             increasing={'line': {'color': '#FF1493'}},
             decreasing={'line': {'color': '#FF1493'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask'  for i in indsBelow], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask\n' + i[11]  for i in indsBelow], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Ask' ),
         row=1, col=1)
         trcount+=1
@@ -937,7 +969,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     #df_dx.append()
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=df_dx, mode='lines',name='Derivative'), row=3, col=1)
     fig.add_hline(y=0, row=3, col=1)
-    
+    '''
     localDevMin = argrelextrema(df_dx, np.less_equal, order=80)[0] 
     localDevMax = argrelextrema(df_dx, np.greater_equal, order=80)[0]
     
@@ -965,7 +997,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                 # color="#ffffff"
             ),row=3, col=1)
     
-    '''
+    
     fig.add_trace(
         go.Bar(
             x=pd.Series([i[1] for i in newDict2]),
@@ -1045,8 +1077,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     
     ''' 
-    for trd in sortadlist:
-        trd.append(df['timestamp'].searchsorted(trd[2])-1)
+    
+            
 
     for trds in sortadlist[:50]:
         try:
@@ -1070,9 +1102,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             ),)
         except(KeyError):
             continue 
-    
-      
-       
+
     
 
     
@@ -1137,7 +1167,7 @@ html.Button('Submit', id='submit-interv', n_clicks=0),
 html.Div(id='interv-button-basic',children="Enter interval from |'1' '2' '3' '5' '10' '15'| and submit"),
 dcc.Store(id='interv-value')
 '''
-symbolNumList = ['5602', '13743', '669', '80420', '2552',  '4122', '109044', '42007074']
+symbolNumList = ['5602', '13743', '669', '80420', '2552',  '4122', '320510', '42007074']
 symbolNameList = ['ES','NQ', 'GC',  'YM', 'RTY',  'SI', 'CL', 'BTC' ]
 
 intList = ['1','2','3','5','10','15']
@@ -1145,9 +1175,10 @@ intList = ['1','2','3','5','10','15']
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
 
-import pandas_ta as ta
+#import pandas_ta as ta
+from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 150000#250000#80001
+inter = 250000#250000#80001
 app = Dash()
 app.layout = html.Div([
     
@@ -1343,9 +1374,10 @@ def update_graph_live(n_intervals, data, ): #interv
     tradeTimes = [i[6] for i in tempTrades]
     
     timeDict = {}
+    cdDict = {}
     for ttm in dtime:
         for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
-            if datetime.strptime(tradMade[6], "%H:%M:%S") > datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=1):
+            if datetime.strptime(tradMade[6], "%H:%M:%S") > datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=5):
                 try:
                     timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
                 except(KeyError,ZeroDivisionError):
@@ -1361,6 +1393,13 @@ def update_graph_live(n_intervals, data, ): #interv
                     timeDict[ttm][1] += tradMade[1]#tradMade[0] * tradMade[1] 
                 elif tradMade[5] == 'N':
                     timeDict[ttm][2] += tradMade[1]#tradMade[0] * tradMade[1] 
+                    
+            if ttm not in cdDict:
+                cdDict[ttm] = []   
+            if ttm in cdDict:
+                cdDict[ttm].append([tradMade[0], tradMade[1], tradMade[5]])
+            
+               
                 
 
     for i in timeDict:
@@ -1369,12 +1408,41 @@ def update_graph_live(n_intervals, data, ): #interv
                 timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[ttm][2]/sum(timeDict[ttm])]
             except(ZeroDivisionError,KeyError):
                 timeDict[i] += [0, 0,0]
+                
     
     
+    dcount = {}
+    for cd in cdDict:
+        count_dict = Counter([i[0] for i in cdDict[cd]])
+        sorted_data = sorted(cdDict[cd], key=lambda x: x[0])
+        for i in count_dict:
+            for x in sorted_data:
+                if i == x[0]:
+                    if cd not in dcount:
+                        dcount[cd] = {}
+                    if cd in dcount:
+                        if i not in dcount[cd]:
+                            dcount[cd][i] = [0,0,0,0]
+                        if i in dcount[cd]:
+                            if x[2] == 'B':
+                                dcount[cd][i][0] += x[1]
+                                dcount[cd][i][2] = round(dcount[cd][i][0]/(dcount[cd][i][0]+dcount[cd][i][1]),2)
+                            if x[2] == 'A':
+                                dcount[cd][i][1] += x[1]
+                                dcount[cd][i][3] = round(dcount[cd][i][1]/(dcount[cd][i][0]+dcount[cd][i][1]),2)
+                if x[0] > i:
+                    break
+                                
     timeFrame = [[i,'']+timeDict[i] for i in timeDict]
 
     for i in range(len(timeFrame)):
         timeFrame[i].append(dtimeEpoch[i])
+        
+    
+    for i in timeFrame:
+        i.append(dict(sorted(dcount[i[0]].items(), reverse=True)))
+        
+    
         
     
     #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=1.5)['SUPERTd_2_1.5']
@@ -1395,49 +1463,7 @@ def update_graph_live(n_intervals, data, ): #interv
     except(ValueError):
         previousDay = []
     
-    '''
-    blob = Blob('levelTwoMBO'+str(symbolNum), bucket) 
-    levelTwoMBO = blob.download_as_text()
-    
-    
-    csv_reader  = csv.reader(io.StringIO(levelTwoMBO))
 
-
-    csv_rows = []
-    [csv_rows.append(row) for row in csv_reader]
-       
-        
-        
-    levelTwoMBO = csv_rows[::-1]
-    levelTwoMBO = [i for i in levelTwoMBO ] #if i[6] == symbolNum and (i[4] == 'T')
-    
-
-    
-    minAgg2 = []
-    for i in levelTwoMBO:
-        #if i[4] == 'T': #  and int(i[3]) >= 2 
-            if int(levelTwoMBO[0][0]) - (60000000000*16) <= int(i[0]):
-                minAgg2.append(i)
-                
-    dic2 = {}
-    for i in minAgg2:
-        if i[2] not in dic2:
-            dic2[i[2]] = [0,0]
-        if i[2] in dic2:
-            if i[5] == 'A':
-                dic2[i[2]][0] += int(i[3])
-            elif i[5] == 'B':
-                dic2[i[2]][1] += int(i[3])
-                
-    
-                
-    newDict2 = []
-    for i in dic2:
-        newDict2.append([str(i)+'A',dic2[i][0]])
-        newDict2.append([str(i)+'B',dic2[i][1]])
-        
-    newDict2.sort(key=lambda x:float(x[0][:len(x[0])-1]), reverse=True)
-    '''
     
     fg = plotChart(df, [hs[1],newwT[:100]], va[0], va[1], x_fake, df_dx, bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[], newDict2=[]) #trends=FindTrends(df,n=10)
 
