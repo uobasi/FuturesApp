@@ -699,7 +699,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             for vb in i[10][xp]:
                 mks+= str(vb)+' '
             
-            tvy += str(xp) +' | ' + mks + \ 
+            tvy += str(xp) +' | ' + mks + '\n'
         i.append(tvy)
         #i.append('\n'.join([f'{key}: {value}\n' for key, value in i[10].items()]))
     
