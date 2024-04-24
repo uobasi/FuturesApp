@@ -5,7 +5,6 @@ Created on Wed Dec 13 01:11:16 2023
 @author: UOBASUB
 """
 import csv
-import os
 import io
 from datetime import datetime, timedelta, date, time
 import pandas as pd 
@@ -700,7 +699,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             for vb in i[10][xp]:
                 mks+= str(vb)+' '
             
-            tvy += str(xp) +' | ' + mks + os.linesep 
+            tvy += str(xp) +' | ' + mks + '<br>' 
         i.append(tvy)
         #i.append('\n'.join([f'{key}: {value}\n' for key, value in i[10].items()]))
     
