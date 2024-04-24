@@ -713,7 +713,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
            close=[df['close'][i[4]] for i in MidCand],
            increasing={'line': {'color': 'gray'}},
            decreasing={'line': {'color': 'gray'}},
-           hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask\n' + i[11]  for i in MidCand] ,
+           hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>'  + i[11]  for i in MidCand] ,
            name='highlight' ),
        row=1, col=1)
        trcount+=1
@@ -727,7 +727,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in putCand],
             increasing={'line': {'color': 'teal'}},
             decreasing={'line': {'color': 'teal'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask\n' + i[11]  for i in putCand],
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + i[11]  for i in putCand],
             name='highlight' ),
         row=1, col=1)
         trcount+=1
@@ -741,7 +741,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in callCand],
             increasing={'line': {'color': 'pink'}},
             decreasing={'line': {'color': 'pink'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask\n' + i[11]  for i in callCand],
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + i[11]  for i in callCand],
             name='highlight' ),
         row=1, col=1)
         trcount+=1
@@ -755,7 +755,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsAbove],
             increasing={'line': {'color': '#00FFFF'}},
             decreasing={'line': {'color': '#00FFFF'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask\n' + i[11]  for i in indsAbove], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + i[11]  for i in indsAbove], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Bid' ),
         row=1, col=1)
         trcount+=1
@@ -769,7 +769,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsBelow],
             increasing={'line': {'color': '#FF1493'}},
             decreasing={'line': {'color': '#FF1493'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask\n' + i[11]  for i in indsBelow], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + i[11]  for i in indsBelow], #+i[12].replace('], ', '],<br>')+'<br>'
             name='Ask' ),
         row=1, col=1)
         trcount+=1
