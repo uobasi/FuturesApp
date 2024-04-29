@@ -1421,14 +1421,16 @@ def update_graph_live(n_intervals, data, ): #interv
                         dcount[cd] = {}
                     if cd in dcount:
                         if i not in dcount[cd]:
-                            dcount[cd][i] = [0,0,0,0]
+                            dcount[cd][i] = [0,0,0,0,0]
                         if i in dcount[cd]:
                             if x[2] == 'B':
                                 dcount[cd][i][0] += x[1]
                                 dcount[cd][i][2] = round(dcount[cd][i][0]/(dcount[cd][i][0]+dcount[cd][i][1]),2)
+                                dcount[cd][i][4] = dcount[cd][i][0] - dcount[cd][i][1]
                             if x[2] == 'A':
                                 dcount[cd][i][1] += x[1]
                                 dcount[cd][i][3] = round(dcount[cd][i][1]/(dcount[cd][i][0]+dcount[cd][i][1]),2)
+                                dcount[cd][i][4] = dcount[cd][i][0] - dcount[cd][i][1]
                 if x[0] > i:
                     break
                                 
