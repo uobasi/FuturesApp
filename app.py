@@ -1166,7 +1166,7 @@ html.Button('Submit', id='submit-interv', n_clicks=0),
 html.Div(id='interv-button-basic',children="Enter interval from |'1' '2' '3' '5' '10' '15'| and submit"),
 dcc.Store(id='interv-value')
 '''
-symbolNumList = ['5602', '13743', '669', '80420', '2552',  '4122', '320510', '42007074']
+symbolNumList = ['5602', '13743', '669', '80420', '2552',  '4122', '320510', '42003423']
 symbolNameList = ['ES','NQ', 'GC',  'YM', 'RTY',  'SI', 'CL', 'BTC' ]
 
 intList = ['1','2','3','5','10','15']
