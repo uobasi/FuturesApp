@@ -1177,7 +1177,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #import pandas_ta as ta
 from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 250000#250000#80001
+inter = 200000#250000#80001
 app = Dash()
 app.layout = html.Div([
     
