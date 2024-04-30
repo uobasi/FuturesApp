@@ -913,7 +913,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     mazz = max([len(i) for i in cdata])
     for i in cdata:
-        if len(i) >= 5:
+        if len(i) >= 3:
             opac = round((len(i)/mazz)/1.2,2)
             fig.add_shape(type="rect",
                       y0=i[0], y1=i[len(i)-1], x0=-1, x1=len(df),
