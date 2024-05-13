@@ -1176,7 +1176,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     return fig
 
 
-symbolNumList = ['5602', '13743', '669', '80420', '2552',  '1256', '320510', '42003423']
+symbolNumList = ['5602', '13743', '669', '80420', '2552',  '1256', '320510', '42009544']
 symbolNameList = ['ES','NQ', 'GC',  'YM', 'RTY',  'PL', 'CL', 'BTC' ]
 
 intList = ['1','2','3','4','5','10','15']
@@ -1259,7 +1259,7 @@ def update_graph_live(n_intervals, data, interv): #interv
         stkName = data
         symbolNum = symbolNumList[symbolNameList.index(stkName)]   
     else:
-        stkName = 'NQ'  
+        stkName = 'ES'  
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
