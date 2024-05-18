@@ -307,6 +307,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     #strTask = str(round(Task/(Tbid+Task+Tmid),2))
     #strMid = str(round(Tmid/(Tbid+Task+Tmid),2))
     #strTBet = str(round(TBet/(Tbid+Task+TBet),2))
+    buys = [abs(i[2]-i[3]) for i in OptionTimeFrame if i[2]-i[3] > 0 ]
+    sells = [abs(i[2]-i[3]) for i in OptionTimeFrame if i[2]-i[3] < 0 ]
+
     
     
     putDec = 0
@@ -337,13 +340,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                         specs=[[{}, {},],
                                [{"colspan": 1},{},],
                                [{"colspan": 1},{},]], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
-                        horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '+strTrend + '('+str(average)+') '+ str(now), 'Volume Profile ' + str(datetime.now().time()) ), #,str(Ask)+'(Sell:'+str(dAsk)+') | '+str(Bid)+ '(Buy'+str(dBid)+') '
+                        horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '+strTrend + '('+str(average)+') '+ str(now)+ '  (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') ', 'Volume Profile ' + str(datetime.now().time()) ), #,str(Ask)+'(Sell:'+str(dAsk)+') | '+str(Bid)+ '(Buy'+str(dBid)+') '
                          column_widths=[0.85,0.15], row_width=[0.15, 0.15, 0.70,] ) #,row_width=[0.30, 0.70,]
 
     
             
-    for pott in OptionTimeFrame:
-        pott.insert(4,df['timestamp'].searchsorted(pott[8]))
+    
        
     optColor = [     'teal' if float(i[2]) > float(i[3]) #rgba(0,128,0,1.0)
                 else 'crimson' if float(i[3]) > float(i[2])#rgba(255,0,0,1.0)
@@ -548,8 +550,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     '''
     colo = []
     for fk in sortadlist2:
-        colo.append([str(round(fk[0],3))+'A',fk[7],fk[8]])
-        colo.append([str(round(fk[0],3))+'B',fk[8],fk[7]])
+        colo.append([str(round(fk[0],3))+'A',fk[7],fk[8], fk[7]/(fk[7]+fk[8]+1)])
+        colo.append([str(round(fk[0],3))+'B',fk[8],fk[7], fk[8]/(fk[7]+fk[8]+1)])
     fig.add_trace(
         go.Bar(
             x=pd.Series([i[1] for i in colo]),
@@ -558,8 +560,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             textposition='auto',
             orientation='h',
             #width=0.2,
-            marker_color=[     'teal' if 'B' in i[0] 
-                        else 'crimson' if 'A' in i[0]
+            marker_color=[     'teal' if 'B' in i[0] and i[3] < 0.65
+                        else '#00FFFF' if 'B' in i[0] and i[3] >= 0.65
+                        else 'crimson' if 'A' in i[0] and i[3] < 0.65
+                        else 'pink' if 'A' in i[0] and i[3] >= 0.65
                         else i for i in colo],
             hovertext=pd.Series([i[0][:len(i[0])-1] + ' '+ str(round(i[1] / (i[1]+i[2]+1),2)) + ' '+ str(round(i[2]/ (i[1]+i[2]+1),2)) for i in colo])#pd.Series([str(round(i[7],3)) + ' ' + str(round(i[8],3))  + ' ' + str(round(i[9],3)) +' ' + str(round([i[7], i[8], i[9]][[i[7], i[8], i[9]].index(max([i[7], i[8], i[9]]))]/sum([i[7], i[8], i[9]]),2)) if sum([i[7], i[8], i[9]]) > 0 else '' for i in sortadlist2]),
         ),
@@ -927,7 +931,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     mazz = max([len(i) for i in cdata])
     for i in cdata:
         if len(i) >= 6:
-            opac = round((len(i)/mazz)/1.2,2)
+            opac = round((len(i)/mazz)/1.6,2)
             fig.add_shape(type="rect",
                       y0=i[0], y1=i[len(i)-1], x0=-1, x1=len(df),
                       fillcolor="darkcyan",
@@ -978,7 +982,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             trcount+=1
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
-    difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame ]
+    difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame]
     coll = [     'teal' if i[0] > 0
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
@@ -1092,10 +1096,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     
      
-    '''
-            
+   
 
-    for trds in sortadlist[:50]:
+    for trds in sortadlist[:10]:
         try:
             if str(trds[3]) == 'A':
                 vallue = 'Sell'
@@ -1118,7 +1121,6 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         except(KeyError):
             continue 
 
-    '''
 
     
     for tmr in range(0,len(fig.data)): 
@@ -1179,7 +1181,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
 symbolNumList = ['5602', '13743', '669', '80420', '2552',  '1256', '320510', '42009544']
 symbolNameList = ['ES','NQ', 'GC',  'YM', 'RTY',  'PL', 'CL', 'BTC' ]
 
-intList = ['1','2','3','4','5','10','15']
+intList = ['1','2','3','4','5','6','10','15']
 
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
@@ -1187,7 +1189,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #import pandas_ta as ta
 from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 200000#250000#80001
+inter = 210000#250000#80001
 app = Dash()
 app.layout = html.Div([
     
@@ -1259,14 +1261,13 @@ def update_graph_live(n_intervals, data, interv): #interv
         stkName = data
         symbolNum = symbolNumList[symbolNameList.index(stkName)]   
     else:
-        stkName = 'ES'  
+        stkName = 'NQ'  
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
         interv = '5'
-        
-        
-        
+         
+    
     
     blob = Blob('FuturesOHLC'+str(symbolNum), bucket) 
     FuturesOHLC = blob.download_as_text()
@@ -1298,8 +1299,10 @@ def update_graph_live(n_intervals, data, interv): #interv
     for i in aggs:
         if i not in newAggs:
             newAggs.append(i)
+    
+    
             
-          
+       
     df = pd.DataFrame(newAggs, columns = ['open', 'high', 'low', 'close', 'volume', 'time', 'timestamp', 'name',])
     
     df['strTime'] = df['timestamp'].apply(lambda x: pd.Timestamp(int(x) // 10**9, unit='s', tz='EST') )
@@ -1323,9 +1326,12 @@ def update_graph_live(n_intervals, data, interv): #interv
     df.dropna(inplace=True)
     df.reset_index(drop=True, inplace=True) 
 
+
     vwap(df)
     ema(df)
     PPP(df)
+
+    
     
     blob = Blob('FuturesTrades'+str(symbolNum), bucket) 
     FuturesTrades = blob.download_as_text()
@@ -1336,8 +1342,8 @@ def update_graph_live(n_intervals, data, interv): #interv
     csv_rows = []
     for row in csv_reader:
         csv_rows.append(row)
-        
-    
+       
+
     #STrades = [i for i in csv_rows]
     AllTrades = []
     for i in csv_rows:
@@ -1349,12 +1355,15 @@ def update_graph_live(n_intervals, data, interv): #interv
             minss = '0'+str(minss)
         opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
         AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
-            
-            
-    hs = historV1(df,80,{},AllTrades,[])
+       
+    #AllTrades = [i for i in AllTrades if i[1] > 1]
+        
+    hs = historV1(df,50,{},AllTrades,[])
     
     va = valueAreaV1(hs[0])
     
+    
+
     x = np.array([i for i in range(len(df))])
     y = np.array([i for i in df['40ema']])
     
@@ -1367,7 +1376,8 @@ def update_graph_live(n_intervals, data, interv): #interv
     # derivative of y with respect to x
     df_dx = derivative(f, x_fake, dx=1e-6)
 
-    
+
+
     mTrade = [i for i in AllTrades ]
     
      
@@ -1378,6 +1388,8 @@ def update_graph_live(n_intervals, data, interv): #interv
     newwT = []
     for i in mTrade:
         newwT.append([i[0],i[1],i[2],i[5], i[4],i[3],i[6]])
+    
+    
 
     
     dtime = df['time'].dropna().values.tolist()
@@ -1420,7 +1432,7 @@ def update_graph_live(n_intervals, data, interv): #interv
     for i in timeDict:
         if len(timeDict[i]) == 3:
             try:
-                timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[ttm][2]/sum(timeDict[ttm])]
+                timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[i][2]/sum(timeDict[i])]#
             except(ZeroDivisionError,KeyError):
                 timeDict[i] += [0, 0,0]
                 
@@ -1459,14 +1471,21 @@ def update_graph_live(n_intervals, data, interv): #interv
         
     
     for i in timeFrame:
-        i.append(dict(sorted(dcount[i[0]].items(), reverse=True)))
-        
+        try:
+            i.append(dict(sorted(dcount[i[0]].items(), reverse=True)))
+        except(KeyError):
+            dcount[i[0]] = {}
+            i.append(dcount[i[0]])
+            
+            
+    for pott in timeFrame:
+        pott.insert(4,df['timestamp'].searchsorted(pott[8]))
     
-        
+         
     
     #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=1.8)['SUPERTd_2_1.8']
     #df['superTrend'][df['superTrend'] < 0] = 0
-    
+ 
     blob = Blob('PrevDay', bucket) 
     PrevDay = blob.download_as_text()
         
@@ -1481,7 +1500,7 @@ def update_graph_live(n_intervals, data, interv): #interv
         previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
     except(ValueError):
         previousDay = []
-    
+
 
     
     fg = plotChart(df, [hs[1],newwT[:150]], va[0], va[1], x_fake, df_dx, bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[], newDict2=[]) #trends=FindTrends(df,n=10)
@@ -1493,3 +1512,15 @@ if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0', port=8080)
     #app.run_server(debug=False, use_reloader=False)
     
+
+
+'''
+import time  
+start_time = time.time()
+
+
+end_time = time.time()
+# Calculate the elapsed time
+elapsed_time = end_time - start_time
+print(f"Elapsed time: {elapsed_time} seconds")
+'''
