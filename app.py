@@ -550,8 +550,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     '''
     colo = []
     for fk in sortadlist2:
-        colo.append([str(round(fk[0],6))+'A',fk[7],fk[8], fk[7]/(fk[7]+fk[8]+1)])
-        colo.append([str(round(fk[0],6))+'B',fk[8],fk[7], fk[8]/(fk[7]+fk[8]+1)])
+        colo.append([str(round(fk[0],7))+'A',fk[7],fk[8], fk[7]/(fk[7]+fk[8]+1)])
+        colo.append([str(round(fk[0],7))+'B',fk[8],fk[7], fk[8]/(fk[7]+fk[8]+1)])
     fig.add_trace(
         go.Bar(
             x=pd.Series([i[1] for i in colo]),
