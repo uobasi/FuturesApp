@@ -286,27 +286,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     sortadlist = lst2[1]
     sortadlist2 = lst2[0]
     
-    '''
-    Ask = sum([i[1] for i in newDict2 if 'A' in i[0]])
-    Bid = sum([i[1] for i in newDict2 if 'B' in i[0]])
-    #askTracker.append(Ask)
-    #bidTracker.append(Bid)
-    #timeTracker.append(datetime.now().time().strftime('%H:%M:%S'))
-    
-    dAsk = round(Ask / (Ask+Bid),2)
-    dBid = round(Bid / (Ask+Bid),2)
-    '''
-    
-    
-    #Tbid = sum([i[6][0] + i[6][1] for i in sortadlist2])
-    #Task = sum([i[6][2] + i[6][3] for i in sortadlist2])
-    #Tmid = sum([i[6][4] for i in sortadlist2])
-    #TBet = sum([i[6][4] for i in sortadlist2])
-    
-    #strTbid = str(round(Tbid/(Tbid+Task+Tmid),2))
-    #strTask = str(round(Task/(Tbid+Task+Tmid),2))
-    #strMid = str(round(Tmid/(Tbid+Task+Tmid),2))
-    #strTBet = str(round(TBet/(Tbid+Task+TBet),2))
+
     buys = [abs(i[2]-i[3]) for i in OptionTimeFrame if i[2]-i[3] > 0 ]
     sells = [abs(i[2]-i[3]) for i in OptionTimeFrame if i[2]-i[3] < 0 ]
 
@@ -383,34 +363,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         row=3, col=1
     )
 
-    '''
-    fig.add_trace(
-        go.Bar(
-            x=pd.Series([OptionTimeFrame[0][0]]),
-            y=pd.Series([max([i[2] for i in OptionTimeFrame]+ [i[3] for i in OptionTimeFrame]) * 1.5]),
-            #textposition='auto',
-            #orientation='h',
-            #width=0.2,
-            marker_color= '#FFFFFF',
-            hovertext='',
-            
-        ),
-        secondary_y= True, row=1, col=1
-    )
-    '''
-
     
-    bms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(4).mean()
-    sms = pd.Series([i[3] for i in OptionTimeFrame]).rolling(4).mean()
+    bms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(9).mean()
+    sms = pd.Series([i[3] for i in OptionTimeFrame]).rolling(9).mean()
     #xms = pd.Series([i[3]+i[2] for i in OptionTimeFrame]).rolling(4).mean()
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=bms, line=dict(color='teal'), mode='lines', name='Buy VMA'), row=3, col=1)
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=sms, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=3, col=1)
-    #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=xms, line=dict(color='black'), mode='lines', name='AVG'), row=2, col=1)
-    
-    #hovertext = []
-    # for i in range(len(df)):
-    #strr = df['time'][0]+'\n' +'Open: '+ str(df['open'[0]])+'\n'
-    #hovertext.append(str(df.bidAskString[i])+' '+str(df.bidAsk[i]))
 
     fig.add_trace(go.Candlestick(x=df['time'],
                                  open=df['open'],
@@ -422,62 +380,6 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                   row=1, col=1)
     
     
-    
-    #fig.add_trace(go.Bar(x=df['time'], y=df['volume'],showlegend=False), row=2, col=1)
-    
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['vma'], mode='lines', name='VMA'), row=2, col=1)
-    
-    '''
-    localMin = argrelextrema(df.close.values, np.less_equal, order=100)[0] 
-    localMax = argrelextrema(df.close.values, np.greater_equal, order=100)[0]
-     
-    if len(localMin) > 0:
-        mcount = 0 
-        for p in localMin:
-            fig.add_annotation(x=df['time'][p], y=df['close'][p],
-                               text= str(mcount) +'lMin' ,
-                               showarrow=True,
-                               arrowhead=4,
-                               font=dict(
-                #family="Courier New, monospace",
-                size=15,
-                # color="#ffffff"
-            ),)
-            mcount+=1
-    if len(localMax) > 0:
-        mcount = 0 
-        for b in localMax:
-            fig.add_annotation(x=df['time'][b], y=df['close'][b],
-                               text=str(mcount) + 'lMax',
-                               showarrow=True,
-                               arrowhead=4,
-                               font=dict(
-                #family="Courier New, monospace",
-                size=15,
-                # color="#ffffff"
-            ),)
-            mcount+=1
-    '''
-    '''
-    fig.add_trace(go.Scatter(x=df['time'].iloc[df['time'].searchsorted('09:30:00'):] , y=pd.Series([round(i[2] / (i[2]+i[3]),2) for i in overall]), mode='lines',name='Put Volume'), row=2, col=1)
-    fig.add_trace(go.Scatter(x=df['time'].iloc[df['time'].searchsorted('09:30:00'):] , y=pd.Series([round(i[3] / (i[2]+i[3]),2) for i in overall]), mode='lines',name='Call Volume'), row=2, col=1)
-
-    
-    
-    
-    fig.add_trace(go.Scatter(x=df['time'], y=df_dx, mode='lines',name='Derivative'), row=2, col=2)
-    fig.add_hline(y=0, row=2, col=2, line_color='black')
-        
-    
-    
-    for ps in mlst:
-        ps.append(df['time'].searchsorted(ps[6])-1)
-    fig.add_trace(go.Scatter(x=pd.Series([i[6] for i in mlst if i[7] < len(df['close'])]), y=pd.Series([i[0] for i in mlst if i[7] < len(df['close'])]), mode='markers',name='TradedPrice',  hovertext=pd.Series([str(i[1]) + ' ' + str(i[5])  for i in mlst if i[7] < len(df['close'])]),), row=2, col=2)
-    
-    fig.add_trace(go.Scatter(x=pd.Series([i[6] for i in mlst if i[7] < len(df['close'])]), y=pd.Series([df['close'][i[7]] for i in mlst if i[7] < len(df['close'])]), mode='lines',name='ClosingPrice'), row=2, col=2)
-    
-    #fig.add_trace(go.Scatter(x=pd.Series([df['time'][i[7]] for i in mlst]), y=pd.Series([i[0] for i in mlst]), mode='lines',name='TradedPrice'), row=1, col=1)
-    '''
     
     if pea:
         peak, _ = signal.find_peaks(df['100ema'])
@@ -521,33 +423,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                   opacity=0.09,
                   )
 
-    
-    '''
-    try:
-        colors = ['rgba(255,0,0,'+str(round([i[7], i[8], i[9]][[i[7], i[8], i[9]].index(max([i[7], i[8], i[9]]))]/sum([i[7], i[8], i[9]]),2))+')' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 0  #'rgba(255,0,0,'+str(round(i[6][:4][i[6][:4].index(max(i[6][:4]))]/sum(i[6]),2))+')' if i[5] == 'red' 
-                  else 'rgba(0,139,139,'+str(round([i[7], i[8], i[9]][[i[7], i[8], i[9]].index(max([i[7], i[8], i[9]]))]/sum([i[7], i[8], i[9]]),2))+')' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 1
-                  else '#778899' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 2
-                  else 'gray' for i in sortadlist2]#['darkcyan', ] * len(sortadlist2)#
-    except(ZeroDivisionError):
-        colors = [     'rgba(255,0,0)' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 0
-                  else 'rgba(0,139,139)'if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 1
-                  else '#778899' if [i[7], i[8], i[9]].index(max([i[7], i[8], i[9]])) == 2
-                  else 'gray' for i in sortadlist2]
-    
-    colors = []
-    for i in sortadlist2:
-        thList = [i[7], i[8], i[9]]
-        if sum(thList) > 0:
-            if thList.index(max(thList)) == 0: 
-                colors.append('rgba(255,0,0,'+str(round(thList[0]/sum(thList),2))+')')
-            elif thList.index(max(thList)) == 1: 
-                colors.append('rgba(0,139,139,'+str(round(thList[1]/sum(thList),2))+')')  
-            elif thList.index(max(thList)) == 2: 
-                colors.append('#778899')
-        elif sum(thList) == 0:
-            colors.append('gray')
 
-    '''
     colo = []
     for fk in sortadlist2:
         colo.append([str(round(fk[0],7))+'A',fk[7],fk[8], fk[7]/(fk[7]+fk[8]+1)])
@@ -569,26 +445,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
         ),
         row=1, col=2
     )
-    #hs[1]  [hs[1][20][7], hs[1][20][8], hs[1][20][9]] [[hs[1][20][7], hs[1][20][8], hs[1][20][9]].index(max([hs[1][20][7], hs[1][20][8], hs[1][20][9]]))]
-    '''
-    fig.add_trace(
-        go.Bar(
-            x=pd.Series([i[1] for i in newOpp]),
-            y=pd.Series([float(i[0][1:]) for i in newOpp]),
-            text=pd.Series([i[0] for i in newOpp]),
-            textposition='auto',
-            orientation='h',
-            #width=0.2,
-            marker_color=[     'red' if 'P' in i[0] 
-                        else 'green' if 'C' in i[0]
-                        else i for i in newOpp],
-            hovertext=pd.Series([i[0]  + ' ' + str(i[2]) for i in newOpp]),
-        ),
-        row=1, col=3
-    )
-    '''
-    
-    
+
 
 
     fig.add_trace(go.Scatter(x=[sortadlist2[0][1], sortadlist2[0][1]], y=[
@@ -619,26 +476,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', opacity=0.19, name='1ema',marker_color='rgba(0,0,0)'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', name='UPPERVWAP'))
     
-    '''
-    fig.add_trace(go.Scatter(x=df['time'], y=df['close'], mode='lines',name='Close',marker_color='rgba(0,0,0)'))
-    
-    
-    
-    
-    
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_15'], mode='lines', name='UPPERVWAP15'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N15'], mode='lines', name='LOWERVWAP15'))
-    '''
-    '''
-    fig.add_trace(
-    go.Scatter(
-        x=pd.Series([i[1] for i in linePlot]),
-        y=pd.Series([i[0] for i in linePlot]),
-    ),
-    row=1, col=2)
-    '''
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', name='1ema') , row=1, col=1)
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', name='1ema',line=dict(color="#000000")))
+
     fig.add_hline(y=df['close'][len(df)-1], row=1, col=2)
     
     
@@ -650,22 +488,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     for trd in sortadlist:
         trd.append(df['timestamp'].searchsorted(trd[2])-1)
         
-    '''    
-    candleDict = {}
-    for ttttt in sortadlist:
-        if ttttt[7] not in candleDict:
-            candleDict[ttttt[7]] = [ttttt]
-        else:
-            candleDict[ttttt[7]].append(ttttt)
-            
-    
-    for cdt in candleDict:
-        OptionTimeFrame[cdt].append(candleDict[cdt])
-        
-    for opy in range(len(OptionTimeFrame)):
-        if len(OptionTimeFrame[opy]) < 11:
-            OptionTimeFrame[opy].append([0,0,0,0,0])
-    '''
+
     
     #indsBuy = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Ask(BUY)']]
     #indsSell = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Bid(SELL)']]
@@ -688,7 +511,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     indsBelow = [i for i in OptionTimeFrame if round(i[7],2) >= ccheck and int(i[4]) < len(df) and float(i[3]) >= (sum([i[3] for i in OptionTimeFrame]) / len(OptionTimeFrame))]#  float(sms[i[4]]) # and int(i[4]) < len(df) imbalance = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[13] == 'Imbalance' and i[1] != 'BelowBid(SELL)' and i[1] != 'AboveAsk(BUY)']]
     #indsHAbove = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Ask(BUY)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
     #indsHBelow  = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[1] == 'Bid(SELL)' and float(i[0]) >= 0.40 and int(i[2]) > 160000]]
-    
+    '''
     for i in OptionTimeFrame:
         tvy = ''
         for xp in i[10]:
@@ -699,7 +522,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             tvy += str(xp) +' | ' + mks + '<br>' 
         i.append(tvy)
         #i.append('\n'.join([f'{key}: {value}\n' for key, value in i[10].items()]))
-    
+    '''
     
     if len(MidCand) > 0:
        fig.add_trace(go.Candlestick(
@@ -710,7 +533,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
            close=[df['close'][i[4]] for i in MidCand],
            increasing={'line': {'color': 'gray'}},
            decreasing={'line': {'color': 'gray'}},
-           hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>'  + i[11] + str(sum([i[10][x][2] for x in i[10]]))  for i in MidCand],
+           hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + str(i[2]-i[3])   for i in MidCand], #+ i[11] + str(sum([i[10][x][2] for x in i[10]]))
            hoverlabel=dict(
                 bgcolor="gray",
                 font=dict(color="black", size=8),
@@ -728,7 +551,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in putCand],
             increasing={'line': {'color': 'teal'}},
             decreasing={'line': {'color': 'teal'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + i[11] + str(sum([i[10][x][2] for x in i[10]])) for i in putCand],
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + str(i[2]-i[3]) for i in putCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
             hoverlabel=dict(
                  bgcolor="teal",
                  font=dict(color="white", size=8),
@@ -746,7 +569,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in callCand],
             increasing={'line': {'color': 'pink'}},
             decreasing={'line': {'color': 'pink'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + i[11] + str(sum([i[10][x][2] for x in i[10]])) for i in callCand],
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +  str(i[2]-i[3]) for i in callCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
             hoverlabel=dict(
                  bgcolor="pink",
                  font=dict(color="black", size=8),
@@ -764,7 +587,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsAbove],
             increasing={'line': {'color': '#00FFFF'}},
             decreasing={'line': {'color': '#00FFFF'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + i[11] + str(sum([i[10][x][2] for x in i[10]])) for i in indsAbove], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + str(i[2]-i[3]) for i in indsAbove], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
             hoverlabel=dict(
                  bgcolor="#00FFFF",
                  font=dict(color="black", size=8),
@@ -782,7 +605,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
             close=[df['close'][i[4]] for i in indsBelow],
             increasing={'line': {'color': '#FF1493'}},
             decreasing={'line': {'color': '#FF1493'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + i[11] + str(sum([i[10][x][2] for x in i[10]])) for i in indsBelow], #+i[12].replace('], ', '],<br>')+'<br>'
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' + str(i[2]-i[3]) for i in indsBelow], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
             hoverlabel=dict(
                  bgcolor="#FF1493",
                  font=dict(color="white", size=8),
@@ -809,38 +632,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                             ),
                   row=1, col=1
                  )
-    '''
-    fig.add_trace(go.Scatter(x=df['time'],
-                             y= [(num1 + num2)/2]*len(df['time']) ,
-                             line_color= '#FF99FF',
-                             text = 'VA MidPoint',
-                             textposition="bottom left",
-                             name='VA MidPoint',
-                             showlegend=False,
-                             visible=False,
-                             mode= 'lines',
-                            
-                            ),
-                  row=1, col=1
-                 )
-    
-            
-    mp = df['close'].value_counts()
- 
-    fig.add_trace(
-        go.Bar(
-            x=pd.Series([i for i in mp]),
-            y=pd.Series([i for i in mp.index]),
-            text=np.around(pd.Series([i for i in mp.index]), 2),
-            textposition='auto',
-            orientation='h',
-            #width=0.2,
-            marker_color='cadetblue',
-            hovertext=pd.Series([str(i) for i in mp.index]),
-        ),
-        row=1, col=3
-    )
-    '''
+
     if len(previousDay) > 0:
         if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.20:
             fig.add_trace(go.Scatter(x=df['time'],
@@ -930,7 +722,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     
     mazz = max([len(i) for i in cdata])
     for i in cdata:
-        if len(i) >= 5:
+        if len(i) >= 6:
             opac = round((len(i)/mazz)/1.6,2)
             fig.add_shape(type="rect",
                       y0=i[0], y1=i[len(i)-1], x0=-1, x1=len(df),
@@ -987,115 +779,33 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
     fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=2, col=1)
-    #fig.add_hline(y=0, row=3, col=1)
-    '''
-    localDevMin = argrelextrema(df_dx, np.less_equal, order=80)[0] 
-    localDevMax = argrelextrema(df_dx, np.greater_equal, order=80)[0]
     
-    if len(localDevMin) > 0:
-        for p in localDevMin:
-            fig.add_annotation(x=x_fake[p], y=df_dx[p],
-                               text='lMin' + str(round(df_dx[p],3)),
-                               showarrow=True,
-                               arrowhead=0,
-                               font=dict(
-                #family="Courier New, monospace",
-                size=8,
-                # color="#ffffff"
-            ),row=3, col=1)
-            
-    if len(localDevMax) > 0:
-        for b in localDevMax:
-            fig.add_annotation(x=x_fake[b], y=df_dx[b],
-                               text='lMax ' + str(round(df_dx[b],3)) ,
-                               showarrow=True,
-                               arrowhead=0,
-                               font=dict(
-                #family="Courier New, monospace",
-                size=8,
-                # color="#ffffff"
-            ),row=3, col=1)
-    
-    
-    fig.add_trace(
-        go.Bar(
-            x=pd.Series([i[1] for i in newDict2]),
-            y=pd.Series([float(i[0][:len(i[0])-1]) for i in newDict2]),
-            text=pd.Series([i[0] for i in newDict2]),
-            textposition='auto',
-            orientation='h',
-            marker_color=[     'red' if 'A' in i[0] 
-                        else 'green' if 'B' in i[0]
-                        else i for i in newDict2],
-            hovertext=pd.Series([i[0]  + ' ' + str(i[1]) for i in newDict2]),
-        ),
-        row=1, col=3
-    )
-    
-    fig.add_hline(y=df['close'][len(df)-1], row=1, col=3)
-    '''
-    '''
-    for v in range(len(sortadlist[:4])):
-        res = [0,0,0]
-        fig.add_trace(go.Scatter(x=df['time'],
-                                 y= [sortadlist[v][0]]*len(df['time']) ,
-                                 line_color= 'rgb(0,104,139)' if (str(sortadlist[v][3]) == 'B') else 'brown' if (str(sortadlist[v][3]) == 'A') else 'rgb(0,0,0)',
-                                 text = str(sortadlist[v][4]) + ' ' + str(sortadlist[v][1]) + ' ' + str(sortadlist[v][3])  + ' ' + str(sortadlist[v][6]),
-                                 #text='('+str(priceDict[sortadlist[v][0]]['ASKAVG'])+'/'+str(priceDict[sortadlist[v][0]]['BIDAVG']) +')'+ '('+str(priceDict[sortadlist[v][0]]['ASK'])+'/'+str(priceDict[sortadlist[v][0]]['BID']) +')'+  '('+ sortadlist[v][3] +') '+str(sortadlist[v][4]),
-                                 textposition="bottom left",
-                                 name=str(sortadlist[v][0]),
-                                 showlegend=False,
-                                 visible=False,
-                                 mode= 'lines',
-                                
-                                ),
-                      row=1, col=1
-                     )
+    posti = sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
+    negati = sum([i[0] for i in difList if i[0] < 0])/len([i[0] for i in difList if i[0] < 0])
 
-    '''
-    
+    fig.add_trace(go.Scatter(x=df['time'],
+                             y= [posti]*len(df['time']) ,
+                             line_color='teal',
+                             text = str(posti),
+                             textposition="bottom left",
+                             name=str(posti),
+                             showlegend=False,
+                             mode= 'lines',
+                            ),
+                    row=2, col=1
+                 )
 
-    
-    
-
-    '''
-    
-    
-    for mk in sortadlist:
-        if mk[3] ==  'B':
-            fig.add_hline(y=mk[0], line=dict(color='rgb(0,104,139,0.3)'), row=1, col=2)
-        elif mk[3] ==  'A':
-            fig.add_hline(y=mk[0], line=dict(color='rgb(188,56,0,0.3)'), row=1, col=2)
-        else:
-            fig.add_hline(y=mk[0], line=dict(color='rgb(0,0,0,0.3)'), row=1, col=2)
-    
-
-    #if len(sortadlist2) > 0:
-    #    mzk = [i[1] for i in sortadlist2]
-    #    fig.add_vline(x=int(sum(mzk) / len(mzk)),line=dict(color='rgb(0,0,0,0.3)'), row=1, col=2)
-
-    
-    for i in range(df.first_valid_index()+1,len(df.index)):
-            prev = i - 1
-            try:
-                if df['superTrend'][i] != df['superTrend'][prev] and not np.isnan(df['superTrend'][i]) :
-                    #print(i,df['inUptrend'][i])
-                    fig.add_annotation(x=df['time'][i], y=df['open'][i],
-                                       text = 'BUY'  if df['superTrend'][i] else 'SELL',
-                                       showarrow=True,
-                                       arrowhead=6,
-                                       font=dict(
-                        #family="Courier New, monospace",
-                        size=8,
-                        #color="#ffffff"
-                    ),)  
-            except(KeyError):
-                continue    
-        
-    '''
-    
-    
-     
+    fig.add_trace(go.Scatter(x=df['time'],
+                             y= [negati]*len(df['time']) ,
+                             line_color='crimson',
+                             text = str(negati),
+                             textposition="bottom left",
+                             name=str(negati),
+                             showlegend=False,
+                             mode= 'lines',
+                            ),
+                    row=2, col=1
+                 )
    
 
     for trds in sortadlist[:10]:
@@ -1161,9 +871,6 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx, optionOrderList, stockName=''
     fig.update_layout(height=880, xaxis_rangeslider_visible=False, showlegend=False)
     fig.update_xaxes(autorange="reversed", row=1, col=2)
     #fig.update_xaxes(autorange="reversed", row=1, col=3)
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsMid'], mode='lines', name='BbandsMid'))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsUpp'], mode='lines', name='BbandsUpp'))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['BbandsLow'], mode='lines', name='BbandsLow'))
     #fig.update_layout(plot_bgcolor='gray')
     #fig.update_layout(paper_bgcolor='rgba(96, 95, 93, 0.5)')
     #"paper_bgcolor": "rgba(0, 0, 0, 0)",
@@ -1189,7 +896,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #import pandas_ta as ta
 from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 210000#250000#80001
+inter = 30000#210000#250000#80001
 app = Dash()
 app.layout = html.Div([
     
@@ -1209,6 +916,10 @@ app.layout = html.Div([
     html.Button('Submit', id='submit-interv', n_clicks=0),
     html.Div(id='interv-button-basic',children="Enter a symbol from |5 10 15 30 | and submit"),
     dcc.Store(id='interv-value'),
+    
+    dcc.Store(id='data-store'),
+    dcc.Store(id='previous-interv'),
+    dcc.Store(id='previous-stkName'),
     
     
 ])
@@ -1247,26 +958,42 @@ def update_interval(n_clicks, value):
         return 'The input interval '+str(value)+" is not accepted please try different interval from  |'1' '2' '3' '5' '10' '15'|", 'The input interval '+str(value)+" is not accepted please try different interval from  |'1' '2' '3' '5' '10' '15'|"
 
 
-@callback(Output('graph', 'figure'),
-          Input('interval', 'n_intervals'),
-          State('stkName-value', 'data'),
-          State('interv-value', 'data'))
-
+@callback(
+    [Output('data-store', 'data'),
+        Output('graph', 'figure'),
+        Output('previous-stkName', 'data'),
+        Output('previous-interv', 'data')],
+    [Input('interval', 'n_intervals')],
+    [State('stkName-value', 'data'),
+        State('interv-value', 'data'),
+        State('data-store', 'data'),
+        State('previous-stkName', 'data'),
+        State('previous-interv', 'data')
+    ],
+)
     
-def update_graph_live(n_intervals, data, interv): #interv
+def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv): #interv
     print('inFunction')	
+    #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
 
-    if data in symbolNameList:
-        stkName = data
+    if sname in symbolNameList:
+        stkName = sname
         symbolNum = symbolNumList[symbolNameList.index(stkName)]   
     else:
-        stkName = 'NQ'  
+        stkName = 'NQ' 
+        sname = 'NQ'
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
         interv = '5'
-         
+        
+    if stkName != previous_stkName:
+        stored_data = None
+    
+    
+        
+    
     
     
     blob = Blob('FuturesOHLC'+str(symbolNum), bucket) 
@@ -1326,12 +1053,15 @@ def update_graph_live(n_intervals, data, interv): #interv
     df.dropna(inplace=True)
     df.reset_index(drop=True, inplace=True) 
 
+    
+    
+    
 
     vwap(df)
     ema(df)
     PPP(df)
 
-    
+
     
     blob = Blob('FuturesTrades'+str(symbolNum), bucket) 
     FuturesTrades = blob.download_as_text()
@@ -1390,8 +1120,6 @@ def update_graph_live(n_intervals, data, interv): #interv
         newwT.append([i[0],i[1],i[2],i[5], i[4],i[3],i[6]])
     
     
-
-    
     dtime = df['time'].dropna().values.tolist()
     dtimeEpoch = df['timestamp'].dropna().values.tolist()
     
@@ -1400,87 +1128,95 @@ def update_graph_live(n_intervals, data, interv): #interv
     tempTrades = sorted(tempTrades, key=lambda d: d[6], reverse=False) 
     tradeTimes = [i[6] for i in tempTrades]
     
-    timeDict = {}
-    cdDict = {}
-    for ttm in dtime:
-        for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
-            if datetime.strptime(tradMade[6], "%H:%M:%S") > datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=int(interv)):
-                try:
-                    timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
-                except(KeyError,ZeroDivisionError):
-                    timeDict[ttm] = [0,0,0]
-                break
-            
-            if ttm not in timeDict:
-                timeDict[ttm] = [0,0,0]
-            if ttm in timeDict:
-                if tradMade[5] == 'B':
-                    timeDict[ttm][0] += tradMade[1]#tradMade[0] * tradMade[1]
-                elif tradMade[5] == 'A':
-                    timeDict[ttm][1] += tradMade[1]#tradMade[0] * tradMade[1] 
-                elif tradMade[5] == 'N':
-                    timeDict[ttm][2] += tradMade[1]#tradMade[0] * tradMade[1] 
-                    
-            if ttm not in cdDict:
-                cdDict[ttm] = []   
-            if ttm in cdDict:
-                cdDict[ttm].append([tradMade[0], tradMade[1], tradMade[5]])
-            
-               
-                
-
-    for i in timeDict:
-        if len(timeDict[i]) == 3:
-            try:
-                timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[i][2]/sum(timeDict[i])]#
-            except(ZeroDivisionError,KeyError):
-                timeDict[i] += [0, 0,0]
-                
-    
-    
-    dcount = {}
-    for cd in cdDict:
-        count_dict = Counter([i[0] for i in cdDict[cd]])
-        sorted_data = sorted(cdDict[cd], key=lambda x: x[0])
-        for i in count_dict:
-            for x in sorted_data:
-                if i == x[0]:
-                    if cd not in dcount:
-                        dcount[cd] = {}
-                    if cd in dcount:
-                        if i not in dcount[cd]:
-                            dcount[cd][i] = [0,0,0,0]
-                        if i in dcount[cd]:
-                            if x[2] == 'B':
-                                dcount[cd][i][0] += x[1]
-                                #dcount[cd][i][2] = round(dcount[cd][i][0]/(dcount[cd][i][0]+dcount[cd][i][1]),2)
-                                dcount[cd][i][2] = dcount[cd][i][0] - dcount[cd][i][1]
-                                dcount[cd][i][3] = dcount[cd][i][0] + dcount[cd][i][1]
-                            if x[2] == 'A':
-                                dcount[cd][i][1] += x[1]
-                                #dcount[cd][i][3] = round(dcount[cd][i][1]/(dcount[cd][i][0]+dcount[cd][i][1]),2)
-                                dcount[cd][i][2] = dcount[cd][i][0] - dcount[cd][i][1]
-                                dcount[cd][i][3] = dcount[cd][i][0] + dcount[cd][i][1]
-                if x[0] > i:
+    if stored_data is not None:
+        print('here')
+        timeDict = {}
+        lastTime = stored_data['timeFrame'][len(stored_data['timeFrame'])-1][0]
+        for ttm in dtime[dtime.index(lastTime):]:
+            for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
+                if datetime.strptime(tradMade[6], "%H:%M:%S") > datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=int(interv)):
+                    try:
+                        timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
+                    except(KeyError,ZeroDivisionError):
+                        timeDict[ttm] = [0,0,0]
                     break
-                                
-    timeFrame = [[i,'']+timeDict[i] for i in timeDict]
-
-    for i in range(len(timeFrame)):
-        timeFrame[i].append(dtimeEpoch[i])
+                
+                if ttm not in timeDict:
+                    timeDict[ttm] = [0,0,0]
+                if ttm in timeDict:
+                    if tradMade[5] == 'B':
+                        timeDict[ttm][0] += tradMade[1]#tradMade[0] * tradMade[1]
+                    elif tradMade[5] == 'A':
+                        timeDict[ttm][1] += tradMade[1]#tradMade[0] * tradMade[1] 
+                    elif tradMade[5] == 'N':
+                        timeDict[ttm][2] += tradMade[1]#tradMade[0] * tradMade[1] 
+                        
+    
+        for i in timeDict:
+            if len(timeDict[i]) == 3:
+                try:
+                    timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[i][2]/sum(timeDict[i])]#
+                except(ZeroDivisionError,KeyError):
+                    timeDict[i] += [0, 0,0]
+                    
         
+                                    
+        timeFrame = [[i,'']+timeDict[i] for i in timeDict]
     
-    for i in timeFrame:
-        try:
-            i.append(dict(sorted(dcount[i[0]].items(), reverse=True)))
-        except(KeyError):
-            dcount[i[0]] = {}
-            i.append(dcount[i[0]])
+        for i in range(len(timeFrame)):
+            timeFrame[i].append(dtimeEpoch[dtime.index(timeFrame[i][0])])
             
+
+        for pott in timeFrame:
+            pott.insert(4,df['timestamp'].searchsorted(pott[8]))
             
-    for pott in timeFrame:
-        pott.insert(4,df['timestamp'].searchsorted(pott[8]))
+        stored_data['timeFrame'] = stored_data['timeFrame'][:len(stored_data['timeFrame'])-1] + timeFrame
+        #timeFrame = stored_data['timeFrame']
     
+    if stored_data is None:
+        print('Newstored')
+        timeDict = {}
+        for ttm in dtime:
+            for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
+                if datetime.strptime(tradMade[6], "%H:%M:%S") > datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=int(interv)):
+                    try:
+                        timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
+                    except(KeyError,ZeroDivisionError):
+                        timeDict[ttm] = [0,0,0]
+                    break
+                
+                if ttm not in timeDict:
+                    timeDict[ttm] = [0,0,0]
+                if ttm in timeDict:
+                    if tradMade[5] == 'B':
+                        timeDict[ttm][0] += tradMade[1]#tradMade[0] * tradMade[1]
+                    elif tradMade[5] == 'A':
+                        timeDict[ttm][1] += tradMade[1]#tradMade[0] * tradMade[1] 
+                    elif tradMade[5] == 'N':
+                        timeDict[ttm][2] += tradMade[1]#tradMade[0] * tradMade[1] 
+                    
+    
+        for i in timeDict:
+            if len(timeDict[i]) == 3:
+                try:
+                    timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[i][2]/sum(timeDict[i])]#
+                except(ZeroDivisionError,KeyError):
+                    timeDict[i] += [0, 0,0]
+                    
+        
+                                    
+        timeFrame = [[i,'']+timeDict[i] for i in timeDict]
+    
+        for i in range(len(timeFrame)):
+            timeFrame[i].append(dtimeEpoch[i])
+            
+        for pott in timeFrame:
+            pott.insert(4,df['timestamp'].searchsorted(pott[8]))
+            
+        stored_data = {'timeFrame': timeFrame} 
+        
+    #OptionTimeFrame = stored_data['timeFrame']   
+    previous_stkName = sname
          
     
     #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=1.8)['SUPERTd_2_1.8']
@@ -1500,12 +1236,10 @@ def update_graph_live(n_intervals, data, interv): #interv
         previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
     except(ValueError):
         previousDay = []
-
-
     
-    fg = plotChart(df, [hs[1],newwT[:150]], va[0], va[1], x_fake, df_dx, bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = timeFrame, overall=[], newDict2=[]) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:150]], va[0], va[1], x_fake, df_dx, bigOrders=[], optionOrderList=[], stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, prevdtstr='', pea=False, sord = [], OptionTimeFrame = stored_data['timeFrame'], overall=[], newDict2=[]) #trends=FindTrends(df,n=10)
 
-    return fg
+    return stored_data, fg, previous_stkName, previous_interv
 
 #[(i[2]-i[3],i[0]) for i in timeFrame ]
 if __name__ == '__main__':
