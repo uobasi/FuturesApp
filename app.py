@@ -1245,7 +1245,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     except(ValueError):
         previousDay = []
     
-    fg = plotChart(df, [hs[1],newwT[:100]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=4) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:100]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=5) #trends=FindTrends(df,n=10)
 
     return stored_data, fg, previous_stkName, previous_interv
 
