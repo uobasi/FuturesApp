@@ -998,6 +998,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     if stkName != previous_stkName:
         stored_data = None
+
+    if interv != previous_interv:
+        stored_data = None
     
     
         
@@ -1225,6 +1228,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     #OptionTimeFrame = stored_data['timeFrame']   
     previous_stkName = sname
+    previous_interv = interv
+
          
     
     #df['superTrend'] = ta.supertrend(df['high'], df['low'], df['close'], length=2, multiplier=1.8)['SUPERTd_2_1.8']
