@@ -321,7 +321,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                                [{"colspan": 1},{},],
                                [{"colspan": 1},{},]], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
                         horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '+strTrend + '('+str(average)+') '+ str(now)+ '  (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') ', 'Volume Profile ' + str(datetime.now().time()) ), #,str(Ask)+'(Sell:'+str(dAsk)+') | '+str(Bid)+ '(Buy'+str(dBid)+') '
-                         column_widths=[0.85,0.15], row_width=[0.10, 0.20, 0.70,] ) #,row_width=[0.30, 0.70,]
+                         column_widths=[0.85,0.15], row_width=[0.15, 0.15, 0.70,] ) #,row_width=[0.30, 0.70,]
 
     
             
@@ -904,7 +904,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #import pandas_ta as ta
 from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 20000#210000#250000#80001
+inter = 100000#210000#250000#80001
 app = Dash()
 app.layout = html.Div([
     
@@ -1245,7 +1245,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     except(ValueError):
         previousDay = []
     
-    fg = plotChart(df, [hs[1],newwT[:100]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=5) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:100]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=4) #trends=FindTrends(df,n=10)
 
     return stored_data, fg, previous_stkName, previous_interv
 
