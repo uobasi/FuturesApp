@@ -320,7 +320,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                         specs=[[{}, {},],
                                [{"colspan": 1},{},],
                                [{"colspan": 1},{},]], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
-                        horizontal_spacing=0.02, vertical_spacing=0.03, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '+strTrend + '('+str(average)+') '+ str(now)+ '  (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') ', 'Volume Profile ' + str(datetime.now().time()) ), #,str(Ask)+'(Sell:'+str(dAsk)+') | '+str(Bid)+ '(Buy'+str(dBid)+') '
+                        horizontal_spacing=0.00, vertical_spacing=0.00, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '+strTrend + '('+str(average)+') '+ str(now)+ '  (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') ', 'Volume Profile ' + str(datetime.now().time()) ), #,str(Ask)+'(Sell:'+str(dAsk)+') | '+str(Bid)+ '(Buy'+str(dBid)+') '
                          column_widths=[0.85,0.15], row_width=[0.15, 0.15, 0.70,] ) #,row_width=[0.30, 0.70,]
 
     
@@ -898,13 +898,17 @@ symbolNameList = ['ES', 'NQ',  'YM',  'BTC', 'CL', 'GC']
 
 intList = ['1','2','3','4','5','6','10','15']
 
+vaildClust = [str(i) for i in range(3,20)]
+
+vaildTPO = [str(i) for i in range(50,500)]
+
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
 
 #import pandas_ta as ta
 from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 40000#210000#250000#80001
+inter = 45000#210000#250000#80001
 app = Dash()
 app.layout = html.Div([
     
@@ -922,12 +926,19 @@ app.layout = html.Div([
     
     html.Div(dcc.Input(id='input-on-interv', type='text')),
     html.Button('Submit', id='submit-interv', n_clicks=0),
-    html.Div(id='interv-button-basic',children="Enter a symbol from |5 10 15 30 | and submit"),
+    html.Div(id='interv-button-basic',children="Enter interval from |5 10 15 30 | and submit"),
     dcc.Store(id='interv-value'),
+    
+    html.Div(dcc.Input(id='input-on-cluster', type='text')),
+    html.Button('Submit', id='submit-cluster', n_clicks=0),
+    html.Div(id='cluster-button-basic',children="Enter a vaild minimum cluster number from 3 - 20"),
+    dcc.Store(id='cluster-value'),
     
     dcc.Store(id='data-store'),
     dcc.Store(id='previous-interv'),
     dcc.Store(id='previous-stkName'),
+    
+    
     
     
 ])
@@ -967,6 +978,24 @@ def update_interval(n_clicks, value):
 
 
 @callback(
+    Output('cluster-value', 'data'),
+    Output('cluster-button-basic', 'children'),
+    Input('submit-cluster', 'n_clicks'),
+    State('input-on-cluster', 'value'),
+    prevent_initial_call=True
+)
+def update_clusterNum(n_clicks, value):
+    value = str(value)
+    
+    if value in vaildClust:
+        print('The input cluster number was "{}" '.format(value))
+        return str(value), str(value), 
+    else:
+        return 'The input cluster '+str(value)+" is not accepted please try different number from  3 - 20", 'The input cluster '+str(value)+" is not accepted please try different number from  3 - 20"
+
+
+
+@callback(
     [Output('data-store', 'data'),
         Output('graph', 'figure'),
         Output('previous-stkName', 'data'),
@@ -976,11 +1005,12 @@ def update_interval(n_clicks, value):
         State('interv-value', 'data'),
         State('data-store', 'data'),
         State('previous-stkName', 'data'),
-        State('previous-interv', 'data')
+        State('previous-interv', 'data'),
+        State('cluster-value', 'data'),
     ],
 )
     
-def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv): #interv
+def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum): #interv
     print('inFunction')	
     #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
@@ -996,11 +1026,17 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if interv not in intList:
         interv = '5'
         
+    if clustNum not in vaildClust:
+        clustNum = '5'
+        
     if stkName != previous_stkName:
         stored_data = None
 
     if interv != previous_interv:
         stored_data = None
+        
+    
+    
     
     
         
@@ -1250,7 +1286,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     except(ValueError):
         previousDay = []
     
-    fg = plotChart(df, [hs[1],newwT[:100]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=5) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:100]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum)) #trends=FindTrends(df,n=10)
 
     return stored_data, fg, previous_stkName, previous_interv
 
