@@ -893,14 +893,14 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     return fig
 
 
-symbolNumList = ['5602', '13743', '80420', '42009544', '200430', '669']
-symbolNameList = ['ES', 'NQ',  'YM',  'BTC', 'CL', 'GC']
+symbolNumList = ['5602', '13743', '80420', '121358', '200430', '2017', '1256', '74067', '74683']
+symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI']
 
 intList = ['1','2','3','4','5','6','10','15']
 
 vaildClust = [str(i) for i in range(3,20)]
 
-vaildTPO = [str(i) for i in range(50,500)]
+vaildTPO = [str(i) for i in range(10,500)]
 
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
@@ -908,11 +908,11 @@ bucket = gclient.get_bucket("stockapp-storage")
 #import pandas_ta as ta
 from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 45000#210000#250000#80001
+inter = 35000#210000#250000#80001
 app = Dash()
 app.layout = html.Div([
     
-    dcc.Graph(id='graph'),
+    dcc.Graph(id='graph', config={'modeBarButtonsToAdd': ['drawline']}),
     dcc.Interval(
         id='interval',
         interval=inter,
@@ -921,12 +921,12 @@ app.layout = html.Div([
 
     html.Div(dcc.Input(id='input-on-submit', type='text')),
     html.Button('Submit', id='submit-val', n_clicks=0),
-    html.Div(id='container-button-basic',children="Enter a symbol from |'ES' 'NQ' 'GC' 'HG' 'YM' 'RTY' 'SI' 'CL' 'NG' | and submit"),
+    html.Div(id='container-button-basic',children="Enter a symbol from |'ES', 'NQ',  'YM',  'BTC', 'CL', 'GC'| and submit"),
     dcc.Store(id='stkName-value'),
     
     html.Div(dcc.Input(id='input-on-interv', type='text')),
     html.Button('Submit', id='submit-interv', n_clicks=0),
-    html.Div(id='interv-button-basic',children="Enter interval from |5 10 15 30 | and submit"),
+    html.Div(id='interv-button-basic',children="Enter interval from |5 10 15 30| and submit"),
     dcc.Store(id='interv-value'),
     
     html.Div(dcc.Input(id='input-on-cluster', type='text')),
@@ -934,13 +934,15 @@ app.layout = html.Div([
     html.Div(id='cluster-button-basic',children="Enter a vaild minimum cluster number from 3 - 20"),
     dcc.Store(id='cluster-value'),
     
+    html.Div(dcc.Input(id='input-on-tpo', type='text')),
+    html.Button('Submit', id='submit-tpo', n_clicks=0),
+    html.Div(id='tpo-button-basic',children="Enter a vaild minimum top ranked order number from 10 - 500"),
+    dcc.Store(id='tpo-value'),
+    
     dcc.Store(id='data-store'),
     dcc.Store(id='previous-interv'),
     dcc.Store(id='previous-stkName'),
-    
-    
-    
-    
+  
 ])
 
 @callback(
@@ -958,7 +960,7 @@ def update_output(n_clicks, value):
         print('The input symbol was "{}" '.format(value))
         return str(value).upper(), str(value).upper()
     else:
-        return 'The input symbol '+str(value)+" is not accepted please try different symbol from  |'ES' 'NQ' 'GC' 'HG' 'YM' 'RTY' 'SI' 'CL' 'NG'|", 'The input symbol was '+str(value)+" is not accepted please try different symbol  |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'|  "
+        return 'The input symbol '+str(value)+" is not accepted please try different symbol from  |'ES', 'NQ',  'YM',  'BTC', 'CL', 'GC'|", 'The input symbol was '+str(value)+" is not accepted please try different symbol  |'ESH4' 'NQH4' 'CLG4' 'GCG4' 'NGG4' 'HGH4' 'YMH4' 'BTCZ3' 'RTYH4'|  "
 
 @callback(
     Output('interv-value', 'data'),
@@ -994,6 +996,24 @@ def update_clusterNum(n_clicks, value):
         return 'The input cluster '+str(value)+" is not accepted please try different number from  3 - 20", 'The input cluster '+str(value)+" is not accepted please try different number from  3 - 20"
 
 
+@callback(
+    Output('tpo-value', 'data'),
+    Output('tpo-button-basic', 'children'),
+    Input('submit-tpo', 'n_clicks'),
+    State('input-on-tpo', 'value'),
+    prevent_initial_call=True
+)
+def update_tpo(n_clicks, value):
+    value = str(value)
+    
+    if value in vaildTPO:
+        print('The input top rank order was "{}" '.format(value))
+        return str(value), str(value), 
+    else:
+        return 'The input top rank order was '+str(value)+" is not accepted please try different number from  10 - 500", 'The input top rank order '+str(value)+" is not accepted please try different number from  10 - 500"
+
+
+
 
 @callback(
     [Output('data-store', 'data'),
@@ -1007,10 +1027,11 @@ def update_clusterNum(n_clicks, value):
         State('previous-stkName', 'data'),
         State('previous-interv', 'data'),
         State('cluster-value', 'data'),
+        State('tpo-value', 'data'),
     ],
 )
     
-def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum): #interv
+def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum, tpoNum): #interv
     print('inFunction')	
     #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
@@ -1024,7 +1045,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '5'
+        interv = '10'
         
     if clustNum not in vaildClust:
         clustNum = '5'
@@ -1035,13 +1056,11 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if interv != previous_interv:
         stored_data = None
         
-    
-    
-    
-    
+    if tpoNum not in vaildTPO:
+        tpoNum = '100'
         
-    
-    
+        
+
     
     blob = Blob('FuturesOHLC'+str(symbolNum), bucket) 
     FuturesOHLC = blob.download_as_text()
@@ -1286,7 +1305,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     except(ValueError):
         previousDay = []
     
-    fg = plotChart(df, [hs[1],newwT[:100]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum)) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum)) #trends=FindTrends(df,n=10)
 
     return stored_data, fg, previous_stkName, previous_interv
 
