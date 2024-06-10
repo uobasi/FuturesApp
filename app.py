@@ -749,9 +749,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             fig.add_trace(go.Scatter(x=df['time'],
                                  y= [i[0]]*len(df['time']) ,
                                  line_color='rgba(220,20,60,'+str(opac)+')' if askCount > bidCount else 'rgba(0,139,139,'+str(opac)+')' if askCount < bidCount else 'gray',
-                                 text =str(i[0])+ ' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
+                                 text =str(i[0])+ ' (' + str(bidCount+askCount)+ ')' +' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
                                  textposition="bottom left",
-                                 name=str(i[0])+ ' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
+                                 name=str(i[0])+ ' (' + str(bidCount+askCount)+ ')' +' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
                                  showlegend=False,
                                  mode= 'lines',
                                 
@@ -762,9 +762,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             fig.add_trace(go.Scatter(x=df['time'],
                                  y= [i[len(i)-1]]*len(df['time']) ,
                                  line_color='rgba(220,20,60,'+str(opac)+')' if askCount > bidCount else 'rgba(0,139,139,'+str(opac)+')' if askCount < bidCount else 'gray',
-                                 text = str(i[len(i)-1])+ ' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
+                                 text = str(i[len(i)-1])+ ' (' + str(bidCount+askCount)+ ')' +' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
                                  textposition="bottom left",
-                                 name= str(i[len(i)-1])+ ' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
+                                 name= str(i[len(i)-1])+' (' + str(bidCount+askCount)+ ')' + ' (' + str(len(i))+ ') Ask:('+ str(askDec) + ') '+str(askCount)+' | Bid: ('+ str(bidDec) +') '+str(bidCount),
                                  showlegend=False,
                                  mode= 'lines',
                                 
@@ -893,8 +893,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     return fig
 
 
-symbolNumList = ['5602', '13743', '80420', '121358', '200430', '2017', '1256', '74067', '74683']
-symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI']
+symbolNumList = ['5602', '13743', '80420', '121358', '200430', '2017', '1256', '74067', '74683', '944']
+symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG']
 
 intList = ['1','2','3','4','5','6','10','15']
 
@@ -908,7 +908,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #import pandas_ta as ta
 from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 35000#210000#250000#80001
+inter = 50000#210000#250000#80001
 app = Dash()
 app.layout = html.Div([
     
