@@ -474,6 +474,32 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     
     #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', opacity=0.19, name='1ema',marker_color='rgba(0,0,0)'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', name='UPPERVWAP'))
+    localMin = argrelextrema(df.low.values, np.less_equal, order=20)[0] 
+    localMax = argrelextrema(df.high.values, np.greater_equal, order=20)[0]
+     
+    if len(localMin) > 0:
+        for p in localMin:
+            fig.add_annotation(x=df['time'][p], y=df['low'][p],
+                               text='<b>' + 'lMin ' + str(df['low'][p]) + '</b>',
+                               showarrow=True,
+                               arrowhead=4,
+                               font=dict(
+                #family="Courier New, monospace",
+                size=10,
+                # color="#ffffff"
+            ),)
+    if len(localMax) > 0:
+        for b in localMax:
+            fig.add_annotation(x=df['time'][b], y=df['high'][b],
+                               text='<b>' + 'lMax '+ str(df['high'][b]) +  '</b>',
+                               showarrow=True,
+                               arrowhead=4,
+                               font=dict(
+                #family="Courier New, monospace",
+                size=10,
+                # color="#ffffff"
+            ),)
+            
     
 
     fig.add_hline(y=df['close'][len(df)-1], row=1, col=2)
