@@ -474,8 +474,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     
     #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', opacity=0.19, name='1ema',marker_color='rgba(0,0,0)'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', name='UPPERVWAP'))
-    localMin = argrelextrema(df.low.values, np.less_equal, order=20)[0] 
-    localMax = argrelextrema(df.high.values, np.greater_equal, order=20)[0]
+    localMin = argrelextrema(df.low.values, np.less_equal, order=18)[0] 
+    localMax = argrelextrema(df.high.values, np.greater_equal, order=18)[0]
      
     if len(localMin) > 0:
         for p in localMin:
@@ -919,7 +919,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     return fig
 
 
-symbolNumList = ['5602', '13743', '80420', '121358', '200430', '2017', '1256', '74067', '74683', '944']
+symbolNumList = ['118', '4358', '42012334', '121358', '36956', '2017', '1256', '74067', '74683', '944']
 symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG']
 
 intList = ['1','2','3','4','5','6','10','15']
@@ -934,14 +934,15 @@ bucket = gclient.get_bucket("stockapp-storage")
 #import pandas_ta as ta
 from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
-inter = 50000#210000#250000#80001
+initial_inter = 260000  # Initial interval #210000#250000#80001
+subsequent_inter = 60000  # Subsequent interval
 app = Dash()
 app.layout = html.Div([
     
     dcc.Graph(id='graph', config={'modeBarButtonsToAdd': ['drawline']}),
     dcc.Interval(
         id='interval',
-        interval=inter,
+        interval=initial_inter,
         n_intervals=0,
       ),
 
@@ -968,6 +969,7 @@ app.layout = html.Div([
     dcc.Store(id='data-store'),
     dcc.Store(id='previous-interv'),
     dcc.Store(id='previous-stkName'),
+    dcc.Store(id='interval-time', data=initial_inter),
   
 ])
 
@@ -1045,7 +1047,8 @@ def update_tpo(n_clicks, value):
     [Output('data-store', 'data'),
         Output('graph', 'figure'),
         Output('previous-stkName', 'data'),
-        Output('previous-interv', 'data')],
+        Output('previous-interv', 'data'),
+        Output('interval', 'interval')],
     [Input('interval', 'n_intervals')],
     [State('stkName-value', 'data'),
         State('interv-value', 'data'),
@@ -1054,10 +1057,11 @@ def update_tpo(n_clicks, value):
         State('previous-interv', 'data'),
         State('cluster-value', 'data'),
         State('tpo-value', 'data'),
+        State('interval-time', 'data'),
     ],
 )
     
-def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum, tpoNum): #interv
+def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum, tpoNum, interval_time): #interv
     print('inFunction')	
     #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
@@ -1330,10 +1334,13 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
     except(ValueError):
         previousDay = []
+        
+    if interval_time == initial_inter:
+        interval_time = subsequent_inter
     
     fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum)) #trends=FindTrends(df,n=10)
 
-    return stored_data, fg, previous_stkName, previous_interv
+    return stored_data, fg, previous_stkName, previous_interv, interval_time
 
 #[(i[2]-i[3],i[0]) for i in timeFrame ]
 if __name__ == '__main__':
