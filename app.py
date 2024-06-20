@@ -1080,12 +1080,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if clustNum not in vaildClust:
         clustNum = '5'
         
-    if stkName != previous_stkName:
+    if stkName != previous_stkName or interv != previous_interv:
         stored_data = None
 
-    if interv != previous_interv:
-        stored_data = None
-        
+
     if tpoNum not in vaildTPO:
         tpoNum = '100'
         
@@ -1337,6 +1335,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     if interval_time == initial_inter:
         interval_time = subsequent_inter
+    
+    if stkName != previous_stkName or interv != previous_interv:
+        interval_time = initial_inter
     
     fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum)) #trends=FindTrends(df,n=10)
 
