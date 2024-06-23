@@ -643,7 +643,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     
 
     fig.add_trace(go.Scatter(x=df['time'], y= [sortadlist2[0][0]]*len(df['time']) ,
-                             line_color='orange',
+                             line_color='yellow',
                              text = 'Current Day POC',
                              textposition="bottom left",
                              showlegend=False,
@@ -764,7 +764,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             
             
             
-            opac = round((len(i)/mazz)/1.3,2)
+            opac = round((len(i)/mazz)/1.6,2)
             fig.add_shape(type="rect",
                       y0=i[0], y1=i[len(i)-1], x0=-1, x1=len(df),
                       fillcolor="crimson" if askCount > bidCount else 'teal' if askCount < bidCount else 'gray',
@@ -842,13 +842,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
 
 
 
-    for trds in sortadlist[:10]:
+    for trds in sortadlist[:50]:
         try:
             if str(trds[3]) == 'A':
                 vallue = 'Sell'
                 sidev = trds[0]
             elif str(trds[3]) == 'B':
-                vallue = 'BUY'
+                vallue = 'Buy'
                 sidev = trds[0]
             else:
                 vallue = 'Mid'
@@ -919,8 +919,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     return fig
 
 
-symbolNumList = ['118', '4358', '42012334', '121358', '36956', '2017', '1256', '74067', '74683', '944']
-symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG']
+symbolNumList = ['118', '4358', '42012334', '121358', '36956', '2017', '1256', '74067', '74683', '944', ]
+symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG',]
 
 intList = ['1','2','3','4','5','6','10','15']
 
@@ -935,7 +935,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 260000  # Initial interval #210000#250000#80001
-subsequent_inter = 60000  # Subsequent interval
+subsequent_inter = 50000  # Subsequent interval
 app = Dash()
 app.layout = html.Div([
     
