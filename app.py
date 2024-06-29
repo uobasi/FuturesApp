@@ -534,6 +534,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     putCand = [i for i in OptionTimeFrame if int(i[2]) > int(i[3]) if int(i[4]) < len(df)] # if int(i[4]) < len(df)
     callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df) +i[3]+i[5] +i[2]+i[5]
     MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
+    tpCandle =  sorted([i for i in OptionTimeFrame if len(i[10]) > 0 if int(i[4]) < len(df)], key=lambda x: len(x[10]),reverse=True)[:10] 
+    
     
     est_now = datetime.utcnow() + timedelta(hours=-4)
     start_time = est_now.replace(hour=8, minute=00, second=0, microsecond=0)
@@ -560,24 +562,27 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
         i.append(tvy)
         #i.append('\n'.join([f'{key}: {value}\n' for key, value in i[10].items()]))
     '''
+    #print(OptionTimeFrame[0])
     for i in OptionTimeFrame:
         mks = ''
         tobuyss =  sum([x[1] for x in [t for t in i[10] if t[3] == 'B']])
         tosellss = sum([x[1] for x in [t for t in i[10] if t[3] == 'A']])
+        lenbuys = len([t for t in i[10] if t[3] == 'B'])
+        lensells = len([t for t in i[10] if t[3] == 'A'])
         
         try:
-            tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+'))' + '<br>' 
+            tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) ' + str(lenbuys+lensells) + '<br>' 
         except(ZeroDivisionError):
             tpStrings =' '
         
-        for xp in sorted(i[10], key=lambda x: x[0], reverse=True):
+        for xp in i[10]:#sorted(i[10], key=lambda x: x[0], reverse=True):
             try:
                 taag = 'Buy' if xp[3] == 'B' else 'Sell' if xp[3] == 'A' else 'Mid'
-                mks += str(xp[0]) + ' | ' + str(xp[1]) + ' ' + taag + ' ' + str(xp[4]) + '<br>' 
+                mks += str(xp[0]) + ' | ' + str(xp[1]) + ' ' + taag + ' ' + str(xp[4]) + ' '+ xp[6] + '<br>' 
             except(IndexError):
                 pass
         try:
-            i[11] = mks + tpStrings
+            i[11] = mks + tpStrings 
         except(IndexError):
             i.append(mks + tpStrings)
          
@@ -670,6 +675,24 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                  font=dict(color="white", size=10),
                  ),
             name='Ask' ),
+        row=1, col=1)
+        trcount+=1
+        
+    if len(tpCandle) > 0:
+        fig.add_trace(go.Candlestick(
+            x=[df['time'][i[4]] for i in tpCandle],
+            open=[df['open'][i[4]] for i in tpCandle],
+            high=[df['high'][i[4]] for i in tpCandle],
+            low=[df['low'][i[4]] for i in tpCandle],
+            close=[df['close'][i[4]] for i in tpCandle],
+            increasing={'line': {'color': 'black'}},
+            decreasing={'line': {'color': 'black'}},
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ str(i[2]-i[3]) for i in tpCandle], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
+            hoverlabel=dict(
+                 bgcolor="black",
+                 font=dict(color="white", size=10),
+                 ),
+            name='TRO' ),
         row=1, col=1)
         trcount+=1
     
@@ -879,7 +902,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=negati, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=2, col=1)
 
 
-
+    '''
     for trds in sortadlist[:40]:
         try:
             if str(trds[3]) == 'A':
@@ -903,7 +926,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
         except(KeyError):
             continue 
 
-
+    '''
     
     for tmr in range(0,len(fig.data)): 
         fig.data[tmr].visible = True
@@ -957,7 +980,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     return fig
 
 
-symbolNumList = ['118', '4358', '42012334', '121358', '36956', '2017', '1256', '74067', '74683', '944', ]
+symbolNumList = ['118', '4358', '42012334', '121358', '36956', '2017', '4124497', '28080', '74683', '939', ]
 symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG',]
 
 intList = ['1','2','3','4','5','6','10','15']
