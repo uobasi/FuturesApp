@@ -571,7 +571,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
         lensells = len([t for t in i[10] if t[3] == 'A'])
         
         try:
-            tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) ' + str(lenbuys+lensells) + '<br>' 
+            tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) ' + str(lenbuys+lensells) +' '+  str(tobuyss+tosellss)+'<br>' 
         except(ZeroDivisionError):
             tpStrings =' '
         
@@ -980,7 +980,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     return fig
 
 
-symbolNumList = ['118', '4358', '42012334', '121358', '36956', '2017', '4124497', '28080', '74683', '939', ]
+symbolNumList = ['118', '4358', '42012334', '42002072', '36956', '2017', '4124497', '28080', '2707', '939', ]
 symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG',]
 
 intList = ['1','2','3','4','5','6','10','15']
@@ -1191,7 +1191,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     df.set_index('strTime', inplace=True)
     df['volume'] = pd.to_numeric(df['volume'], downcast='integer')
-    df_resampled = df.resample(interv+'T').agg({
+    df_resampled = df.resample(interv+'min').agg({
         'timestamp': 'first',
         'name': 'last',
         'open': 'first',
