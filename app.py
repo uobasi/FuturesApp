@@ -296,7 +296,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     
     tpString = '  (Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+') | '+ '(Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+'))'
     
-    
+    '''
     putDec = 0
     CallDec = 0
     NumPut = sum([float(i[3]) for i in OptionTimeFrame[len(OptionTimeFrame)-11:]])
@@ -320,12 +320,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             thputDec = 0
             thCallDec = 0
         
-
+    '''
     fig = make_subplots(rows=3, cols=2, shared_xaxes=True, shared_yaxes=True,
                         specs=[[{}, {},],
                                [{"colspan": 1},{},],
                                [{"colspan": 1},{},]], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
-                        horizontal_spacing=0.00, vertical_spacing=0.00, subplot_titles=(stockName +' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '+strTrend + '('+str(average)+') '+ str(now)+ '  (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') '+ tpString, 'VP ' + str(datetime.now().time()) ), #,str(Ask)+'(Sell:'+str(dAsk)+') | '+str(Bid)+ '(Buy'+str(dBid)+') '
+                         horizontal_spacing=0.00, vertical_spacing=0.00, subplot_titles=(stockName + ' '+strTrend + '('+str(average)+') '+ str(now)+ '  (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') '+ tpString, 'VP ' + str(datetime.now().time()) ), #' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '
                          column_widths=[0.85,0.15], row_width=[0.15, 0.15, 0.70,] ) #,row_width=[0.30, 0.70,]
 
     
