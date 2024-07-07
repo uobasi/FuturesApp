@@ -535,6 +535,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df) +i[3]+i[5] +i[2]+i[5]
     MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
     tpCandle =  sorted([i for i in OptionTimeFrame if len(i[10]) > 0 if int(i[4]) < len(df)], key=lambda x: len(x[10]),reverse=True)[:10] 
+    #print(tpCandle)
     
     
     est_now = datetime.utcnow() + timedelta(hours=-4)
@@ -865,36 +866,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
     fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=2, col=1)
-    '''
-    
-    posti = sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
-    negati = sum([i[0] for i in difList if i[0] < 0])/len([i[0] for i in difList if i[0] < 0])
 
-    fig.add_trace(go.Scatter(x=df['time'],
-                             y= [posti]*len(df['time']) ,
-                             line_color='teal',
-                             text = str(posti),
-                             textposition="bottom left",
-                             name=str(posti),
-                             showlegend=False,
-                             mode= 'lines',
-                            ),
-                    row=2, col=1
-                 )
-
-    fig.add_trace(go.Scatter(x=df['time'],
-                             y= [negati]*len(df['time']) ,
-                             line_color='crimson',
-                             text = str(negati),
-                             textposition="bottom left",
-                             name=str(negati),
-                             showlegend=False,
-                             mode= 'lines',
-                            ),
-                    row=2, col=1
-                 )
-   
-    '''
     posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
     negati = pd.Series([i[0] if i[0] < 0 else 0 for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] < 0])/len([i[0] for i in difList if i[0] < 0])
     
@@ -902,6 +874,26 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=negati, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=2, col=1)
 
 
+    if len(tpCandle) > 0:
+        troRank = []
+        for i in tpCandle:
+            tobuyss =  sum([x[1] for x in [t for t in i[10] if t[3] == 'B']])
+            tosellss = sum([x[1] for x in [t for t in i[10] if t[3] == 'A']])
+            troRank.append([tobuyss+tosellss,i[4]])
+            
+        troRank = sorted(troRank, key=lambda x: x[0], reverse=True)
+        
+        for i in range(len(troRank)):
+            fig.add_annotation(x=df['time'][troRank[i][1]], y=df['high'][troRank[i][1]],
+                                   text='<b>' + '['+str(i)+', '+str(troRank[i][0])+']' + '</b>',
+                                   showarrow=True,
+                                   arrowhead=1,
+                                   font=dict(
+                    #family="Courier New, monospace",
+                    size=13,
+                    # color="#ffffff"
+                ),)
+        
     '''
     for trds in sortadlist[:40]:
         try:
@@ -993,7 +985,7 @@ gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
 
 #import pandas_ta as ta
-from collections import Counter
+#from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 260000  # Initial interval #210000#250000#80001
 subsequent_inter = 50000  # Subsequent interval
