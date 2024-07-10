@@ -534,7 +534,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     putCand = [i for i in OptionTimeFrame if int(i[2]) > int(i[3]) if int(i[4]) < len(df)] # if int(i[4]) < len(df)
     callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df) +i[3]+i[5] +i[2]+i[5]
     MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
-    tpCandle =  sorted([i for i in OptionTimeFrame if len(i[10]) > 0 if int(i[4]) < len(df)], key=lambda x: len(x[10]),reverse=True)[:10] 
+    tpCandle =  sorted([i for i in OptionTimeFrame if len(i[10]) > 0 if int(i[4]) < len(df)], key=lambda x: len(x[10]),reverse=True)[:8] 
     #print(tpCandle)
     
     
@@ -550,6 +550,19 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     indsAbove = [i for i in OptionTimeFrame if round(i[6],2) >= ccheck and int(i[4]) < len(df) and float(i[2]) >= (sum([i[2]+i[3] for i in OptionTimeFrame]) / len(OptionTimeFrame))]#  float(bms[i[4]])  # and int(i[4]) < len(df) [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(int(i[10]),i[1]) for i in sord if i[11] == stockName and i[1] == 'AboveAsk(BUY)']]
     
     indsBelow = [i for i in OptionTimeFrame if round(i[7],2) >= ccheck and int(i[4]) < len(df) and float(i[3]) >= (sum([i[3]+i[2] for i in OptionTimeFrame]) / len(OptionTimeFrame))]#  float(sms[i[4]]) # and int(i[4]) < len(df) imbalance = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[13] == 'Imbalance' and i[1] != 'BelowBid(SELL)' and i[1] != 'AboveAsk(BUY)']]
+
+    troAbove = []
+    troBelow = []
+    
+    for tro in tpCandle:
+        troBuys = sum([i[1] for i in tro[10] if i[3] == 'B'])
+        troSells = sum([i[1] for i in tro[10] if i[3] == 'A'])
+        
+        if troBuys/(troBuys+troSells) >= 0.65:
+            troAbove.append(tro+[troBuys, troSells, troBuys/(troBuys+troSells)])
+        if troSells/(troBuys+troSells) >= 0.65:
+            troBelow.append(tro+[troSells, troBuys, troSells/(troBuys+troSells)])
+        
 
     '''
     for i in OptionTimeFrame:
@@ -694,6 +707,43 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                  font=dict(color="white", size=10),
                  ),
             name='TRO' ),
+        row=1, col=1)
+        trcount+=1
+        
+    if len(troAbove) > 0:
+        fig.add_trace(go.Candlestick(
+            x=[df['time'][i[4]] for i in troAbove],
+            open=[df['open'][i[4]] for i in troAbove],
+            high=[df['high'][i[4]] for i in troAbove],
+            low=[df['low'][i[4]] for i in troAbove],
+            close=[df['close'][i[4]] for i in troAbove],
+            increasing={'line': {'color': '#2CA02C'}},
+            decreasing={'line': {'color': '#2CA02C'}},
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +str(i[11])+ str(i[2]-i[3]) for i in troAbove], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
+            hoverlabel=dict(
+                 bgcolor="#2CA02C",
+                 font=dict(color="white", size=10),
+                 ),
+            name='TroBuyimbalance' ),
+        row=1, col=1)
+        trcount+=1
+        
+    
+    if len(troBelow) > 0:
+        fig.add_trace(go.Candlestick(
+            x=[df['time'][i[4]] for i in troBelow],
+            open=[df['open'][i[4]] for i in troBelow],
+            high=[df['high'][i[4]] for i in troBelow],
+            low=[df['low'][i[4]] for i in troBelow],
+            close=[df['close'][i[4]] for i in troBelow],
+            increasing={'line': {'color': '#F6222E'}},
+            decreasing={'line': {'color': '#F6222E'}},
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +str(i[11])+ str(i[2]-i[3]) for i in troBelow], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
+            hoverlabel=dict(
+                 bgcolor="#F6222E",
+                 font=dict(color="white", size=10),
+                 ),
+            name='TroSellimbalance' ),
         row=1, col=1)
         trcount+=1
     
