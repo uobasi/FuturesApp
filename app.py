@@ -598,9 +598,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
         troBuys = sum([i[1] for i in tro[10] if i[3] == 'B'])
         troSells = sum([i[1] for i in tro[10] if i[3] == 'A'])
         
-        if troBuys/(troBuys+troSells) >= 0.65:
+        if round(troBuys/(troBuys+troSells),2) >= 0.65:
             troAbove.append(tro+[troBuys, troSells, troBuys/(troBuys+troSells)])
-        if troSells/(troBuys+troSells) >= 0.65:
+        if round(troSells/(troBuys+troSells),2) >= 0.65:
             troBelow.append(tro+[troSells, troBuys, troSells/(troBuys+troSells)])
          
 
