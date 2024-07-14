@@ -321,12 +321,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             thCallDec = 0
         
     '''
-    fig = make_subplots(rows=3, cols=2, shared_xaxes=True, shared_yaxes=True,
+    fig = make_subplots(rows=4, cols=2, shared_xaxes=True, shared_yaxes=True,
                         specs=[[{}, {},],
+                               [{"colspan": 1},{},],
                                [{"colspan": 1},{},],
                                [{"colspan": 1},{},]], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') '
                          horizontal_spacing=0.00, vertical_spacing=0.00, subplot_titles=(stockName + ' '+strTrend + '('+str(average)+') '+ str(now)+ '  (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') '+ tpString, 'VP ' + str(datetime.now().time()) ), #' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '
-                         column_widths=[0.85,0.15], row_width=[0.15, 0.15, 0.70,] ) #,row_width=[0.30, 0.70,]
+                         column_widths=[0.85,0.15], row_width=[0.12, 0.12, 0.12, 0.64,] ) #,row_width=[0.30, 0.70,]
 
     
             
@@ -348,7 +349,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
         ),
-         row=3, col=1
+         row=4, col=1
     )
         
     fig.add_trace(
@@ -365,15 +366,15 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             hovertext=pd.Series([i[0]+' '+i[1] for i in OptionTimeFrame]),
             
         ),
-        row=3, col=1
+        row=4, col=1
     )
 
     
     bms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(9).mean()
     sms = pd.Series([i[3] for i in OptionTimeFrame]).rolling(9).mean()
     #xms = pd.Series([i[3]+i[2] for i in OptionTimeFrame]).rolling(4).mean()
-    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=bms, line=dict(color='teal'), mode='lines', name='Buy VMA'), row=3, col=1)
-    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=sms, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=3, col=1)
+    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=bms, line=dict(color='teal'), mode='lines', name='Buy VMA'), row=4, col=1)
+    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=sms, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=4, col=1)
 
     fig.add_trace(go.Candlestick(x=df['time'],
                                  open=df['open'],
@@ -914,18 +915,34 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             trcount+=1
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
+    
     difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame]
     coll = [     'teal' if i[0] > 0
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
-    fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=2, col=1)
+    fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=3, col=1)
 
-    posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
-    negati = pd.Series([i[0] if i[0] < 0 else 0 for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] < 0])/len([i[0] for i in difList if i[0] < 0])
+    #posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
+    #negati = pd.Series([i[0] if i[0] < 0 else 0 for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] < 0])/len([i[0] for i in difList if i[0] < 0])
     
-    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=posti, line=dict(color='teal'), mode='lines', name='Buy VMA'), row=2, col=1)
-    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=negati, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=2, col=1)
-
+    #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=posti, line=dict(color='teal'), mode='lines', name='Buy VMA'), row=3, col=1)
+    #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=negati, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=3, col=1)
+    
+    
+    #df['Momentum'] = df['Momentum'].fillna(0) ['teal' if val > 0 else 'crimson' for val in df['Momentum']]
+    colors = ['maroon']
+    for val in range(1,len(df['Momentum'])):
+        if df['Momentum'][val] > 0:
+            color = 'teal'
+            if df['Momentum'][val] > df['Momentum'][val-1]:
+                color = '#54C4C1' 
+        else:
+            color = 'maroon'
+            if df['Momentum'][val] < df['Momentum'][val-1]:
+                color='crimson' 
+        colors.append(color)
+    fig.add_trace(go.Bar(x=df['time'], y=df['Momentum'], marker_color =colors ), row=2, col=1)
+    
 
     if len(tpCandle) > 0:
         troRank = []
@@ -1008,7 +1025,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     '''
     
     
-    fig.update_layout(height=880, xaxis_rangeslider_visible=False, showlegend=False)
+    fig.update_layout(height=890, xaxis_rangeslider_visible=False, showlegend=False)
     fig.update_xaxes(autorange="reversed", row=1, col=2)
     #fig.update_xaxes(autorange="reversed", row=1, col=3)
     #fig.update_layout(plot_bgcolor='gray')
@@ -1020,10 +1037,48 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     fig.update_xaxes(showticklabels=False, row=1, col=1)
     fig.update_xaxes(showticklabels=False, row=2, col=2)
     fig.update_xaxes(showticklabels=False, row=2, col=1)
-    #fig.update_xaxes(showticklabels=False, row=3, col=1)
+    fig.update_xaxes(showticklabels=False, row=4, col=1)
     #fig.show(config={'modeBarButtonsToAdd': ['drawline']})
     return fig
 
+def calculate_bollinger_bands(df):
+   df['20sma'] = df['close'].rolling(window=20).mean()
+   df['stddev'] = df['close'].rolling(window=20).std()
+   df['lower_band'] = df['20sma'] - (2 * df['stddev'])
+   df['upper_band'] = df['20sma'] + (2 * df['stddev'])
+
+def calculate_keltner_channels(df):
+   df['TR'] = abs(df['high'] - df['low'])
+   df['ATR'] = df['TR'].rolling(window=20).mean()
+
+   df['lower_keltner'] = df['20sma'] - (df['ATR'] * 1.5)
+   df['upper_keltner'] = df['20sma'] + (df['ATR'] * 1.5)
+
+def calculate_ttm_squeeze(df, n=14):
+    '''
+    df['20sma'] = df['close'].rolling(window=20).mean()
+    highest = df['high'].rolling(window = 20).max()
+    lowest = df['low'].rolling(window = 20).min()
+    m1 = (highest + lowest)/2 
+    df['Momentum'] = (df['close'] - (m1 + df['20sma'])/2)
+    fit_y = np.array(range(0,20))
+    df['Momentum'] = df['Momentum'].rolling(window = 20).apply(lambda x: np.polyfit(fit_y, x, 1)[0] * (20-1) + np.polyfit(fit_y, x, 1)[1], raw=True)
+    
+    '''
+    #calculate_bollinger_bands(df)
+    #calculate_keltner_channels(df)
+    #df['Squeeze'] = (df['upper_band'] - df['lower_band']) - (df['upper_keltner'] - df['lower_keltner'])
+    #df['Squeeze_On'] = df['Squeeze'] < 0
+    #df['Momentum'] = df['close'] - df['close'].shift(20)
+    df['20sma'] = df['close'].rolling(window=n).mean()
+    highest = df['high'].rolling(window = n).max()
+    lowest = df['low'].rolling(window = n).min()
+    m1 = (highest + lowest)/2 
+    df['Momentum'] = (df['close'] - (m1 + df['20sma'])/2)
+    #fit_y = np.array(range(0,n))
+    #df['Momentum'] = df['Momentum'].rolling(window = n).apply(lambda x: np.polyfit(fit_y, x, 1)[0] * (n-1) + np.polyfit(fit_y, x, 1)[1], raw=True)
+    
+    
 
 symbolNumList = ['118', '4358', '42012334', '42002072', '36956', '2017', '4124497', '28080', '2707', '939', ]
 symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG',]
@@ -1438,6 +1493,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
     except(ValueError):
         previousDay = []
+        
+    calculate_ttm_squeeze(df)
         
     if interval_time == initial_inter:
         interval_time = subsequent_inter
