@@ -1075,8 +1075,8 @@ def calculate_ttm_squeeze(df, n=14):
     lowest = df['low'].rolling(window = n).min()
     m1 = (highest + lowest)/2 
     df['Momentum'] = (df['close'] - (m1 + df['20sma'])/2)
-    #fit_y = np.array(range(0,n))
-    #df['Momentum'] = df['Momentum'].rolling(window = n).apply(lambda x: np.polyfit(fit_y, x, 1)[0] * (n-1) + np.polyfit(fit_y, x, 1)[1], raw=True)
+    fit_y = np.array(range(0,n))
+    df['Momentum'] = df['Momentum'].rolling(window = n).apply(lambda x: np.polyfit(fit_y, x, 1)[0] * (n-1) + np.polyfit(fit_y, x, 1)[1], raw=True)
     
     
 
