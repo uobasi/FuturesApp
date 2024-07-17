@@ -462,6 +462,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP'))
     
+    if 'POC' in df.columns:
+        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', name='POC',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', name='HighVA',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', name='LowVA',marker_color='rgba(0,0,0)'))
 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.1, name='UPPERVWAP2', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N2'], mode='lines', opacity=0.1, name='LOWERVWAP2', line=dict(color='black')))
@@ -759,7 +763,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     
 
     fig.add_trace(go.Scatter(x=df['time'], y= [sortadlist2[0][0]]*len(df['time']) ,
-                             line_color='yellow',
+                             line_color='#0000FF',
                              text = 'Current Day POC',
                              textposition="bottom left",
                              showlegend=False,
@@ -771,7 +775,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                  )
 
     if len(previousDay) > 0:
-        if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.15:
+        if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.30:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[2])]*len(df['time']) ,
                                     line_color='cyan',
@@ -787,7 +791,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                         )
             trcount+=1
 
-        if (abs(float(previousDay[0]) - df['1ema'][len(df)-1]) / ((float(previousDay[0]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.15:
+        if (abs(float(previousDay[0]) - df['1ema'][len(df)-1]) / ((float(previousDay[0]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.30:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[0])]*len(df['time']) ,
                                     line_color='green',
@@ -801,7 +805,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                         )
             trcount+=1
 
-        if (abs(float(previousDay[1]) - df['1ema'][len(df)-1]) / ((float(previousDay[1]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.15:
+        if (abs(float(previousDay[1]) - df['1ema'][len(df)-1]) / ((float(previousDay[1]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.30:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[1])]*len(df['time']) ,
                                     line_color='purple',
@@ -964,8 +968,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                     # color="#ffffff"
                 ),)
         
-    '''
-    for trds in sortadlist[:40]:
+    
+    for trds in sortadlist[:1]:
         try:
             if str(trds[3]) == 'A':
                 vallue = 'Sell'
@@ -988,7 +992,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
         except(KeyError):
             continue 
 
-    '''
+    
     
     for tmr in range(0,len(fig.data)): 
         fig.data[tmr].visible = True
@@ -1054,7 +1058,7 @@ def calculate_keltner_channels(df):
    df['lower_keltner'] = df['20sma'] - (df['ATR'] * 1.5)
    df['upper_keltner'] = df['20sma'] + (df['ATR'] * 1.5)
 
-def calculate_ttm_squeeze(df, n=14):
+def calculate_ttm_squeeze(df, n=12):
     '''
     df['20sma'] = df['close'].rolling(window=20).mean()
     highest = df['high'].rolling(window = 20).max()
@@ -1077,8 +1081,6 @@ def calculate_ttm_squeeze(df, n=14):
     df['Momentum'] = (df['close'] - (m1 + df['20sma'])/2)
     fit_y = np.array(range(0,n))
     df['Momentum'] = df['Momentum'].rolling(window = n).apply(lambda x: np.polyfit(fit_y, x, 1)[0] * (n-1) + np.polyfit(fit_y, x, 1)[1], raw=True)
-    if df['Momentum'].isna().all():
-        df['Momentum'] = (df['close'] - (m1 + df['20sma'])/2)
     
     
 
@@ -1225,7 +1227,7 @@ def update_tpo(n_clicks, value):
 )
     
 def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum, tpoNum, interval_time): #interv
-    print('inFunction')	
+    
     #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
 
@@ -1251,7 +1253,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         tpoNum = '100'
         
         
-
+    print('inFunction '+sname)	
     
     blob = Blob('FuturesOHLC'+str(symbolNum), bucket) 
     FuturesOHLC = blob.download_as_text()
@@ -1352,7 +1354,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
 
     x = np.array([i for i in range(len(df))])
-    y = np.array([i for i in df['40ema']])
+    y = np.array([i for i in df['30ema']])
     
     
 
@@ -1495,7 +1497,27 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
     except(ValueError):
         previousDay = []
-        
+    
+    
+    
+    blob = Blob('POCData'+str(symbolNum), bucket) 
+    POCData = blob.download_as_text()
+    csv_reader  = csv.reader(io.StringIO(POCData))
+
+    csv_rows = []
+    for row in csv_reader:
+        csv_rows.append(row)
+    
+    LowVA = [float(i[0]) for i in csv_rows]
+    HighVA = [float(i[1]) for i in csv_rows]
+    POC = [float(i[2]) for i in csv_rows]
+    #if len(LowVA) > 0:
+    if len(df) >= len(LowVA) and len(LowVA) > 0:
+        df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
+        df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
+        df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
+
+  
     calculate_ttm_squeeze(df)
         
     if interval_time == initial_inter:
