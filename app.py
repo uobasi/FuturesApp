@@ -432,13 +432,15 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
 
     colo = []
     for fk in sortadlist2:
-        colo.append([str(round(fk[0],7))+'A',fk[7],fk[8], fk[7]/(fk[7]+fk[8]+1)])
-        colo.append([str(round(fk[0],7))+'B',fk[8],fk[7], fk[8]/(fk[7]+fk[8]+1)])
+        colo.append([str(round(fk[0],7))+'A',fk[7],fk[8], fk[7]/(fk[7]+fk[8]+fk[9]+1), fk[9]])
+        colo.append([str(round(fk[0],7))+'B',fk[8],fk[7], fk[8]/(fk[7]+fk[8]+fk[9]+1), fk[9]])
+        colo.append([str(round(fk[0],7))+'N',fk[9],fk[7], fk[9]/(fk[7]+fk[8]+fk[9]+1), fk[8]])
+        
     fig.add_trace(
         go.Bar(
             x=pd.Series([i[1] for i in colo]),
             y=pd.Series([float(i[0][:len(i[0])-1]) for i in colo]),
-            text=np.around(pd.Series([float(i[0][:len(i[0])-1]) for i in colo]), 6),
+            #text=np.around(pd.Series([float(i[0][:len(i[0])-1]) for i in colo]), 6),
             textposition='auto',
             orientation='h',
             #width=0.2,
@@ -446,8 +448,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                         else '#00FFFF' if 'B' in i[0] and i[3] >= 0.65
                         else 'crimson' if 'A' in i[0] and i[3] < 0.65
                         else 'pink' if 'A' in i[0] and i[3] >= 0.65
+                        else 'gray' if 'N' in i[0]
                         else i for i in colo],
-            hovertext=pd.Series([i[0][:len(i[0])-1] + ' '+ str(round(i[1] / (i[1]+i[2]+1),2)) + ' '+ str(round(i[2]/ (i[1]+i[2]+1),2)) for i in colo])#pd.Series([str(round(i[7],3)) + ' ' + str(round(i[8],3))  + ' ' + str(round(i[9],3)) +' ' + str(round([i[7], i[8], i[9]][[i[7], i[8], i[9]].index(max([i[7], i[8], i[9]]))]/sum([i[7], i[8], i[9]]),2)) if sum([i[7], i[8], i[9]]) > 0 else '' for i in sortadlist2]),
+            hovertext=pd.Series([i[0][:len(i[0])-1] + ' '+ str(round(i[1] / (i[1]+i[2]+i[4]+1),2)) for i in colo])#  + ' '+ str(round(i[2]/ (i[1]+i[2]+i[4]+1),2))     #pd.Series([str(round(i[7],3)) + ' ' + str(round(i[8],3))  + ' ' + str(round(i[9],3)) +' ' + str(round([i[7], i[8], i[9]][[i[7], i[8], i[9]].index(max([i[7], i[8], i[9]]))]/sum([i[7], i[8], i[9]]),2)) if sum([i[7], i[8], i[9]]) > 0 else '' for i in sortadlist2]),
         ),
         row=1, col=2
     )
@@ -463,9 +466,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP'))
     
     if 'POC' in df.columns:
-        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', name='POC',marker_color='rgba(0,0,0)'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', name='HighVA',marker_color='rgba(0,0,0)'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', name='LowVA',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.50,name='POC',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.50, name='HighVA',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.50,name='LowVA',marker_color='rgba(0,0,0)'))
 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.1, name='UPPERVWAP2', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N2'], mode='lines', opacity=0.1, name='LOWERVWAP2', line=dict(color='black')))
@@ -964,11 +967,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                                    arrowhead=1,
                                    font=dict(
                     #family="Courier New, monospace",
-                    size=13,
+                    size=10,
                     # color="#ffffff"
                 ),)
         
-    
+    '''
     for trds in sortadlist[:1]:
         try:
             if str(trds[3]) == 'A':
@@ -991,7 +994,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             ),)
         except(KeyError):
             continue 
-
+    '''
     
     
     for tmr in range(0,len(fig.data)): 
@@ -1100,7 +1103,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 260000  # Initial interval #210000#250000#80001
-subsequent_inter = 50000  # Subsequent interval
+subsequent_inter = 60000  # Subsequent interval
 app = Dash()
 app.layout = html.Div([
     
