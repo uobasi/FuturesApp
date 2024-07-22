@@ -466,7 +466,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP'))
     
     if 'POC' in df.columns:
-        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',marker_color='#0000FF'))
         fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.50, name='HighVA',marker_color='rgba(0,0,0)'))
         fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.50,name='LowVA',marker_color='rgba(0,0,0)'))
 
@@ -772,7 +772,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['2ema'], mode='lines', name='2ema'))
     
-
+    '''
     fig.add_trace(go.Scatter(x=df['time'], y= [sortadlist2[0][0]]*len(df['time']) ,
                              line_color='#0000FF',
                              text = 'Current Day POC',
@@ -784,7 +784,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                             ),
                   row=1, col=1
                  )
-
+    '''
     if len(previousDay) > 0:
         if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.30:
             fig.add_trace(go.Scatter(x=df['time'],
@@ -1110,7 +1110,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #import pandas_ta as ta
 #from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
-initial_inter = 260000  # Initial interval #210000#250000#80001
+initial_inter = 280000  # Initial interval #210000#250000#80001
 subsequent_inter = 90000  # Subsequent interval
 app = Dash()
 app.layout = html.Div([
@@ -1251,10 +1251,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '10'
+        interv = '15'
         
     if clustNum not in vaildClust:
-        clustNum = '5'
+        clustNum = '8'
         
     if stkName != previous_stkName or interv != previous_interv:
         stored_data = None
