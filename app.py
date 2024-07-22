@@ -466,7 +466,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP'))
     
     if 'POC' in df.columns:
-        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.50,name='POC',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',marker_color='rgba(0,0,0)'))
         fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.50, name='HighVA',marker_color='rgba(0,0,0)'))
         fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.50,name='LowVA',marker_color='rgba(0,0,0)'))
 
@@ -606,10 +606,18 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
         troBuys = sum([i[1] for i in tro[10] if i[3] == 'B'])
         troSells = sum([i[1] for i in tro[10] if i[3] == 'A'])
         
-        if round(troBuys/(troBuys+troSells),2) >= 0.61:
-            troAbove.append(tro+[troBuys, troSells, troBuys/(troBuys+troSells)])
-        if round(troSells/(troBuys+troSells),2) >= 0.61:
-            troBelow.append(tro+[troSells, troBuys, troSells/(troBuys+troSells)])
+        try:
+            if round(troBuys/(troBuys+troSells),2) >= 0.61:
+                troAbove.append(tro+[troBuys, troSells, troBuys/(troBuys+troSells)])
+        except(ZeroDivisionError):
+            troAbove.append(tro+[troBuys, troSells, 0])
+            
+        try:
+            if round(troSells/(troBuys+troSells),2) >= 0.61:
+                troBelow.append(tro+[troSells, troBuys, troSells/(troBuys+troSells)])
+        except(ZeroDivisionError):
+            troBelow.append(tro+[troSells, troBuys, 0])
+        
          
 
     
@@ -887,7 +895,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             
             
             
-            opac = round((len(i)/mazz)/1.6,2)
+            opac = round((len(i)/mazz)/2,2)
             fig.add_shape(type="rect",
                       y0=i[0], y1=i[len(i)-1], x0=-1, x1=len(df),
                       fillcolor="crimson" if askCount > bidCount else 'teal' if askCount < bidCount else 'gray',
@@ -1061,7 +1069,7 @@ def calculate_keltner_channels(df):
    df['lower_keltner'] = df['20sma'] - (df['ATR'] * 1.5)
    df['upper_keltner'] = df['20sma'] + (df['ATR'] * 1.5)
 
-def calculate_ttm_squeeze(df, n=12):
+def calculate_ttm_squeeze(df, n=13):
     '''
     df['20sma'] = df['close'].rolling(window=20).mean()
     highest = df['high'].rolling(window = 20).max()
@@ -1087,7 +1095,7 @@ def calculate_ttm_squeeze(df, n=12):
     
     
 
-symbolNumList = ['118', '4358', '42012334', '42002072', '36956', '2017', '4124497', '28080', '2707', '939', ]
+symbolNumList = ['118', '4358', '42012334', '42002072', '585200', '2017', '4124497', '28080', '2707', '938', ]
 symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG',]
 
 intList = ['1','2','3','4','5','6','10','15']
@@ -1103,7 +1111,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 260000  # Initial interval #210000#250000#80001
-subsequent_inter = 60000  # Subsequent interval
+subsequent_inter = 90000  # Subsequent interval
 app = Dash()
 app.layout = html.Div([
     
@@ -1350,7 +1358,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
        
     #AllTrades = [i for i in AllTrades if i[1] > 1]
         
-    hs = historV1(df,50,{},AllTrades,[])
+    hs = historV1(df,100,{},AllTrades,[])
     
     va = valueAreaV1(hs[0])
     
