@@ -487,6 +487,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     
     #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', opacity=0.19, name='1ema',marker_color='rgba(0,0,0)'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', name='UPPERVWAP'))
+    '''
     localMin = argrelextrema(df.low.values, np.less_equal, order=18)[0] 
     localMax = argrelextrema(df.high.values, np.greater_equal, order=18)[0]
      
@@ -514,7 +515,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
             ),)
             
     
-
+    '''
     fig.add_hline(y=df['close'][len(df)-1], row=1, col=2)
     
     
@@ -786,7 +787,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                  )
     '''
     if len(previousDay) > 0:
-        if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.30:
+        if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.15:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[2])]*len(df['time']) ,
                                     line_color='cyan',
@@ -802,7 +803,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                         )
             trcount+=1
 
-        if (abs(float(previousDay[0]) - df['1ema'][len(df)-1]) / ((float(previousDay[0]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.30:
+        if (abs(float(previousDay[0]) - df['1ema'][len(df)-1]) / ((float(previousDay[0]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.15:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[0])]*len(df['time']) ,
                                     line_color='green',
@@ -816,7 +817,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
                         )
             trcount+=1
 
-        if (abs(float(previousDay[1]) - df['1ema'][len(df)-1]) / ((float(previousDay[1]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.30:
+        if (abs(float(previousDay[1]) - df['1ema'][len(df)-1]) / ((float(previousDay[1]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.15:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[1])]*len(df['time']) ,
                                     line_color='purple',
@@ -1251,7 +1252,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '15'
+        interv = '5'
         
     if clustNum not in vaildClust:
         clustNum = '8'
