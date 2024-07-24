@@ -1096,8 +1096,8 @@ def calculate_ttm_squeeze(df, n=13):
     
     
 
-symbolNumList = ['118', '4358', '42012334', '42002072', '585200', '2017', '4124497', '28080', '2707', '938', ]
-symbolNameList = ['ES', 'NQ', 'YM','BTC', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG',]
+symbolNumList = ['118', '4358', '42012334', '585200', '2017', '4124497', '28080', '2707', '938', ]
+symbolNameList = ['ES', 'NQ', 'YM', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG',]
 
 intList = ['1','2','3','4','5','6','10','15']
 
@@ -1112,7 +1112,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 280000  # Initial interval #210000#250000#80001
-subsequent_inter = 50000  # Subsequent interval
+subsequent_inter = 70000  # Subsequent interval
 app = Dash()
 app.layout = html.Div([
     
@@ -1529,7 +1529,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
         df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
         
-        
+     
+    '''
     blob = Blob('levelTwoMBO'+str(symbolNum), bucket) 
     levelTwoMBO = blob.download_as_text()
         
@@ -1551,7 +1552,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     mboSellDec = round(sum(mboSells) / (sum(mboBuys)+sum(mboSells)),2)
     
     mboString = 'As of '+stTime+' '+ 'Buys: '+str(sum(mboBuys))+'('+str(mboBuysDec)+') '+ 'Sells: '+str(sum(mboSells))+'('+str(mboSellDec)+') '
-  
+    '''
+    mboString = ''
     calculate_ttm_squeeze(df)
     
         
