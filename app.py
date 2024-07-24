@@ -270,7 +270,7 @@ def find_clusters(numbers, threshold):
     return clusters
 
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = '',   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5):
   
     
     average = round(np.average(df_dx), 3)
@@ -294,7 +294,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     tobuys =  sum([x[1] for x in [i for i in sortadlist if i[3] == 'B']])
     tosells = sum([x[1] for x in [i for i in sortadlist if i[3] == 'A']])
     
-    tpString = '  (Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+') | '+ '(Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+'))'
+    tpString = '  (Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+') | '+ '(Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+'))\n '+ mboString
     
     '''
     putDec = 0
@@ -370,8 +370,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='',   trends:list=
     )
 
     
-    bms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(9).mean()
-    sms = pd.Series([i[3] for i in OptionTimeFrame]).rolling(9).mean()
+    bms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(6).mean()
+    sms = pd.Series([i[3] for i in OptionTimeFrame]).rolling(6).mean()
     #xms = pd.Series([i[3]+i[2] for i in OptionTimeFrame]).rolling(4).mean()
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=bms, line=dict(color='teal'), mode='lines', name='Buy VMA'), row=4, col=1)
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=sms, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=4, col=1)
@@ -1112,7 +1112,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 280000  # Initial interval #210000#250000#80001
-subsequent_inter = 90000  # Subsequent interval
+subsequent_inter = 50000  # Subsequent interval
 app = Dash()
 app.layout = html.Div([
     
@@ -1528,9 +1528,32 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
         df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
         df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
+        
+        
+    blob = Blob('levelTwoMBO'+str(symbolNum), bucket) 
+    levelTwoMBO = blob.download_as_text()
+        
 
+    csv_reader  = csv.reader(io.StringIO(levelTwoMBO))
+    
+    csv_rows = []
+    for row in csv_reader:
+        csv_rows.append(row)
+        
+    
+    aggs = [ ]  
+    levelTwoMBO = [i for i in csv_rows]
+    
+    stTime = (datetime.fromtimestamp(int(levelTwoMBO[0][0])/1e9)).strftime('%H:%M:%S')
+    mboBuys =  [int(i[3]) for i in levelTwoMBO if i[5] == 'B']
+    mboSells = [int(i[3]) for i in levelTwoMBO if i[5] == 'A']
+    mboBuysDec = round(sum(mboBuys) / (sum(mboBuys)+sum(mboSells)),2)
+    mboSellDec = round(sum(mboSells) / (sum(mboBuys)+sum(mboSells)),2)
+    
+    mboString = 'As of '+stTime+' '+ 'Buys: '+str(sum(mboBuys))+'('+str(mboBuysDec)+') '+ 'Sells: '+str(sum(mboSells))+'('+str(mboSellDec)+') '
   
     calculate_ttm_squeeze(df)
+    
         
     if interval_time == initial_inter:
         interval_time = subsequent_inter
@@ -1538,7 +1561,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if stkName != previous_stkName or interv != previous_interv:
         interval_time = initial_inter
     
-    fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum)) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum)) #trends=FindTrends(df,n=10)
 
     return stored_data, fg, previous_stkName, previous_interv, interval_time
 
