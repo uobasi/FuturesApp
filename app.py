@@ -1096,8 +1096,8 @@ def calculate_ttm_squeeze(df, n=13):
     
     
 
-symbolNumList = ['118', '4358', '42012334', '585200', '2017', '4124497', '28080', '2707', '938', ]
-symbolNameList = ['ES', 'NQ', 'YM', 'CL', 'GC', 'PL', 'HG', 'SI', 'NG',]
+symbolNumList = ['118', '4358', '42012334', '585200', '2017','28080', '938', '206871']
+symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', '6J']
 
 intList = ['1','2','3','4','5','6','10','15']
 
@@ -1125,7 +1125,7 @@ app.layout = html.Div([
 
     html.Div(dcc.Input(id='input-on-submit', type='text')),
     html.Button('Submit', id='submit-val', n_clicks=0),
-    html.Div(id='container-button-basic',children="Enter a symbol from |'ES', 'NQ',  'YM',  'BTC', 'CL', 'GC'| and submit"),
+    html.Div(id='container-button-basic',children="Enter a symbol from |'ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', '6J'| and submit"),
     dcc.Store(id='stkName-value'),
     
     html.Div(dcc.Input(id='input-on-interv', type='text')),
