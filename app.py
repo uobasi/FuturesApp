@@ -33,7 +33,9 @@ def ema(df):
     df['40ema'] = df['close'].ewm(span=40, adjust=False).mean()
     df['28ema'] = df['close'].ewm(span=28, adjust=False).mean()
     df['50ema'] = df['close'].ewm(span=50, adjust=False).mean()
-    df['100ema'] = df['close'].ewm(span=50, adjust=False).mean()
+    df['100ema'] = df['close'].ewm(span=100, adjust=False).mean()
+    df['150ema'] = df['close'].ewm(span=150, adjust=False).mean()
+    df['200ema'] = df['close'].ewm(span=200, adjust=False).mean()
     df['1ema'] = df['close'].ewm(span=1, adjust=False).mean()
 
 def vwap(df):
@@ -469,7 +471,16 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',marker_color='#0000FF'))
         fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.50, name='HighVA',marker_color='rgba(0,0,0)'))
         fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.50,name='LowVA',marker_color='rgba(0,0,0)'))
-
+        
+    fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.5, name='100ema', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.5, name='150ema', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['200ema'], mode='lines', opacity=0.5, name='200emaa', line=dict(color='black')))
+    
+    fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', name='uppervwapAvg', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',name='lowervwapAvg', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', name='vwapAvg', ))
+    
+    
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.1, name='UPPERVWAP2', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N2'], mode='lines', opacity=0.1, name='LOWERVWAP2', line=dict(color='black')))
 
@@ -1096,8 +1107,8 @@ def calculate_ttm_squeeze(df, n=13):
     
     
 
-symbolNumList = ['118', '4358', '42012334', '585200', '2017','28080', '938', '206871']
-symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', '6J']
+symbolNumList = ['118', '4358', '42012334', '585200', '393','28080', '938', '11232']
+symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY']
 
 intList = ['1','2','3','4','5','6','10','15']
 
@@ -1112,7 +1123,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 #from collections import Counter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 280000  # Initial interval #210000#250000#80001
-subsequent_inter = 70000  # Subsequent interval
+subsequent_inter = 100000  # Subsequent interval
 app = Dash()
 app.layout = html.Div([
     
@@ -1252,7 +1263,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '5'
+        interv = '10'
         
     if clustNum not in vaildClust:
         clustNum = '8'
@@ -1331,6 +1342,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     vwap(df)
     ema(df)
     PPP(df)
+    df['uppervwapAvg'] = df['STDEV_25'].cumsum() / (df.index + 1)
+    df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
+    df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
 
 
     
