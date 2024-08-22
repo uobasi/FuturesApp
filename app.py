@@ -469,8 +469,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     if 'POC' in df.columns:
         fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',marker_color='#0000FF'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.50, name='HighVA',marker_color='rgba(0,0,0)'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.50,name='LowVA',marker_color='rgba(0,0,0)'))
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.50, name='HighVA',marker_color='rgba(0,0,0)'))
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.50,name='LowVA',marker_color='rgba(0,0,0)'))
         
     fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.5, name='100ema', line=dict(color='black')))
     fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.5, name='150ema', line=dict(color='black')))
@@ -1534,13 +1534,13 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     for row in csv_reader:
         csv_rows.append(row)
     
-    LowVA = [float(i[0]) for i in csv_rows]
-    HighVA = [float(i[1]) for i in csv_rows]
+    #LowVA = [float(i[0]) for i in csv_rows]
+    #HighVA = [float(i[1]) for i in csv_rows]
     POC = [float(i[2]) for i in csv_rows]
     #if len(LowVA) > 0:
-    if len(df) >= len(LowVA) and len(LowVA) > 0:
-        df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
-        df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
+    if len(df) >= len(POC) and len(POC) > 0:
+        #df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
+        #df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
         df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
         
      
