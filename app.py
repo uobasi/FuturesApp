@@ -467,11 +467,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP'))
     
+    '''
     if 'POC' in df.columns:
         fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.50, name='HighVA',marker_color='rgba(0,0,0)'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.50,name='LowVA',marker_color='rgba(0,0,0)'))
-        
+    '''   
     fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.5, name='100ema', line=dict(color='black')))
     fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.5, name='150ema', line=dict(color='black')))
     fig.add_trace(go.Scatter(x=df['time'], y=df['200ema'], mode='lines', opacity=0.5, name='200emaa', line=dict(color='black')))
