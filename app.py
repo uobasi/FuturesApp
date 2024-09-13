@@ -842,7 +842,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     ),
                         )
             trcount+=1
-        
+    '''   
     fig.add_trace(go.Scatter(x=df['time'],
                              y= [df['vwap'].mean()]*len(df['time']) ,
                              line_color='#FF1493',
@@ -878,7 +878,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                              mode= 'lines',
                             ),
                  )
-
+    '''
     data = [i[0] for i in sortadlist]
     data.sort(reverse=True)
     differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
