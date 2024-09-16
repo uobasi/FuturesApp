@@ -372,11 +372,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     )
 
     
-    bms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(6).mean() .cumsum() / (df.index + 1)
+    bms = pd.Series([i[2] for i in OptionTimeFrame]).rolling(6).mean()
     sms = pd.Series([i[3] for i in OptionTimeFrame]).rolling(6).mean()
     #xms = pd.Series([i[3]+i[2] for i in OptionTimeFrame]).rolling(4).mean()
-    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=pd.Series([i[2] for i in OptionTimeFrame]).cumsum() / (df.index + 1), line=dict(color='teal'), mode='lines', name='Buy VMA'), row=4, col=1)
-    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=pd.Series([i[3] for i in OptionTimeFrame]).cumsum() / (df.index + 1), line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=4, col=1)
+    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=bms, line=dict(color='teal'), mode='lines', name='Buy VMA'), row=4, col=1)
+    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=sms, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=4, col=1)
 
     fig.add_trace(go.Candlestick(x=df['time'],
                                  open=df['open'],
