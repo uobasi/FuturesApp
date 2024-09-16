@@ -1138,7 +1138,7 @@ app.layout = html.Div([
 
     html.Div(dcc.Input(id='input-on-submit', type='text')),
     html.Button('Submit', id='submit-val', n_clicks=0),
-    html.Div(id='container-button-basic',children="Enter a symbol from |'ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', '6J'| and submit"),
+    html.Div(id='container-button-basic',children="Enter a symbol from |'ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY'| and submit"),
     dcc.Store(id='stkName-value'),
     
     html.Div(dcc.Input(id='input-on-interv', type='text')),
