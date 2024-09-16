@@ -1126,6 +1126,7 @@ from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 280000  # Initial interval #210000#250000#80001
 subsequent_inter = 100000  # Subsequent interval
 app = Dash()
+app.title = "Initial Title"
 app.layout = html.Div([
     
     dcc.Graph(id='graph', config={'modeBarButtonsToAdd': ['drawline']}),
