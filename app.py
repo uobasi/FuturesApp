@@ -1531,23 +1531,25 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         previousDay = []
     
     
-    
-    blob = Blob('POCData'+str(symbolNum), bucket) 
-    POCData = blob.download_as_text()
-    csv_reader  = csv.reader(io.StringIO(POCData))
+    try:
+        blob = Blob('POCData'+str(symbolNum), bucket) 
+        POCData = blob.download_as_text()
+        csv_reader  = csv.reader(io.StringIO(POCData))
 
-    csv_rows = []
-    for row in csv_reader:
-        csv_rows.append(row)
-    
-    #LowVA = [float(i[0]) for i in csv_rows]
-    #HighVA = [float(i[1]) for i in csv_rows]
-    POC = [float(i[2]) for i in csv_rows]
-    #if len(LowVA) > 0:
-    if len(df) >= len(POC) and len(POC) > 0:
-        #df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
-        #df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
-        df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
+        csv_rows = []
+        for row in csv_reader:
+            csv_rows.append(row)
+        
+        #LowVA = [float(i[0]) for i in csv_rows]
+        #HighVA = [float(i[1]) for i in csv_rows]
+        POC = [float(i[2]) for i in csv_rows]
+        #if len(LowVA) > 0:
+        if len(df) >= len(POC) and len(POC) > 0:
+            #df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
+            #df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
+            df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
+    except(NotFound):
+        pass
         
      
     '''
