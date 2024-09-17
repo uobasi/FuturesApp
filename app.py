@@ -1126,6 +1126,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 
 #import pandas_ta as ta
 #from collections import Counter
+from google.api_core.exceptions import NotFound
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 280000  # Initial interval #210000#250000#80001
 subsequent_inter = 100000  # Subsequent interval
