@@ -1426,7 +1426,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         lastTime = stored_data['timeFrame'][len(stored_data['timeFrame'])-1][0]
         for ttm in dtime[dtime.index(lastTime):]:
             for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
-                if datetime.strptime(tradMade[6], "%H:%M:%S") > datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=int(interv)):
+                if datetime.strptime(tradMade[6], "%H:%M:%S") >= datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=int(interv)):
                     try:
                         timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
                     except(KeyError,ZeroDivisionError):
@@ -1470,7 +1470,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         timeDict = {}
         for ttm in dtime:
             for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
-                if datetime.strptime(tradMade[6], "%H:%M:%S") > datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=int(interv)):
+                if datetime.strptime(tradMade[6], "%H:%M:%S") >= datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=int(interv)):
                     try:
                         timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
                     except(KeyError,ZeroDivisionError):
