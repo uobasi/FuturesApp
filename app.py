@@ -1129,7 +1129,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 from google.api_core.exceptions import NotFound
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 280000  # Initial interval #210000#250000#80001
-subsequent_inter = 100000  # Subsequent interval
+subsequent_inter = 80000  # Subsequent interval
 app = Dash()
 app.title = "Initial Title"
 app.layout = html.Div([
@@ -1419,93 +1419,68 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     tempTrades = [i for i in AllTrades]
     tempTrades = sorted(tempTrades, key=lambda d: d[6], reverse=False) 
     tradeTimes = [i[6] for i in tempTrades]
+    tradeEpoch = [i[2] for i in AllTrades]
     
-    if stored_data is not None:
-        print('here')
-        timeDict = {}
-        lastTime = stored_data['timeFrame'][len(stored_data['timeFrame'])-1][0]
-        for ttm in dtime[dtime.index(lastTime):]:
-            for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
-                if datetime.strptime(tradMade[6], "%H:%M:%S") >= datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=int(interv)):
-                    try:
-                        timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
-                    except(KeyError,ZeroDivisionError):
-                        timeDict[ttm] = [0,0,0]
-                    break
-                
-                if ttm not in timeDict:
-                    timeDict[ttm] = [0,0,0]
-                if ttm in timeDict:
-                    if tradMade[5] == 'B':
-                        timeDict[ttm][0] += tradMade[1]#tradMade[0] * tradMade[1]
-                    elif tradMade[5] == 'A':
-                        timeDict[ttm][1] += tradMade[1]#tradMade[0] * tradMade[1] 
-                    elif tradMade[5] == 'N':
-                        timeDict[ttm][2] += tradMade[1]#tradMade[0] * tradMade[1] 
-                        
-    
-        for i in timeDict:
-            if len(timeDict[i]) == 3:
-                try:
-                    timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[i][2]/sum(timeDict[i])]#
-                except(ZeroDivisionError,KeyError):
-                    timeDict[i] += [0, 0,0]
-                    
-        
-                                    
-        timeFrame = [[i,'']+timeDict[i] for i in timeDict]
-    
-        for i in range(len(timeFrame)):
-            timeFrame[i].append(dtimeEpoch[dtime.index(timeFrame[i][0])])
-            
 
-        for pott in timeFrame:
-            pott.insert(4,df['timestamp'].searchsorted(pott[8]))
-            
-        stored_data['timeFrame'] = stored_data['timeFrame'][:len(stored_data['timeFrame'])-1] + timeFrame
-        #timeFrame = stored_data['timeFrame']
-    
-    if stored_data is None:
-        print('Newstored')
-        timeDict = {}
-        for ttm in dtime:
-            for tradMade in tempTrades[bisect.bisect_left(tradeTimes, ttm):]:
-                if datetime.strptime(tradMade[6], "%H:%M:%S") >= datetime.strptime(ttm, "%H:%M:%S") + timedelta(minutes=int(interv)):
-                    try:
-                        timeDict[ttm] += [timeDict[ttm][0]/sum(timeDict[ttm]), timeDict[ttm][1]/sum(timeDict[ttm]), timeDict[ttm][2]/sum(timeDict[ttm])]
-                    except(KeyError,ZeroDivisionError):
-                        timeDict[ttm] = [0,0,0]
-                    break
-                
-                if ttm not in timeDict:
-                    timeDict[ttm] = [0,0,0]
-                if ttm in timeDict:
-                    if tradMade[5] == 'B':
-                        timeDict[ttm][0] += tradMade[1]#tradMade[0] * tradMade[1]
-                    elif tradMade[5] == 'A':
-                        timeDict[ttm][1] += tradMade[1]#tradMade[0] * tradMade[1] 
-                    elif tradMade[5] == 'N':
-                        timeDict[ttm][2] += tradMade[1]#tradMade[0] * tradMade[1] 
-                    
-    
-        for i in timeDict:
-            if len(timeDict[i]) == 3:
-                try:
-                    timeDict[i] += [timeDict[i][0]/sum(timeDict[i]), timeDict[i][1]/sum(timeDict[i]), timeDict[i][2]/sum(timeDict[i])]#
-                except(ZeroDivisionError,KeyError):
-                    timeDict[i] += [0, 0,0]
-                    
+    #print('Newstored')
+    timeDict = {}
+    make = []
+    for ttm in range(len(dtimeEpoch)):
         
-                                    
-        timeFrame = [[i,'']+timeDict[i] for i in timeDict]
+        make.append([dtimeEpoch[ttm],dtime[ttm],bisect.bisect_left(tradeEpoch, dtimeEpoch[ttm])])
+        timeDict[dtime[ttm]] = [0,0,0]
+        
+        
     
-        for i in range(len(timeFrame)):
-            timeFrame[i].append(dtimeEpoch[i])
+    for tr in range(len(make)):
+        try:
+           tempList =  AllTrades[make[tr][2]:make[tr+1][2]]
+           for i in tempList:
+               if i[5] == 'B':
+                   timeDict[make[tr][1]][0] += i[1]#tradMade[0] * tradMade[1]
+               elif i[5] == 'A':
+                   timeDict[make[tr][1]][1] += i[1]#tradMade[0] * tradMade[1] 
+               elif i[5] == 'N':
+                   timeDict[make[tr][1]][2] += i[1]#tradMade[0] * tradMade[1]
+           try:    
+               timeDict[make[tr][1]] += [timeDict[make[tr][1]][0]/sum(timeDict[make[tr][1]]), timeDict[make[tr][1]][1]/sum(timeDict[make[tr][1]]), timeDict[make[tr][1]][2]/sum(timeDict[make[tr][1]])]   
+           except(ZeroDivisionError):
+               timeDict[make[tr][1]]  += [0, 0,0] 
             
-        for pott in timeFrame:
-            pott.insert(4,df['timestamp'].searchsorted(pott[8]))
+               
+        except(IndexError):
+            tempList =  AllTrades[make[tr][2]:len(AllTrades)]
+            for i in tempList:
+                if i[5] == 'B':
+                    timeDict[make[tr][1]][0] += i[1]#tradMade[0] * tradMade[1]
+                elif i[5] == 'A':
+                    timeDict[make[tr][1]][1] += i[1]#tradMade[0] * tradMade[1] 
+                elif i[5] == 'N':
+                    timeDict[make[tr][1]][2] += i[1]#tradMade[0] * tradMade[1] 
+            try:    
+                timeDict[make[tr][1]] += [timeDict[make[tr][1]][0]/sum(timeDict[make[tr][1]]), timeDict[make[tr][1]][1]/sum(timeDict[make[tr][1]]), timeDict[make[tr][1]][2]/sum(timeDict[make[tr][1]])]   
+            except(ZeroDivisionError):
+                timeDict[make[tr][1]]  += [0, 0,0]
+                
+    
+        
+        
+
+                                    
+    timeFrame = [[i,'']+timeDict[i] for i in timeDict]
+
+    for i in range(len(timeFrame)):
+        timeFrame[i].append(dtimeEpoch[i])
+        
+    for pott in timeFrame:
+        #print(pott)
+        pott.insert(4,df['timestamp'].searchsorted(pott[8]))
+        
+        #for tit in  range(1,len(dtime)):
+        #   pff = tempTrades[:bisect.bisect_left([i[2] for i in AllTrades], 1726610580000000000)]
             
-        stored_data = {'timeFrame': timeFrame} 
+        
+        #stored_data = {'timeFrame': timeFrame} 
         
     #OptionTimeFrame = stored_data['timeFrame']   
     previous_stkName = sname
@@ -1586,7 +1561,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if stkName != previous_stkName or interv != previous_interv:
         interval_time = initial_inter
     
-    fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum)) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = timeFrame, clusterNum=int(clustNum)) #trends=FindTrends(df,n=10)
 
     return stored_data, fg, previous_stkName, previous_interv, interval_time
 
