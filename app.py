@@ -1058,7 +1058,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     fig.update_xaxes(autorange="reversed", row=1, col=2)
     #fig.update_xaxes(autorange="reversed", row=1, col=3)
     #fig.update_layout(plot_bgcolor='gray')
-    #fig.update_layout(paper_bgcolor='rgba(96, 95, 93, 0.5)')
+    fig.update_layout(paper_bgcolor='#f0f0f0')
     #"paper_bgcolor": "rgba(0, 0, 0, 0)",
 
     
