@@ -1436,7 +1436,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         if tr+1 < len(make):
             tempList = AllTrades[make[tr][2]:make[tr+1][2]]
         else:
-            tempList = llTrades[make[tr][2]:len(AllTrades)]
+            tempList = AllTrades[make[tr][2]:len(AllTrades)]
         for i in tempList:
             if i[5] == 'B':
                 timeDict[make[tr][1]][0] += i[1]#tradMade[0] * tradMade[1]
