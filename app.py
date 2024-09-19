@@ -1460,7 +1460,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
             
         stored_data['timeFrame'] = stored_data['timeFrame'][:len(stored_data['timeFrame'])-1] + timeFrame
-        print(timeFrame)
+        #print(timeFrame)
         
 
     
