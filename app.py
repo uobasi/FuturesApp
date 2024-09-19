@@ -1433,34 +1433,22 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     
     for tr in range(len(make)):
-        try:
-           tempList =  AllTrades[make[tr][2]:make[tr+1][2]]
-           for i in tempList:
-               if i[5] == 'B':
-                   timeDict[make[tr][1]][0] += i[1]#tradMade[0] * tradMade[1]
-               elif i[5] == 'A':
-                   timeDict[make[tr][1]][1] += i[1]#tradMade[0] * tradMade[1] 
-               elif i[5] == 'N':
-                   timeDict[make[tr][1]][2] += i[1]#tradMade[0] * tradMade[1]
-           try:    
-               timeDict[make[tr][1]] += [timeDict[make[tr][1]][0]/sum(timeDict[make[tr][1]]), timeDict[make[tr][1]][1]/sum(timeDict[make[tr][1]]), timeDict[make[tr][1]][2]/sum(timeDict[make[tr][1]])]   
-           except(ZeroDivisionError):
-               timeDict[make[tr][1]]  += [0, 0,0] 
-            
-               
-        except(IndexError):
-            tempList =  AllTrades[make[tr][2]:len(AllTrades)]
-            for i in tempList:
-                if i[5] == 'B':
-                    timeDict[make[tr][1]][0] += i[1]#tradMade[0] * tradMade[1]
-                elif i[5] == 'A':
-                    timeDict[make[tr][1]][1] += i[1]#tradMade[0] * tradMade[1] 
-                elif i[5] == 'N':
-                    timeDict[make[tr][1]][2] += i[1]#tradMade[0] * tradMade[1] 
-            try:    
-                timeDict[make[tr][1]] += [timeDict[make[tr][1]][0]/sum(timeDict[make[tr][1]]), timeDict[make[tr][1]][1]/sum(timeDict[make[tr][1]]), timeDict[make[tr][1]][2]/sum(timeDict[make[tr][1]])]   
-            except(ZeroDivisionError):
-                timeDict[make[tr][1]]  += [0, 0,0]
+        if tr+1 < len(make):
+            tempList = AllTrades[make[tr][2]:make[tr+1][2]]
+        else:
+            tempList = llTrades[make[tr][2]:len(AllTrades)]
+        for i in tempList:
+            if i[5] == 'B':
+                timeDict[make[tr][1]][0] += i[1]#tradMade[0] * tradMade[1]
+            elif i[5] == 'A':
+                timeDict[make[tr][1]][1] += i[1]#tradMade[0] * tradMade[1] 
+            elif i[5] == 'N':
+                timeDict[make[tr][1]][2] += i[1]#tradMade[0] * tradMade[1]
+        try:    
+            timeDict[make[tr][1]] += [timeDict[make[tr][1]][0]/sum(timeDict[make[tr][1]]), timeDict[make[tr][1]][1]/sum(timeDict[make[tr][1]]), timeDict[make[tr][1]][2]/sum(timeDict[make[tr][1]])]   
+        except(ZeroDivisionError):
+            timeDict[make[tr][1]]  += [0, 0,0] 
+
                 
     
         
