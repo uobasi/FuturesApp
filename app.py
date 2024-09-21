@@ -71,6 +71,7 @@ def PPP(df):
     stdev_multiple_1_5 = 1.5
     stdev_multiple_2 = 2.00
     stdev_multiple_25 = 2.50
+    stdev_multiple_35 = 3.5
 
     df['STDEV_0'] = df.vwap + stdev_multiple_0 * df['STDEV_TV']
     df['STDEV_N0'] = df.vwap - stdev_multiple_0 * df['STDEV_TV']
@@ -86,6 +87,9 @@ def PPP(df):
     
     df['STDEV_25'] = df.vwap + stdev_multiple_25 * df['STDEV_TV']
     df['STDEV_N25'] = df.vwap - stdev_multiple_25 * df['STDEV_TV']
+
+    df['STDEV_35'] = df.vwap + stdev_multiple_35 * df['STDEV_TV']
+    df['STDEV_N35'] = df.vwap - stdev_multiple_35 * df['STDEV_TV']
 
 
 def VMA(df):
@@ -480,6 +484,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', name='uppervwapAvg', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',name='lowervwapAvg', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg35'], mode='lines',name='lowervwapAvg35', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', name='vwapAvg', ))
     
     
@@ -1428,6 +1433,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     PPP(df)
     df['uppervwapAvg'] = df['STDEV_25'].cumsum() / (df.index + 1)
     df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
+    df['lowervwapAvg35'] = df['STDEV_N35'].cumsum() / (df.index + 1)
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
 
 
