@@ -272,7 +272,7 @@ def find_clusters(numbers, threshold):
     return clusters
 
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = '',   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = '',   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5, troInterval:list=[]):
   
     
     average = round(np.average(df_dx), 3)
@@ -325,16 +325,16 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     '''
     fig = make_subplots(rows=4, cols=2, shared_xaxes=True, shared_yaxes=True,
                         specs=[[{}, {},],
-                               [{"colspan": 1},{},],
+                               [{"colspan": 1},{"type": "table", "rowspan": 3},],
                                [{"colspan": 1},{},],
                                [{"colspan": 1},{},]], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') ' (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') 
                          horizontal_spacing=0.01, vertical_spacing=0.00, subplot_titles=(stockName + ' '+strTrend + '('+str(average)+') '+ str(now)+ ' '+ tpString, 'VP ' + str(datetime.now().time()) ), #' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '
-                         column_widths=[0.85,0.15], row_width=[0.12, 0.12, 0.12, 0.64,] ) #,row_width=[0.30, 0.70,]
+                         column_widths=[0.80,0.20], row_width=[0.12, 0.12, 0.12, 0.64,] ) #,row_width=[0.30, 0.70,]
 
     
             
     
-       
+    '''   
     optColor = [     'teal' if float(i[2]) > float(i[3]) #rgba(0,128,0,1.0)
                 else 'crimson' if float(i[3]) > float(i[2])#rgba(255,0,0,1.0)
                 else 'rgba(128,128,128,1.0)' if float(i[3]) == float(i[2])
@@ -377,7 +377,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #xms = pd.Series([i[3]+i[2] for i in OptionTimeFrame]).rolling(4).mean()
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=bms, line=dict(color='teal'), mode='lines', name='Buy VMA'), row=4, col=1)
     fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=sms, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=4, col=1)
-
+    '''
     fig.add_trace(go.Candlestick(x=df['time'],
                                  open=df['open'],
                                  high=df['high'],
@@ -944,12 +944,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             trcount+=1
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
-    
+    '''
     difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame]
     coll = [     'teal' if i[0] > 0
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
     fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=3, col=1)
+    '''
     #fig.add_hline(y=0, row=3, col=1)
     #posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
     #negati = pd.Series([i[0] if i[0] < 0 else 0 for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] < 0])/len([i[0] for i in difList if i[0] < 0])
@@ -959,6 +960,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     
     #df['Momentum'] = df['Momentum'].fillna(0) ['teal' if val > 0 else 'crimson' for val in df['Momentum']]
+    '''
     colors = ['maroon']
     for val in range(1,len(df['Momentum'])):
         if df['Momentum'][val] > 0:
@@ -971,6 +973,20 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                 color='crimson' 
         colors.append(color)
     fig.add_trace(go.Bar(x=df['time'], y=df['Momentum'], marker_color =colors ), row=2, col=1)
+    '''
+    
+    coll = [     'teal' if i[2] > 0
+                else 'crimson' if i[2] < 0
+                else 'gray' for i in troInterval]
+    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[2] for i in troInterval]), marker_color=coll), row=2, col=1)
+    
+    coll2 = [     'crimson' if i[4] > 0
+                else 'teal' if i[4] < 0
+                else 'gray' for i in troInterval]
+    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[4] for i in troInterval]), marker_color=coll2), row=3, col=1)
+    
+    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[1] for i in troInterval]), line=dict(color='teal'), mode='lines', name='Buy TRO'), row=4, col=1)
+    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[3] for i in troInterval]), line=dict(color='crimson'), mode='lines', name='Sell TRO'), row=4, col=1)
     
 
     if len(tpCandle) > 0:
@@ -1052,6 +1068,17 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         sliders=sliders
     )
     '''
+    
+
+    
+    # Add a table in the second column
+    fig.add_trace(
+        go.Table(
+            header=dict(values=["Time", "Buyers", "Buyers Change", "Sellers", "Sellers Change",]),
+            cells=dict(values=list(zip(*troInterval[::-1]))),  # Transpose data to fit the table
+        ),
+        row=2, col=2
+    )
     
     
     fig.update_layout(height=890, xaxis_rangeslider_visible=False, showlegend=False)
@@ -1510,6 +1537,33 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
             
         stored_data['timeFrame'] = stored_data['timeFrame'][:len(stored_data['timeFrame'])-1] + timeFrame
+        
+        bful = []
+        for it in range(len(make)):
+            if it+1 < len(make):
+                tempList = AllTrades[make[0][2]:make[it+1][2]]
+            else:
+                tempList = AllTrades
+            #print(make[0][2],make[it+1][2], len(tempList))
+            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:200]
+                        
+            bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A'])])
+            
+        bolist = [0]
+        for i in range(len(bful)-1):
+            bolist.append(bful[i+1][1] - bful[i][1])
+            
+        solist = [0]
+        for i in range(len(bful)-1):
+            solist.append(bful[i+1][2] - bful[i][2])
+            #buyse/sellle
+            
+        
+        dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row]] for row in  range(len(bful))]
+        
+        stored_data['tro'] = stored_data['tro'][:len(stored_data['tro'])-1] + dst
+        #print(stored_data['tro'])
+        
         #print(timeFrame)
         
 
@@ -1553,7 +1607,31 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             #print(pott)
             pott.insert(4,df['timestamp'].searchsorted(pott[8]))
             
-        stored_data = {'timeFrame': timeFrame} 
+        
+        bful = []
+        for it in range(len(make)):
+            if it+1 < len(make):
+                tempList = AllTrades[make[0][2]:make[it+1][2]]
+            else:
+                tempList = AllTrades
+            #print(make[0][2],make[it+1][2], len(tempList))
+            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:200]
+                        
+            bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A'])])
+            
+        bolist = [0]
+        for i in range(len(bful)-1):
+            bolist.append(bful[i+1][1] - bful[i][1])
+            
+        solist = [0]
+        for i in range(len(bful)-1):
+            solist.append(bful[i+1][2] - bful[i][2])
+            #buyse/sellle
+            
+        
+        dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row]] for row in  range(len(bful))]
+            
+        stored_data = {'timeFrame': timeFrame, 'tro':dst} 
         
     
     
@@ -1639,7 +1717,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if stkName != previous_stkName or interv != previous_interv:
         interval_time = initial_inter
     
-    fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum)) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
 
     return stored_data, fg, previous_stkName, previous_interv, interval_time
 
