@@ -1081,7 +1081,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     )
     
     
-    fig.update_layout(height=890, xaxis_rangeslider_visible=False, showlegend=False)
+    fig.update_layout(height=950, xaxis_rangeslider_visible=False, showlegend=False)
     fig.update_xaxes(autorange="reversed", row=1, col=2)
     #fig.update_xaxes(autorange="reversed", row=1, col=3)
     #fig.update_layout(plot_bgcolor='gray')
