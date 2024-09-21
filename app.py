@@ -1058,7 +1058,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     fig.update_xaxes(autorange="reversed", row=1, col=2)
     #fig.update_xaxes(autorange="reversed", row=1, col=3)
     #fig.update_layout(plot_bgcolor='gray')
-    fig.update_layout(paper_bgcolor='#f0f0f0')
+    fig.update_layout(paper_bgcolor='#E5ECF6')
     #"paper_bgcolor": "rgba(0, 0, 0, 0)",
 
     
@@ -1124,6 +1124,46 @@ vaildTPO = [str(i) for i in range(10,500)]
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
 
+styles = {
+    'main_container': {
+        'display': 'flex',
+        'flexDirection': 'row',  # Align items in a row
+        'justifyContent': 'space-around',  # Space between items
+        'flexWrap': 'wrap',  # Wrap items if screen is too small
+        #'marginTop': '20px',
+        'background': '#E5ECF6',  # Soft light blue background
+        'padding': '20px',
+        #'borderRadius': '10px'  # Optional: adds rounded corners for better aesthetics
+    },
+    'sub_container': {
+        'display': 'flex',
+        'flexDirection': 'column',  # Align items in a column within each sub container
+        'alignItems': 'center',
+        'margin': '10px'
+    },
+    'input': {
+        'width': '150px',
+        'height': '35px',
+        'marginBottom': '10px',
+        'borderRadius': '5px',
+        'border': '1px solid #ddd',
+        'padding': '0 10px'
+    },
+    'button': {
+        'width': '100px',
+        'height': '35px',
+        'borderRadius': '10px',
+        'border': 'none',
+        'color': 'white',
+        'background': '#333333',  # Changed to a darker blue color
+        'cursor': 'pointer'
+    },
+    'label': {
+        'textAlign': 'center'
+    }
+}
+
+
 #import pandas_ta as ta
 #from collections import Counter
 from google.api_core.exceptions import NotFound
@@ -1140,26 +1180,36 @@ app.layout = html.Div([
         interval=initial_inter,
         n_intervals=0,
       ),
-
-    html.Div(dcc.Input(id='input-on-submit', type='text')),
-    html.Button('Submit', id='submit-val', n_clicks=0),
-    html.Div(id='container-button-basic',children="Enter a symbol from |'ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY'| and submit"),
-    dcc.Store(id='stkName-value'),
+    html.Div([
+        html.Div([
+            dcc.Input(id='input-on-submit', type='text', style=styles['input']),
+            html.Button('Submit', id='submit-val', n_clicks=0, style=styles['button']),
+            html.Div(id='container-button-basic', children="Enter a symbol from ['ES', 'NQ', 'YM', 'CL', 'GC', 'HG', 'NG', 'RTY'] and submit", style=styles['label']),
+        ], style=styles['sub_container']),
+        dcc.Store(id='stkName-value'),
+        
+        html.Div([
+            dcc.Input(id='input-on-interv', type='text', style=styles['input']),
+            html.Button('Submit', id='submit-interv', n_clicks=0, style=styles['button']),
+            html.Div(id='interv-button-basic',children="Enter interval from [5, 10, 15, 30] and submit", style=styles['label']),
+        ], style=styles['sub_container']),
+        dcc.Store(id='interv-value'),
+        
+        html.Div([
+            dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
+            html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
+            html.Div(id='cluster-button-basic',children="Enter a valid minimum cluster number from 3 - 20", style=styles['label']),
+        ], style=styles['sub_container']),
+        dcc.Store(id='cluster-value'),
+        
+        html.Div([
+            dcc.Input(id='input-on-tpo', type='text', style=styles['input']),
+            html.Button('Submit', id='submit-tpo', n_clicks=0, style=styles['button']),
+            html.Div(id='tpo-button-basic', children="Enter a valid minimum top ranked order number from 10 - 500", style=styles['label']),
+        ], style=styles['sub_container']),
+        dcc.Store(id='tpo-value'),
+    ], style=styles['main_container']),
     
-    html.Div(dcc.Input(id='input-on-interv', type='text')),
-    html.Button('Submit', id='submit-interv', n_clicks=0),
-    html.Div(id='interv-button-basic',children="Enter interval from |5 10 15 30| and submit"),
-    dcc.Store(id='interv-value'),
-    
-    html.Div(dcc.Input(id='input-on-cluster', type='text')),
-    html.Button('Submit', id='submit-cluster', n_clicks=0),
-    html.Div(id='cluster-button-basic',children="Enter a vaild minimum cluster number from 3 - 20"),
-    dcc.Store(id='cluster-value'),
-    
-    html.Div(dcc.Input(id='input-on-tpo', type='text')),
-    html.Button('Submit', id='submit-tpo', n_clicks=0),
-    html.Div(id='tpo-button-basic',children="Enter a vaild minimum top ranked order number from 10 - 500"),
-    dcc.Store(id='tpo-value'),
     
     dcc.Store(id='data-store'),
     dcc.Store(id='previous-interv'),
