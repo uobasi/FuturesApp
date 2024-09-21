@@ -944,13 +944,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             trcount+=1
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
-    '''
+    
     difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame]
     coll = [     'teal' if i[0] > 0
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
-    fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=3, col=1)
-    '''
+    fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=4, col=1)
+    
     #fig.add_hline(y=0, row=3, col=1)
     #posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
     #negati = pd.Series([i[0] if i[0] < 0 else 0 for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] < 0])/len([i[0] for i in difList if i[0] < 0])
@@ -975,18 +975,18 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     fig.add_trace(go.Bar(x=df['time'], y=df['Momentum'], marker_color =colors ), row=2, col=1)
     '''
     
-    coll = [     'teal' if i[2] > 0
+    coll3 = [     'teal' if i[2] > 0
                 else 'crimson' if i[2] < 0
                 else 'gray' for i in troInterval]
-    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[2] for i in troInterval]), marker_color=coll), row=2, col=1)
+    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[2] for i in troInterval]), marker_color=coll3), row=2, col=1)
     
     coll2 = [     'crimson' if i[4] > 0
                 else 'teal' if i[4] < 0
                 else 'gray' for i in troInterval]
     fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[4] for i in troInterval]), marker_color=coll2), row=3, col=1)
     
-    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[1] for i in troInterval]), line=dict(color='teal'), mode='lines', name='Buy TRO'), row=4, col=1)
-    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[3] for i in troInterval]), line=dict(color='crimson'), mode='lines', name='Sell TRO'), row=4, col=1)
+    #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[1] for i in troInterval]), line=dict(color='teal'), mode='lines', name='Buy TRO'), row=4, col=1)
+    #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[3] for i in troInterval]), line=dict(color='crimson'), mode='lines', name='Sell TRO'), row=4, col=1)
     
 
     if len(tpCandle) > 0:
@@ -1211,28 +1211,28 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-submit', type='text', style=styles['input']),
             html.Button('Submit', id='submit-val', n_clicks=0, style=styles['button']),
-            html.Div(id='container-button-basic', children="Enter a symbol from ['ES', 'NQ', 'YM', 'CL', 'GC', 'HG', 'NG', 'RTY'] and submit", style=styles['label']),
+            html.Div(id='container-button-basic', children="Enter a symbol from 'ES', 'NQ', 'YM', 'CL', 'GC', 'HG', 'NG', 'RTY'", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='stkName-value'),
         
         html.Div([
             dcc.Input(id='input-on-interv', type='text', style=styles['input']),
             html.Button('Submit', id='submit-interv', n_clicks=0, style=styles['button']),
-            html.Div(id='interv-button-basic',children="Enter interval from [5, 10, 15, 30] and submit", style=styles['label']),
+            html.Div(id='interv-button-basic',children="Enter interval from 5, 10, 15, 30", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='interv-value'),
         
         html.Div([
             dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
             html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Enter a valid minimum cluster number from 3 - 20", style=styles['label']),
+            html.Div(id='cluster-button-basic',children="Enter a cluster number from 3 - 20", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='cluster-value'),
         
         html.Div([
             dcc.Input(id='input-on-tpo', type='text', style=styles['input']),
             html.Button('Submit', id='submit-tpo', n_clicks=0, style=styles['button']),
-            html.Div(id='tpo-button-basic', children="Enter a valid minimum top ranked order number from 10 - 500", style=styles['label']),
+            html.Div(id='tpo-button-basic', children="Enter a top ranked order number from 10 - 500", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='tpo-value'),
     ], style=styles['main_container']),
