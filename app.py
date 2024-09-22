@@ -513,6 +513,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', name='uppervwapAvg', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',name='lowervwapAvg', ))
+    '''
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg35'], mode='lines',name='lowervwapAvg35', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg45'], mode='lines',name='lowervwapAvg45', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg55'], mode='lines',name='lowervwapAvg55', ))
@@ -521,6 +522,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg85'], mode='lines',name='lowervwapAvg85', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg95'], mode='lines',name='lowervwapAvg95', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg105'], mode='lines',name='lowervwapAvg105', ))
+    '''
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', name='vwapAvg', ))
     
     
@@ -1469,6 +1471,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     PPP(df)
     df['uppervwapAvg'] = df['STDEV_25'].cumsum() / (df.index + 1)
     df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
+    '''
     df['lowervwapAvg35'] = df['STDEV_N35'].cumsum() / (df.index + 1)
     df['lowervwapAvg45'] = df['STDEV_N45'].cumsum() / (df.index + 1)
     df['lowervwapAvg55'] = df['STDEV_N55'].cumsum() / (df.index + 1)
@@ -1477,6 +1480,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['lowervwapAvg85'] = df['STDEV_N85'].cumsum() / (df.index + 1)
     df['lowervwapAvg95'] = df['STDEV_N95'].cumsum() / (df.index + 1)
     df['lowervwapAvg105'] = df['STDEV_N105'].cumsum() / (df.index + 1)
+    '''
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
 
 
