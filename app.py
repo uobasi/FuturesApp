@@ -1473,6 +1473,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['lowervwapAvg45'] = df['STDEV_N45'].cumsum() / (df.index + 1)
     df['lowervwapAvg55'] = df['STDEV_N55'].cumsum() / (df.index + 1)
     df['lowervwapAvg65'] = df['STDEV_N65'].cumsum() / (df.index + 1)
+    df['lowervwapAvg75'] = df['STDEV_N75'].cumsum() / (df.index + 1)
+    df['lowervwapAvg85'] = df['STDEV_N85'].cumsum() / (df.index + 1)
+    df['lowervwapAvg95'] = df['STDEV_N95'].cumsum() / (df.index + 1)
+    df['lowervwapAvg105'] = df['STDEV_N105'].cumsum() / (df.index + 1)
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
 
 
