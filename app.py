@@ -75,6 +75,11 @@ def PPP(df):
     stdev_multiple_45 = 4.5
     stdev_multiple_55 = 5.5
     stdev_multiple_65 = 6.5
+    stdev_multiple_75 = 7.5
+    stdev_multiple_85 = 8.5
+    stdev_multiple_95 = 9.5
+    stdev_multiple_105 = 10.5
+    
 
     df['STDEV_0'] = df.vwap + stdev_multiple_0 * df['STDEV_TV']
     df['STDEV_N0'] = df.vwap - stdev_multiple_0 * df['STDEV_TV']
@@ -102,6 +107,18 @@ def PPP(df):
 
     df['STDEV_65'] = df.vwap + stdev_multiple_65 * df['STDEV_TV']
     df['STDEV_N65'] = df.vwap - stdev_multiple_65 * df['STDEV_TV']
+
+    df['STDEV_75'] = df.vwap + stdev_multiple_75 * df['STDEV_TV']
+    df['STDEV_N75'] = df.vwap - stdev_multiple_75 * df['STDEV_TV']
+    
+    df['STDEV_85'] = df.vwap + stdev_multiple_85 * df['STDEV_TV']
+    df['STDEV_N85'] = df.vwap - stdev_multiple_85 * df['STDEV_TV']
+
+    df['STDEV_95'] = df.vwap + stdev_multiple_95 * df['STDEV_TV']
+    df['STDEV_N95'] = df.vwap - stdev_multiple_95 * df['STDEV_TV']
+
+    df['STDEV_105'] = df.vwap + stdev_multiple_105 * df['STDEV_TV']
+    df['STDEV_N105'] = df.vwap - stdev_multiple_105 * df['STDEV_TV']
 
 
 def VMA(df):
@@ -500,6 +517,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg45'], mode='lines',name='lowervwapAvg45', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg55'], mode='lines',name='lowervwapAvg55', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg65'], mode='lines',name='lowervwapAvg65', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg75'], mode='lines',name='lowervwapAvg75', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg85'], mode='lines',name='lowervwapAvg85', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg95'], mode='lines',name='lowervwapAvg95', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg105'], mode='lines',name='lowervwapAvg105', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', name='vwapAvg', ))
     
     
