@@ -1218,28 +1218,28 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-submit', type='text', style=styles['input']),
             html.Button('Submit', id='submit-val', n_clicks=0, style=styles['button']),
-            html.Div(id='container-button-basic', children="Enter a symbol from ['ES', 'NQ', 'YM', 'CL', 'GC', 'HG', 'NG', 'RTY'] and submit", style=styles['label']),
+            html.Div(id='container-button-basic', children="Enter a symbol from 'ES', 'NQ', 'YM', 'CL', 'GC', 'HG', 'NG', 'RTY'", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='stkName-value'),
         
         html.Div([
             dcc.Input(id='input-on-interv', type='text', style=styles['input']),
             html.Button('Submit', id='submit-interv', n_clicks=0, style=styles['button']),
-            html.Div(id='interv-button-basic',children="Enter interval from [5, 10, 15, 30] and submit", style=styles['label']),
+            html.Div(id='interv-button-basic',children="Enter interval from 5, 10, 15, 30", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='interv-value'),
         
         html.Div([
             dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
             html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Enter a valid minimum cluster number from 3 - 20", style=styles['label']),
+            html.Div(id='cluster-button-basic',children="Enter a cluster number from 3 - 20", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='cluster-value'),
         
         html.Div([
             dcc.Input(id='input-on-tpo', type='text', style=styles['input']),
             html.Button('Submit', id='submit-tpo', n_clicks=0, style=styles['button']),
-            html.Div(id='tpo-button-basic', children="Enter a valid minimum top ranked order number from 10 - 500", style=styles['label']),
+            html.Div(id='tpo-button-basic', children="Enter a top ranked order number from 10 - 500", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='tpo-value'),
     ], style=styles['main_container']),
@@ -1357,7 +1357,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '8'
+        clustNum = '6'
         
     if stkName != previous_stkName or interv != previous_interv:
         stored_data = None
