@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Sun Sep 22 18:46:41 2024
+
+@author: UOBASUB
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Dec 13 01:11:16 2023
 
 @author: UOBASUB
@@ -71,15 +78,6 @@ def PPP(df):
     stdev_multiple_1_5 = 1.5
     stdev_multiple_2 = 2.00
     stdev_multiple_25 = 2.50
-    stdev_multiple_35 = 3.5
-    stdev_multiple_45 = 4.5
-    stdev_multiple_55 = 5.5
-    stdev_multiple_65 = 6.5
-    stdev_multiple_75 = 7.5
-    stdev_multiple_85 = 8.5
-    stdev_multiple_95 = 9.5
-    stdev_multiple_105 = 10.5
-    
 
     df['STDEV_0'] = df.vwap + stdev_multiple_0 * df['STDEV_TV']
     df['STDEV_N0'] = df.vwap - stdev_multiple_0 * df['STDEV_TV']
@@ -95,30 +93,6 @@ def PPP(df):
     
     df['STDEV_25'] = df.vwap + stdev_multiple_25 * df['STDEV_TV']
     df['STDEV_N25'] = df.vwap - stdev_multiple_25 * df['STDEV_TV']
-
-    df['STDEV_35'] = df.vwap + stdev_multiple_35 * df['STDEV_TV']
-    df['STDEV_N35'] = df.vwap - stdev_multiple_35 * df['STDEV_TV']
-
-    df['STDEV_45'] = df.vwap + stdev_multiple_45 * df['STDEV_TV']
-    df['STDEV_N45'] = df.vwap - stdev_multiple_45 * df['STDEV_TV']
-
-    df['STDEV_55'] = df.vwap + stdev_multiple_55 * df['STDEV_TV']
-    df['STDEV_N55'] = df.vwap - stdev_multiple_55 * df['STDEV_TV']
-
-    df['STDEV_65'] = df.vwap + stdev_multiple_65 * df['STDEV_TV']
-    df['STDEV_N65'] = df.vwap - stdev_multiple_65 * df['STDEV_TV']
-
-    df['STDEV_75'] = df.vwap + stdev_multiple_75 * df['STDEV_TV']
-    df['STDEV_N75'] = df.vwap - stdev_multiple_75 * df['STDEV_TV']
-    
-    df['STDEV_85'] = df.vwap + stdev_multiple_85 * df['STDEV_TV']
-    df['STDEV_N85'] = df.vwap - stdev_multiple_85 * df['STDEV_TV']
-
-    df['STDEV_95'] = df.vwap + stdev_multiple_95 * df['STDEV_TV']
-    df['STDEV_N95'] = df.vwap - stdev_multiple_95 * df['STDEV_TV']
-
-    df['STDEV_105'] = df.vwap + stdev_multiple_105 * df['STDEV_TV']
-    df['STDEV_N105'] = df.vwap - stdev_multiple_105 * df['STDEV_TV']
 
 
 def VMA(df):
@@ -513,16 +487,6 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', name='uppervwapAvg', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',name='lowervwapAvg', ))
-    '''
-    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg35'], mode='lines',name='lowervwapAvg35', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg45'], mode='lines',name='lowervwapAvg45', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg55'], mode='lines',name='lowervwapAvg55', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg65'], mode='lines',name='lowervwapAvg65', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg75'], mode='lines',name='lowervwapAvg75', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg85'], mode='lines',name='lowervwapAvg85', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg95'], mode='lines',name='lowervwapAvg95', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg105'], mode='lines',name='lowervwapAvg105', ))
-    '''
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', name='vwapAvg', ))
     
     
@@ -987,13 +951,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             trcount+=1
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
-    
+    '''
     difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame]
     coll = [     'teal' if i[0] > 0
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
-    fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=4, col=1)
-    
+    fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=3, col=1)
+    '''
     #fig.add_hline(y=0, row=3, col=1)
     #posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
     #negati = pd.Series([i[0] if i[0] < 0 else 0 for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] < 0])/len([i[0] for i in difList if i[0] < 0])
@@ -1018,18 +982,18 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     fig.add_trace(go.Bar(x=df['time'], y=df['Momentum'], marker_color =colors ), row=2, col=1)
     '''
     
-    coll3 = [     'teal' if i[2] > 0
+    coll = [     'teal' if i[2] > 0
                 else 'crimson' if i[2] < 0
                 else 'gray' for i in troInterval]
-    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[2] for i in troInterval]), marker_color=coll3), row=2, col=1)
+    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[2] for i in troInterval]), marker_color=coll), row=2, col=1)
     
     coll2 = [     'crimson' if i[4] > 0
                 else 'teal' if i[4] < 0
                 else 'gray' for i in troInterval]
     fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[4] for i in troInterval]), marker_color=coll2), row=3, col=1)
     
-    #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[1] for i in troInterval]), line=dict(color='teal'), mode='lines', name='Buy TRO'), row=4, col=1)
-    #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[3] for i in troInterval]), line=dict(color='crimson'), mode='lines', name='Sell TRO'), row=4, col=1)
+    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[1] for i in troInterval]), line=dict(color='teal'), mode='lines', name='Buy TRO'), row=4, col=1)
+    fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[3] for i in troInterval]), line=dict(color='crimson'), mode='lines', name='Sell TRO'), row=4, col=1)
     
 
     if len(tpCandle) > 0:
@@ -1124,7 +1088,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     )
     
     
-    fig.update_layout(height=950, xaxis_rangeslider_visible=False, showlegend=False)
+    fig.update_layout(height=890, xaxis_rangeslider_visible=False, showlegend=False)
     fig.update_xaxes(autorange="reversed", row=1, col=2)
     #fig.update_xaxes(autorange="reversed", row=1, col=3)
     #fig.update_layout(plot_bgcolor='gray')
@@ -1254,28 +1218,28 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-submit', type='text', style=styles['input']),
             html.Button('Submit', id='submit-val', n_clicks=0, style=styles['button']),
-            html.Div(id='container-button-basic', children="Enter a symbol from 'ES', 'NQ', 'YM', 'CL', 'GC', 'HG', 'NG', 'RTY'", style=styles['label']),
+            html.Div(id='container-button-basic', children="Enter a symbol from ['ES', 'NQ', 'YM', 'CL', 'GC', 'HG', 'NG', 'RTY'] and submit", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='stkName-value'),
         
         html.Div([
             dcc.Input(id='input-on-interv', type='text', style=styles['input']),
             html.Button('Submit', id='submit-interv', n_clicks=0, style=styles['button']),
-            html.Div(id='interv-button-basic',children="Enter interval from 5, 10, 15, 30", style=styles['label']),
+            html.Div(id='interv-button-basic',children="Enter interval from [5, 10, 15, 30] and submit", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='interv-value'),
         
         html.Div([
             dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
             html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Enter a cluster number from 3 - 20", style=styles['label']),
+            html.Div(id='cluster-button-basic',children="Enter a valid minimum cluster number from 3 - 20", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='cluster-value'),
         
         html.Div([
             dcc.Input(id='input-on-tpo', type='text', style=styles['input']),
             html.Button('Submit', id='submit-tpo', n_clicks=0, style=styles['button']),
-            html.Div(id='tpo-button-basic', children="Enter a top ranked order number from 10 - 500", style=styles['label']),
+            html.Div(id='tpo-button-basic', children="Enter a valid minimum top ranked order number from 10 - 500", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='tpo-value'),
     ], style=styles['main_container']),
@@ -1471,16 +1435,6 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     PPP(df)
     df['uppervwapAvg'] = df['STDEV_25'].cumsum() / (df.index + 1)
     df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
-    '''
-    df['lowervwapAvg35'] = df['STDEV_N35'].cumsum() / (df.index + 1)
-    df['lowervwapAvg45'] = df['STDEV_N45'].cumsum() / (df.index + 1)
-    df['lowervwapAvg55'] = df['STDEV_N55'].cumsum() / (df.index + 1)
-    df['lowervwapAvg65'] = df['STDEV_N65'].cumsum() / (df.index + 1)
-    df['lowervwapAvg75'] = df['STDEV_N75'].cumsum() / (df.index + 1)
-    df['lowervwapAvg85'] = df['STDEV_N85'].cumsum() / (df.index + 1)
-    df['lowervwapAvg95'] = df['STDEV_N95'].cumsum() / (df.index + 1)
-    df['lowervwapAvg105'] = df['STDEV_N105'].cumsum() / (df.index + 1)
-    '''
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
 
 
@@ -1594,32 +1548,31 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         bful = []
         for it in range(len(make)):
             if it+1 < len(make):
-                tempList = AllTrades[make[0][2]:make[it+1][2]]
+                tempList = AllTrades[0:make[it+1][2]]
             else:
                 tempList = AllTrades
             #print(make[0][2],make[it+1][2], len(tempList))
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:200]
                         
             bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A'])])
-            
-        bolist = [0]
-        for i in range(len(bful)-1):
-            bolist.append(bful[i+1][1] - bful[i][1])
-            
-        solist = [0]
-        for i in range(len(bful)-1):
-            solist.append(bful[i+1][2] - bful[i][2])
-            #buyse/sellle
-            
+  
         
-        dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row]] for row in  range(len(bful))]
+        dst = [[bful[row][0], bful[row][1], 0, bful[row][2], 0] for row in  range(len(bful))]
         
         stored_data['tro'] = stored_data['tro'][:len(stored_data['tro'])-1] + dst
-        #print(stored_data['tro'])
         
-        #print(timeFrame)
+        bolist = [0]
+        for i in range(len(stored_data['tro'])-1):
+            bolist.append(stored_data['tro'][i+1][1] - stored_data['tro'][i][1])
+            
+        solist = [0] 
+        for i in range(len(stored_data['tro'])-1):
+            solist.append(stored_data['tro'][i+1][3] - stored_data['tro'][i][3])
+            
+        newst = [[stored_data['tro'][i][0], stored_data['tro'][i][1], bolist[i], stored_data['tro'][i][3], solist[i] ] for i in range(len(stored_data['tro']))]
         
-
+        stored_data['tro'] = newst
+            
     
     
     if stored_data is None:
