@@ -545,7 +545,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     trcount = 0
     
     for trd in sortadlist:
-        trd.append(df['timestamp'].searchsorted(trd[2])-1)
+        trd.append(df['timestamp'].searchsorted(trd[2]))
         
     for i in OptionTimeFrame:
         try:
