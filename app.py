@@ -1581,7 +1581,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         make = []
         for ttm in range(len(dtimeEpoch)):
             
-            make.append([dtimeEpoch[ttm],dtime[ttm],bisect.bisect_left(tradeEpoch, dtimeEpoch[ttm])])
+            make.append([dtimeEpoch[ttm],dtime[ttm],bisect.bisect_left(tradeEpoch, dtimeEpoch[ttm])]) #min(range(len(tradeEpoch)), key=lambda i: abs(tradeEpoch[i] - dtimeEpoch[ttm]))
             timeDict[dtime[ttm]] = [0,0,0]
             
             
@@ -1617,10 +1617,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         bful = []
         for it in range(len(make)):
             if it+1 < len(make):
-                tempList = AllTrades[make[0][2]:make[it+1][2]]
+                tempList = AllTrades[0:make[it+1][2]]
             else:
                 tempList = AllTrades
-            #print(make[0][2],make[it+1][2], len(tempList))
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:200]
                         
             bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A'])])
