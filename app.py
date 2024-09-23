@@ -1508,7 +1508,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     if stored_data is not None:
         print('NotNew')
-        startIndex = df['time'].searchsorted(stored_data['timeFrame'][len(stored_data['timeFrame'])-1][0])
+        startIndex = next(iter(df.index[df['time'] == stored_data['timeFrame'][len(stored_data['timeFrame'])-1][0]]), None)#df['timestamp'].searchsorted(stored_data['timeFrame'][len(stored_data['timeFrame'])-1][9])
         timeDict = {}
         make = []
         for ttm in range(startIndex,len(dtimeEpoch)):
