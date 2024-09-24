@@ -1120,6 +1120,22 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #fig.show(config={'modeBarButtonsToAdd': ['drawline']})
     return fig
 
+
+def find_spikes(data, high_percentile=98, low_percentile=2):
+    # Compute the high and low thresholds
+    high_threshold = np.percentile(data, high_percentile)
+    low_threshold = np.percentile(data, low_percentile)
+    
+    # Find and collect spikes
+    spikes = {'high_spikes': [], 'low_spikes': []}
+    for index, value in enumerate(data):
+        if value > high_threshold:
+            spikes['high_spikes'].append((index, value))
+        elif value < low_threshold:
+            spikes['low_spikes'].append((index, value))
+    
+    return spikes
+
 def calculate_bollinger_bands(df):
    df['20sma'] = df['close'].rolling(window=20).mean()
    df['stddev'] = df['close'].rolling(window=20).std()
