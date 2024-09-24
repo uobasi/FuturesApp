@@ -1240,7 +1240,7 @@ styles = {
 #from collections import Counter
 from google.api_core.exceptions import NotFound
 from dash import Dash, dcc, html, Input, Output, callback, State
-initial_inter = 280000  # Initial interval #210000#250000#80001
+initial_inter = 300000  # Initial interval #210000#250000#80001
 subsequent_inter = 70000  # Subsequent interval
 app = Dash()
 app.title = "Initial Title"
