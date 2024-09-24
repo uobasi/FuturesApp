@@ -1084,6 +1084,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #special_color = "#FFD700"  # Gold color for the highlighted cell
     
     buysideSpikes = find_spikes([i[2] for i in troInterval[::-1]])
+    sellsideSpikes = find_spikes([i[4] for i in troInterval[::-1]])
     
     # Create a color matrix for the cells
     color_matrix = [[default_color for _ in range(len(transposed_data[0]))] for _ in range(len(transposed_data))]
@@ -1092,6 +1093,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         color_matrix[2][b[0]] = 'teal'
     for b in buysideSpikes['low_spikes']:
         color_matrix[2][b[0]] = 'crimson'
+
+    for b in sellsideSpikes['high_spikes']:
+        color_matrix[4][b[0]] = 'crimson'
+    for b in sellsideSpikes['low_spikes']:
+        color_matrix[4][b[0]] = 'teal'
 
     
     fig.add_trace(
