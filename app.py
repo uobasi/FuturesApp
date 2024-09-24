@@ -1395,7 +1395,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '8'
+        clustNum = '10'
         
     if stkName != previous_stkName or interv != previous_interv:
         stored_data = None
