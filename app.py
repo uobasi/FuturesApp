@@ -1093,17 +1093,17 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     for b in buysideSpikes['high_spikes']:
         color_matrix[2][b[0]] = 'teal'
-        textColor_matrix[2][b[0]] = 'white'
+        #textColor_matrix[2][b[0]] = 'white'
     for b in buysideSpikes['low_spikes']:
         color_matrix[2][b[0]] = 'crimson'
-        textColor_matrix[2][b[0]] = 'white'
+        #textColor_matrix[2][b[0]] = 'white'
 
     for b in sellsideSpikes['high_spikes']:
         color_matrix[4][b[0]] = 'crimson'
-        textColor_matrix[4][b[0]] = 'white'
+        #textColor_matrix[4][b[0]] = 'white'
     for b in sellsideSpikes['low_spikes']:
         color_matrix[4][b[0]] = 'teal'
-        textColor_matrix[4][b[0]] = 'white'
+        #textColor_matrix[4][b[0]] = 'white'
 
     
     fig.add_trace(
