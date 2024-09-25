@@ -1081,6 +1081,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     # Add a table in the second column
     transposed_data = list(zip(*troInterval[::-1]))
     default_color = "#EBF0F8"  # Default color for all cells
+    defaultTextColor = 'black'
     #special_color = "#FFD700"  # Gold color for the highlighted cell
     
     buysideSpikes = find_spikes([i[2] for i in troInterval[::-1]])
@@ -1088,22 +1089,27 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     # Create a color matrix for the cells
     color_matrix = [[default_color for _ in range(len(transposed_data[0]))] for _ in range(len(transposed_data))]
+    textColor_matrix = [[defaultTextColor for _ in range(len(transposed_data[0]))] for _ in range(len(transposed_data))]
     
     for b in buysideSpikes['high_spikes']:
         color_matrix[2][b[0]] = 'teal'
+        textColor_matrix[2][b[0]] = 'white'
     for b in buysideSpikes['low_spikes']:
         color_matrix[2][b[0]] = 'crimson'
+        textColor_matrix[2][b[0]] = 'white'
 
     for b in sellsideSpikes['high_spikes']:
         color_matrix[4][b[0]] = 'crimson'
+        textColor_matrix[4][b[0]] = 'white'
     for b in sellsideSpikes['low_spikes']:
         color_matrix[4][b[0]] = 'teal'
+        textColor_matrix[4][b[0]] = 'white'
 
     
     fig.add_trace(
         go.Table(
             header=dict(values=["Time", "Buyers", "Buyers Change", "Sellers", "Sellers Change",]),
-            cells=dict(values=transposed_data, fill_color=color_matrix),  # Transpose data to fit the table
+            cells=dict(values=transposed_data, fill_color=color_matrix, font=dict(color=textColor_matrix)),  # Transpose data to fit the table
         ),
         row=2, col=2
     )
