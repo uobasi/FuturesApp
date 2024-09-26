@@ -1247,7 +1247,7 @@ styles = {
 from google.api_core.exceptions import NotFound
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 300000  # Initial interval #210000#250000#80001
-subsequent_inter = 70000  # Subsequent interval
+subsequent_inter = 75000  # Subsequent interval
 app = Dash()
 app.title = "Initial Title"
 app.layout = html.Div([
