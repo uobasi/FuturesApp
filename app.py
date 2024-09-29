@@ -1730,7 +1730,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
             df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
             df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
-            df['POCDistance'] = (df['1ema'] - df['POC'] / ((df['1ema']+ df['POC']) / 2)) * 100
+            df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
     except(NotFound):
         pass
         
