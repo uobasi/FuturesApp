@@ -1133,7 +1133,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     return fig
 
 
-def find_spikes(data, high_percentile=95, low_percentile=5):
+def find_spikes(data, high_percentile=97, low_percentile=3):
     # Compute the high and low thresholds
     high_threshold = np.percentile(data, high_percentile)
     low_threshold = np.percentile(data, low_percentile)
