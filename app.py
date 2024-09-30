@@ -221,7 +221,7 @@ def splitHun(stkName, trad, quot, num1, num2, quodict):
     
     return [Bidd,belowBid,Askk,aboveAsk,Between]
  
-
+'''
 def valueAreaV1(lst):
     lst = [i for i in lst if i[1] > 0]
     for xm in range(len(lst)):
@@ -305,6 +305,93 @@ def valueAreaV1(lst):
             topVol = 0
         elif dwnIndex == len(lst)-1:
             dwnVol = 0
+
+        # print(total,sPercent,topIndex,dwnIndex,topVol,dwnVol)
+        # time.sleep(3)
+
+    return [lst[topIndex][0], lst[dwnIndex][0], lst[pocIndex][0]]
+'''
+def valueAreaV1(lst):
+    lst = [i for i in lst if i[1] > 0]
+    for xm in range(len(lst)):
+        lst[xm][2] = xm
+        
+        
+    pocIndex = sorted(lst, key=lambda stock: float(stock[1]), reverse=True)[0][2]
+    sPercent = sum([i[1] for i in lst]) * .70
+    pocVolume = lst[lst[pocIndex][2]][1]
+    #topIndex = pocIndex - 2
+    #dwnIndex = pocIndex + 2
+    topVol = 0
+    dwnVol = 0
+    total = pocVolume
+    #topBool1 = topBool2 = dwnBool1 = dwnBool2 =True
+
+    if 0 <= pocIndex - 1 and 0 <= pocIndex - 2:
+        topVol = lst[lst[pocIndex - 1][2]][1] + lst[lst[pocIndex - 2][2]][1]
+        topIndex = pocIndex - 2
+        #topBool2 = True
+    elif 0 <= pocIndex - 1 and 0 > pocIndex - 2:
+        topVol = lst[lst[pocIndex - 1][2]][1]
+        topIndex = pocIndex - 1
+        #topBool1 = True
+    else:
+        topVol = 0
+        topIndex = pocIndex
+
+    if pocIndex + 1 < len(lst) and pocIndex + 2 < len(lst):
+        dwnVol = lst[lst[pocIndex + 1][2]][1] + lst[lst[pocIndex + 2][2]][1]
+        dwnIndex = pocIndex + 2
+        #dwnBool2 = True
+    elif pocIndex + 1 < len(lst) and pocIndex + 2 >= len(lst):
+        dwnVol = lst[lst[pocIndex + 1][2]][1]
+        dwnIndex = pocIndex + 1
+        #dwnBool1 = True
+    else:
+        dwnVol = 0
+        dwnIndex = pocIndex
+
+    # print(pocIndex,topVol,dwnVol,topIndex,dwnIndex)
+    while sPercent > total:
+        if topVol > dwnVol:
+            total += topVol
+            if total > sPercent:
+                break
+
+            if 0 <= topIndex - 1 and 0 <= topIndex - 2:
+                topVol = lst[lst[topIndex - 1][2]][1] + lst[lst[topIndex - 2][2]][1]
+                topIndex = topIndex - 2
+
+            elif 0 <= topIndex - 1 and 0 > topIndex - 2:
+                topVol = lst[lst[topIndex - 1][2]][1]
+                topIndex = topIndex - 1
+
+            #if topIndex == 0:
+                #topVol = 0
+
+        else:
+            total += dwnVol
+
+            if total > sPercent:
+                break
+
+            if dwnIndex + 1 < len(lst) and dwnIndex + 2 < len(lst):
+                dwnVol = lst[lst[dwnIndex + 1][2]][1] + lst[lst[dwnIndex + 2][2]][1]
+                dwnIndex = dwnIndex + 2
+
+            elif dwnIndex + 1 < len(lst) and dwnIndex + 2 >= len(lst):
+                dwnVol = lst[lst[dwnIndex + 1][2]][1]
+                dwnIndex = dwnIndex + 1
+
+            #if dwnIndex == len(lst)-1:
+                #dwnVol = 0
+
+        if dwnIndex == len(lst)-1 and topIndex == 0:
+            break
+        #elif topIndex == 0:
+            #topVol = 0
+        #elif dwnIndex == len(lst)-1:
+            #dwnVol = 0
 
         # print(total,sPercent,topIndex,dwnIndex,topVol,dwnVol)
         # time.sleep(3)
