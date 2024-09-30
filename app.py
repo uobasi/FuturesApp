@@ -98,7 +98,7 @@ def PPP(df):
 def VMA(df):
     df['vma'] = df['volume'].rolling(4).mean()
       
-
+'''
 def historV1(df, num, quodict, trad:list=[], quot:list=[], rangt:int=1):
     #trad = AllTrades
     pzie = [(i[0],i[1]) for i in trad if i[1] >= rangt]
@@ -147,6 +147,59 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[], rangt:int=1):
     sortadlist = sorted(cptemp, key=lambda stock: float(stock[1]), reverse=True)
     
     return [cptemp,sortadlist] 
+'''
+def historV1(df, num, quodict, trad:list=[], quot:list=[]): #rangt:int=1
+    #trad = AllTrades
+    
+    pzie = [(i[0],i[1]) for i in trad] #rangt:int=1
+    dct ={}
+    for i in pzie:
+        if i[0] not in dct:
+            dct[i[0]] =  i[1]
+        else:
+            dct[i[0]] +=  i[1]
+            
+    
+    pzie = [i for i in dct ]#  > 500 list(set(pzie))
+    mTradek = sorted(trad, key=lambda d: d[0], reverse=False)
+    
+    
+    hist, bin_edges = np.histogram(pzie, bins=num)
+    
+    priceList = [i[0] for i in mTradek]
+
+    cptemp = []
+    zipList = []
+    cntt = 0
+    for i in range(len(hist)):
+        pziCount = 0
+        acount = 0
+        bcount = 0
+        ncount = 0
+        for x in mTradek[bisect.bisect_left(priceList, bin_edges[i]) :  bisect.bisect_left(priceList, bin_edges[i+1])]:
+            pziCount += (x[1])
+            if x[4] == 'A':
+                acount += (x[1])
+            elif x[4] == 'B':
+                bcount += (x[1])
+            elif x[4] == 'N':
+                ncount += (x[1])
+                
+        #if pziCount > 100:
+        cptemp.append([bin_edges[i],pziCount,cntt,bin_edges[i+1]])
+        zipList.append([acount,bcount,ncount])
+        cntt+=1
+        
+    for i in cptemp:
+        i+=countCandle(trad,[],i[0],i[3],df['name'][0],{})
+
+    for i in range(len(cptemp)):
+        cptemp[i] += zipList[i]
+        
+    
+    sortadlist = sorted(cptemp, key=lambda stock: float(stock[1]), reverse=True)
+    
+    return [cptemp,sortadlist]  
 
 
 def countCandle(trad,quot,num1,num2, stkName, quodict):
