@@ -442,13 +442,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #buys = [abs(i[2]-i[3]) for i in OptionTimeFrame if i[2]-i[3] > 0 ]
     #sells = [abs(i[2]-i[3]) for i in OptionTimeFrame if i[2]-i[3] < 0 ]
 
-    ratio = str(round(max(tosells,tobuys)/min(tosells,tobuys),3))
-    
     
     tobuys =  sum([x[1] for x in [i for i in sortadlist if i[3] == 'B']])
     tosells = sum([x[1] for x in [i for i in sortadlist if i[3] == 'A']])
     
-    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+')) Ratio: '+str(ratio)+' ' + mboString
+    ratio = str(round(max(tosells,tobuys)/min(tosells,tobuys),3))
+    
+    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))  Ratio : '+str(ratio)+' ' + mboString
     
     '''
     putDec = 0
