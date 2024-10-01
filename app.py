@@ -1888,7 +1888,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             csv_rows.append(row) 
             
         for i in csv_rows:
-            i[3] = int(i[3])
+            i[3] = int(float(i[3]))
         dfVA = pd.DataFrame(csv_rows, columns=['LowVA', 'HighVA', 'POC', 'Timestamp', 'Time'])
 
         # Step 3: Convert the 'Timestamp' to datetime format (nanoseconds format to datetime)
