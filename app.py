@@ -1911,9 +1911,11 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             'Time': 'first'   # Keep the first time for the resampled period
         })
 
-        df['LowVA'] = resampled_dfVA['LowVA']
-        df['HighVA'] = resampled_dfVA['HighVA']
-        df['POC']  = resampled_dfVA['POC']
+        df['LowVA'] = pd.Series([i for i in resampled_dfVA['LowVA']])
+        df['HighVA'] = pd.Series([i for i in resampled_dfVA['HighVA']])
+        df['POC']  = pd.Series([i for i in resampled_dfVA['POC']])
+
+
 
 
 
