@@ -1859,6 +1859,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     
     try:
+        '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
         POCData = blob.download_as_text()
         csv_reader  = csv.reader(io.StringIO(POCData))
@@ -1876,6 +1877,47 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
             df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
             #df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
+        '''
+        blob = Blob('POCData'+str(symbolNum), bucket) 
+        POCData = blob.download_as_text()
+        csv_reader  = csv.reader(io.StringIO(POCData))   
+
+
+        csv_rows = []
+        for row in csv_reader:
+            csv_rows.append(row) 
+            
+        for i in csv_rows:
+            i[3] = int(i[3])
+        dfVA = pd.DataFrame(csv_rows, columns=['LowVA', 'HighVA', 'POC', 'Timestamp', 'Time'])
+
+        # Step 3: Convert the 'Timestamp' to datetime format (nanoseconds format to datetime)
+        dfVA['Timestamp'] = dfVA['Timestamp'] // 1_000_000_000
+        dfVA['Timestamp'] = pd.to_datetime(dfVA['Timestamp'], unit='s')
+
+        # Step 4: Set 'Timestamp' as the DataFrame index
+        dfVA.set_index('Timestamp', inplace=True)
+
+        # Step 5: Convert numerical columns to float
+        dfVA['LowVA'] = dfVA['LowVA'].astype(float)
+        dfVA['HighVA'] = dfVA['HighVA'].astype(float)
+        dfVA['POC'] = dfVA['POC'].astype(float)
+
+        # Step 6: Resample to 3-minute intervals and aggregate values
+        resampled_dfVA = dfVA.resample(interv+'min').agg({
+            'LowVA': 'last',  # Open price should be the first in the resampled period
+            'HighVA': 'last',    # High price should be the maximum in the resampled period
+            'POC': 'last',     # Low price should be the minimum in the resampled period
+            'Time': 'first'   # Keep the first time for the resampled period
+        })
+
+        df['LowVA'] = dfVA['LowVA']
+        df['HighVA'] = dfVA['HighVA']
+        df['POC']  = dfVA['POC']
+
+
+
+
     except(NotFound):
         pass
         
