@@ -1861,7 +1861,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     
     try:
-        '''
+        
         blob = Blob('POCData'+str(symbolNum), bucket) 
         POCData = blob.download_as_text()
         csv_reader  = csv.reader(io.StringIO(POCData))
@@ -1916,7 +1916,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['LowVA'] = pd.Series([i for i in resampled_dfVA['LowVA']])
         df['HighVA'] = pd.Series([i for i in resampled_dfVA['HighVA']])
         df['POC']  = pd.Series([i for i in resampled_dfVA['POC']])
-
+        '''
 
 
 
