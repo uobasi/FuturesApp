@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Sep 22 18:46:41 2024
-
-@author: UOBASUB
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Wed Dec 13 01:11:16 2023
 
 @author: UOBASUB
@@ -1096,13 +1089,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             trcount+=1
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
-    '''
+    
     difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame]
     coll = [     'teal' if i[0] > 0
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
-    fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=4, col=1)
-    '''
+    fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=3, col=1)
+    
     if 'POCDistance' in df.columns:
         colors = ['maroon']
         for val in range(1,len(df['POCDistance'])):
@@ -1149,7 +1142,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     coll2 = [     'crimson' if i[4] > 0
                 else 'teal' if i[4] < 0
                 else 'gray' for i in troInterval]
-    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[4] for i in troInterval]), marker_color=coll2), row=3, col=1)
+    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[4] for i in troInterval]), marker_color=coll2), row=2, col=1)
     
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[1] for i in troInterval]), line=dict(color='teal'), mode='lines', name='Buy TRO'), row=4, col=1)
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[3] for i in troInterval]), line=dict(color='crimson'), mode='lines', name='Sell TRO'), row=4, col=1)
@@ -1557,7 +1550,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '4'
+        interv = '3'
         
     if clustNum not in vaildClust:
         clustNum = '10'
@@ -1962,7 +1955,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     mboString = 'As of '+stTime+' '+ 'Buys: '+str(sum(mboBuys))+'('+str(mboBuysDec)+') '+ 'Sells: '+str(sum(mboSells))+'('+str(mboSellDec)+') '
     '''
     mboString = ''
-    calculate_ttm_squeeze(df)
+    #calculate_ttm_squeeze(df)
     
         
     if interval_time == initial_inter:
