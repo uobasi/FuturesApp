@@ -1096,15 +1096,26 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             trcount+=1
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
-    
+    '''
     difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame]
     coll = [     'teal' if i[0] > 0
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
     fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=4, col=1)
-    
-    #if 'POCDistance' in df.columns:
-        #fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color='black'), row=4, col=1)
+    '''
+    if 'POCDistance' in df.columns:
+        colors = ['maroon']
+        for val in range(1,len(df['POCDistance'])):
+            if df['POCDistance'][val] > 0:
+                color = 'teal'
+                if df['POCDistance'][val] > df['POCDistance'][val-1]:
+                    color = '#54C4C1' 
+            else:
+                color = 'maroon'
+                if df['POCDistance'][val] < df['POCDistance'][val-1]:
+                    color='crimson' 
+            colors.append(color)
+        fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=4, col=1)
 
     #fig.add_hline(y=0, row=3, col=1)
     #posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
@@ -1546,7 +1557,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '3'
+        interv = '4'
         
     if clustNum not in vaildClust:
         clustNum = '10'
@@ -1879,6 +1890,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
             df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
             #df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
+            df['POCDistance'] = ((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
         '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
         POCData = blob.download_as_text()
@@ -1950,7 +1962,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     mboString = 'As of '+stTime+' '+ 'Buys: '+str(sum(mboBuys))+'('+str(mboBuysDec)+') '+ 'Sells: '+str(sum(mboSells))+'('+str(mboSellDec)+') '
     '''
     mboString = ''
-    #calculate_ttm_squeeze(df)
+    calculate_ttm_squeeze(df)
     
         
     if interval_time == initial_inter:
