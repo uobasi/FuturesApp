@@ -1950,7 +1950,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     mboString = 'As of '+stTime+' '+ 'Buys: '+str(sum(mboBuys))+'('+str(mboBuysDec)+') '+ 'Sells: '+str(sum(mboSells))+'('+str(mboSellDec)+') '
     '''
     mboString = ''
-    calculate_ttm_squeeze(df)
+    #calculate_ttm_squeeze(df)
     
         
     if interval_time == initial_inter:
