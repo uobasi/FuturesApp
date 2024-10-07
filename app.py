@@ -1147,7 +1147,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[1] for i in troInterval]), line=dict(color='teal'), mode='lines', name='Buy TRO'), row=4, col=1)
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[3] for i in troInterval]), line=dict(color='crimson'), mode='lines', name='Sell TRO'), row=4, col=1)
     
-
+    '''
     if len(tpCandle) > 0:
         troRank = []
         for i in tpCandle:
@@ -1167,6 +1167,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                     size=10,
                     # color="#ffffff"
                 ),)
+    '''
         
     '''
     for trds in sortadlist[:1]:
