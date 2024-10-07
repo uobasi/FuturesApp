@@ -1560,7 +1560,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
 
 
     if tpoNum not in vaildTPO:
-        tpoNum = '200'
+        tpoNum = '100'
         
         
     print('inFunction '+sname)	
