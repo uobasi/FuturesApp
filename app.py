@@ -608,8 +608,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                   num1, num2],  opacity=0.5), row=1, col=2)
     
     
-    #fig.add_trace(go.Scatter(x=x_fake, y=df_dx, mode='lines',name='Derivative'), row=2, col=2)
-    
+    fig.add_trace(go.Scatter(x=x_fake, y=df_dx, mode='lines',name='Derivative'), row=4, col=1)
+    fig.add_hline(y=0, row=4, col=1)
+
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
     
     
@@ -1133,7 +1134,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         colors.append(color)
     fig.add_trace(go.Bar(x=df['time'], y=df['Momentum'], marker_color =colors ), row=2, col=1)
     '''
-    
+    '''
     coll = [     'teal' if i[2] > 0
                 else 'crimson' if i[2] < 0
                 else 'gray' for i in troInterval]
@@ -1143,7 +1144,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                 else 'teal' if i[4] < 0
                 else 'gray' for i in troInterval]
     fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[4] for i in troInterval]), marker_color=coll2), row=4, col=1)
-    
+    '''
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[1] for i in troInterval]), line=dict(color='teal'), mode='lines', name='Buy TRO'), row=4, col=1)
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[3] for i in troInterval]), line=dict(color='crimson'), mode='lines', name='Sell TRO'), row=4, col=1)
     
@@ -1668,7 +1669,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
 
     x = np.array([i for i in range(len(df))])
-    y = np.array([i for i in df['30ema']])
+    y = np.array([i for i in df['40ema']])
     
     
 
