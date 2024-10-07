@@ -1108,7 +1108,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                 if df['POCDistance'][val] < df['POCDistance'][val-1]:
                     color='crimson' 
             colors.append(color)
-        fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=4, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=2, col=1)
 
     #fig.add_hline(y=0, row=3, col=1)
     #posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
@@ -1137,12 +1137,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     coll = [     'teal' if i[2] > 0
                 else 'crimson' if i[2] < 0
                 else 'gray' for i in troInterval]
-    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[2] for i in troInterval]), marker_color=coll), row=2, col=1)
+    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[2] for i in troInterval]), marker_color=coll), row=4, col=1)
     
     coll2 = [     'crimson' if i[4] > 0
                 else 'teal' if i[4] < 0
                 else 'gray' for i in troInterval]
-    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[4] for i in troInterval]), marker_color=coll2), row=2, col=1)
+    fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[4] for i in troInterval]), marker_color=coll2), row=4, col=1)
     
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[1] for i in troInterval]), line=dict(color='teal'), mode='lines', name='Buy TRO'), row=4, col=1)
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[3] for i in troInterval]), line=dict(color='crimson'), mode='lines', name='Sell TRO'), row=4, col=1)
