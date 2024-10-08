@@ -608,7 +608,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                   num1, num2],  opacity=0.5), row=1, col=2)
     
     
-    fig.add_trace(go.Scatter(x=x_fake, y=df_dx, mode='lines',name='Derivative'), row=4, col=1)
+    fig.add_trace(go.Scatter(x=df['time'], y=df_dx, mode='lines',name='Derivative'), row=4, col=1)
     fig.add_hline(y=0, row=4, col=1)
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
