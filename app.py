@@ -1338,14 +1338,17 @@ def calculate_ttm_squeeze(df, n=13):
     df['Momentum'] = (df['close'] - (m1 + df['20sma'])/2)
     fit_y = np.array(range(0,n))
     df['Momentum'] = df['Momentum'].rolling(window = n).apply(lambda x: np.polyfit(fit_y, x, 1)[0] * (n-1) + np.polyfit(fit_y, x, 1)[1], raw=True)
-    
-    
+
+from concurrent.futures import ThreadPoolExecutor    
+def download_data(bucket_name, blob_name):
+    blob = Blob(blob_name, bucket_name)
+    return blob.download_as_text()    
 
 #symbolNumList = ['118', '4358', '42012334', '392826', '393','163699', '935', '11232']
 #symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY']
 
-symbolNumList = ['183748', '106364', '42006053', '230943', '393','163699', '923', '42018437', '4127886', '73370']
-symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', 'NKD']
+symbolNumList = ['183748', '106364', '42006053', '230943', '393','163699', '923', '42018437', '4127886']
+symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL']
 
 intList = ['1','2','3','4','5','6','10','15']
 
@@ -1401,7 +1404,7 @@ styles = {
 from google.api_core.exceptions import NotFound
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 300000  # Initial interval #210000#250000#80001
-subsequent_inter = 75000  # Subsequent interval
+subsequent_inter = 30000  # Subsequent interval
 app = Dash()
 app.title = "Initial Title"
 app.layout = html.Div([
@@ -1567,6 +1570,20 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     print('inFunction '+sname)	
     
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = [
+            executor.submit(download_data, bucket, 'FuturesOHLC' + str(symbolNum)),
+            executor.submit(download_data, bucket, 'FuturesTrades' + str(symbolNum))
+        ]
+        
+        # Wait for all downloads to complete
+        FuturesOHLC, FuturesTrades = [future.result() for future in futures]
+    
+    # Process data with pandas directly
+    FuturesOHLC = pd.read_csv(io.StringIO(FuturesOHLC), header=None)
+    FuturesTrades = pd.read_csv(io.StringIO(FuturesTrades), header=None)
+    
+    '''
     blob = Blob('FuturesOHLC'+str(symbolNum), bucket) 
     FuturesOHLC = blob.download_as_text()
         
@@ -1578,11 +1595,11 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         csv_rows.append(row)
         
     
-    
-    aggs = [ ]  
     newOHLC = [i for i in csv_rows]
-
-    for i in newOHLC:
+     
+    
+    aggs = [ ] 
+    for i in FuturesOHLC.values.tolist():
         hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
         if hourss < 10:
             hourss = '0'+str(hourss)
@@ -1598,10 +1615,32 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         if i not in newAggs:
             newAggs.append(i)
     
-    
+    '''
+    aggs = [ ] 
+    for row in FuturesOHLC.itertuples(index=False):
+        # Extract values from the row, where row[0] corresponds to the first column, row[1] to the second, etc.
+        hourss = datetime.fromtimestamp(int(row[0]) // 1000000000).hour
+        hourss = f"{hourss:02d}"  # Ensure it's a two-digit string
+        minss = datetime.fromtimestamp(int(row[0]) // 1000000000).minute
+        minss = f"{minss:02d}"  # Ensure it's a two-digit string
+        
+        # Construct the time string
+        opttimeStamp = f"{hourss}:{minss}:00"
+        
+        # Append the transformed row data to the aggs list
+        aggs.append([
+            row[2] / 1e9,  # Convert the value at the third column (open)
+            row[3] / 1e9,  # Convert the value at the fourth column (high)
+            row[4] / 1e9,  # Convert the value at the fifth column (low)
+            row[5] / 1e9,  # Convert the value at the sixth column (close)
+            int(row[6]),   # Volume
+            opttimeStamp,  # The formatted timestamp
+            int(row[0]),   # Original timestamp
+            int(row[1])    # Additional identifier or name
+        ])
             
        
-    df = pd.DataFrame(newAggs, columns = ['open', 'high', 'low', 'close', 'volume', 'time', 'timestamp', 'name',])
+    df = pd.DataFrame(aggs, columns = ['open', 'high', 'low', 'close', 'volume', 'time', 'timestamp', 'name',])
     
     df['strTime'] = df['timestamp'].apply(lambda x: pd.Timestamp(int(x) // 10**9, unit='s', tz='EST') )
     
@@ -1635,8 +1674,11 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
 
-
     
+    
+    
+
+    '''
     blob = Blob('FuturesTrades'+str(symbolNum), bucket) 
     FuturesTrades = blob.download_as_text()
     
@@ -1649,8 +1691,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
        
 
     #STrades = [i for i in csv_rows]
+    start_time_itertuples = time.time()
     AllTrades = []
-    for i in csv_rows:
+    for i in FuturesTrades.values.tolist():
         hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
         if hourss < 10:
             hourss = '0'+str(hourss)
@@ -1659,8 +1702,20 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             minss = '0'+str(minss)
         opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
         AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
+    time_itertuples = time.time() - start_time_itertuples
        
     #AllTrades = [i for i in AllTrades if i[1] > 1]
+    '''
+
+    AllTrades = []
+    for row in FuturesTrades.itertuples(index=False):
+        hourss = datetime.fromtimestamp(int(row[0]) // 1000000000).hour
+        hourss = f"{hourss:02d}"  # Ensure two-digit format for hours
+        minss = datetime.fromtimestamp(int(row[0]) // 1000000000).minute
+        minss = f"{minss:02d}"  # Ensure two-digit format for minutes
+        opttimeStamp = f"{hourss}:{minss}:00"
+        AllTrades.append([int(row[1]) / 1e9, int(row[2]), int(row[0]), 0, row[3], opttimeStamp])
+    
         
     hs = historV1(df,100,{},AllTrades,[])
     
@@ -1680,12 +1735,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     # derivative of y with respect to x
     df_dx = derivative(f, x_fake, dx=1e-6)
 
-
-
-    mTrade = [i for i in AllTrades ]
     
      
-    mTrade = sorted(mTrade, key=lambda d: d[1], reverse=True)
+    mTrade = sorted(AllTrades, key=lambda d: d[1], reverse=True)
     
     [mTrade[i].insert(4,i) for i in range(len(mTrade))] 
     
@@ -1698,9 +1750,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     dtimeEpoch = df['timestamp'].dropna().values.tolist()
     
     
-    tempTrades = [i for i in AllTrades]
-    tempTrades = sorted(tempTrades, key=lambda d: d[6], reverse=False) 
-    tradeTimes = [i[6] for i in AllTrades]
+    #tempTrades = [i for i in AllTrades]
+    tempTrades = sorted(AllTrades, key=lambda d: d[6], reverse=False) 
+    #tradeTimes = [i[6] for i in AllTrades]
     tradeEpoch = [i[2] for i in AllTrades]
     
     
@@ -1933,29 +1985,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         pass
         
      
-    '''
-    blob = Blob('levelTwoMBO'+str(symbolNum), bucket) 
-    levelTwoMBO = blob.download_as_text()
-        
 
-    csv_reader  = csv.reader(io.StringIO(levelTwoMBO))
-    
-    csv_rows = []
-    for row in csv_reader:
-        csv_rows.append(row)
-        
-    
-    aggs = [ ]  
-    levelTwoMBO = [i for i in csv_rows]
-    
-    stTime = (datetime.fromtimestamp(int(levelTwoMBO[0][0])/1e9)).strftime('%H:%M:%S')
-    mboBuys =  [int(i[3]) for i in levelTwoMBO if i[5] == 'B']
-    mboSells = [int(i[3]) for i in levelTwoMBO if i[5] == 'A']
-    mboBuysDec = round(sum(mboBuys) / (sum(mboBuys)+sum(mboSells)),2)
-    mboSellDec = round(sum(mboSells) / (sum(mboBuys)+sum(mboSells)),2)
-    
-    mboString = 'As of '+stTime+' '+ 'Buys: '+str(sum(mboBuys))+'('+str(mboBuysDec)+') '+ 'Sells: '+str(sum(mboSells))+'('+str(mboSellDec)+') '
-    '''
     mboString = ''
     #calculate_ttm_squeeze(df)
     
