@@ -468,13 +468,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             thCallDec = 0
         
     '''
-    fig = make_subplots(rows=4, cols=2, shared_xaxes=True, shared_yaxes=True,
+    fig = make_subplots(rows=3, cols=2, shared_xaxes=True, shared_yaxes=True,
                         specs=[[{}, {},],
-                               [{"colspan": 1},{"type": "table", "rowspan": 3},],
-                               [{"colspan": 1},{},],
-                               [{"colspan": 1},{},]], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') ' (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') 
+                               [{"colspan": 1},{"type": "table", "rowspan": 2},],
+                               [{"colspan": 1},{},],], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') ' (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') 
                          horizontal_spacing=0.01, vertical_spacing=0.00, subplot_titles=(stockName + ' '+strTrend + '('+str(average)+') '+ str(now)+ ' '+ tpString, 'VP ' + str(datetime.now().time()) ), #' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '
-                         column_widths=[0.80,0.20], row_width=[0.12, 0.12, 0.12, 0.64,] ) #,row_width=[0.30, 0.70,]
+                         column_widths=[0.80,0.20], row_width=[0.12, 0.12, 0.76,] ) #,row_width=[0.30, 0.70,]
 
     
             
@@ -608,25 +607,25 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                   num1, num2],  opacity=0.5), row=1, col=2)
     
     
-    fig.add_trace(go.Scatter(x=df['time'], y=df_dx, mode='lines',name='Derivative'), row=4, col=1)
-    fig.add_hline(y=0, row=4, col=1)
+    fig.add_trace(go.Scatter(x=df['time'], y=df_dx, mode='lines',name='Derivative'), row=3, col=1)
+    fig.add_hline(y=0, row=3, col=1)
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
     
     
     if 'POC' in df.columns:
-        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',marker_color='#0000FF'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.50,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.50, name='HighVA',marker_color='rgba(0,0,0)'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.50,name='LowVA',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
       
     #fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.3, name='100ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.3, name='150ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['200ema'], mode='lines', opacity=0.3, name='200emaa', line=dict(color='black')))
     
-    fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', name='uppervwapAvg', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',name='lowervwapAvg', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', name='vwapAvg', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', opacity=0.50,name='uppervwapAvg', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',opacity=0.50,name='lowervwapAvg', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', opacity=0.50,name='vwapAvg', ))
     
     
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.1, name='UPPERVWAP2', line=dict(color='black')))
@@ -946,7 +945,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                  )
     '''
     if len(previousDay) > 0:
-        if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.25:
+        if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.15:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[2])]*len(df['time']) ,
                                     line_color='cyan',
@@ -962,7 +961,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                         )
             trcount+=1
 
-        if (abs(float(previousDay[0]) - df['1ema'][len(df)-1]) / ((float(previousDay[0]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.25:
+        if (abs(float(previousDay[0]) - df['1ema'][len(df)-1]) / ((float(previousDay[0]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.15:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[0])]*len(df['time']) ,
                                     line_color='green',
@@ -976,7 +975,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                         )
             trcount+=1
 
-        if (abs(float(previousDay[1]) - df['1ema'][len(df)-1]) / ((float(previousDay[1]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.25:
+        if (abs(float(previousDay[1]) - df['1ema'][len(df)-1]) / ((float(previousDay[1]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.15:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[1])]*len(df['time']) ,
                                     line_color='purple',
@@ -1026,7 +1025,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                             ),
                  )
     '''
-    data = [i for i in df['close']] #[i[0] for i in sortadlist]
+    
+    '''
+    data =  [i[0] for i in sortadlist] #[i for i in df['close']]
     data.sort(reverse=True)
     differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
     average_difference = (sum(differences) / len(differences))
@@ -1090,13 +1091,109 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             trcount+=1
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
+    '''
+    if '19:00:00' in df['time'].values:
+        fig.add_vline(x=df[df['time'] == '19:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top right', row=1, col=1)
+    
+        if '01:00:00' in df['time'].values:
+            fig.add_vline(x=df[df['time'] == '01:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Sydney Close', annotation_position='top left', row=1, col=1)
+            tempDf = df.loc[:df[df['time'] == '01:00:00'].index[0]]
+            min_low = tempDf['low'].min()
+            max_high = tempDf['high'].max()
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [min_low]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(min_low),
+                                    textposition="bottom left",
+                                    name='Sydney Low',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [max_high]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(max_high),
+                                    textposition="bottom left",
+                                    name='Sydney High',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+
+        if '02:00:00' in df['time'].values:
+            fig.add_vline(x=df[df['time'] == '02:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='London Open', annotation_position='top right', row=1, col=1)
+    
+        if '04:00:00' in df['time'].values:
+            fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top right', row=1, col=1)
+            tempDf = df.loc[df[df['time'] == '19:00:00'].index[0]:df[df['time'] == '04:00:00'].index[0]]
+            max_high = tempDf['high'].max()
+            min_low = tempDf['low'].min()
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [max_high]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(max_high),
+                                    textposition="bottom left",
+                                    name='Toyko High',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [min_low]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(min_low),
+                                    textposition="bottom left",
+                                    name='Toyko Low',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+        if '08:00:00' in df['time'].values:
+            fig.add_vline(x=df[df['time'] == '08:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='NewYork Open', annotation_position='top left', row=1, col=1)
+    
+    
+        if '11:00:00' in df['time'].values:
+            fig.add_vline(x=df[df['time'] == '11:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='London Close', annotation_position='top left', row=1, col=1)
+            tempDf = df.loc[df[df['time'] == '02:00:00'].index[0]:df[df['time'] == '11:00:00'].index[0]]
+            max_high = tempDf['high'].max()
+            min_low = tempDf['low'].min()
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [max_high]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(max_high),
+                                    textposition="bottom left",
+                                    name='London High',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [min_low]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(min_low),
+                                    textposition="bottom left",
+                                    name='London Low',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+        
+            
+        
+    
     
     difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame]
     coll = [     'teal' if i[0] > 0
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
-    fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=3, col=1)
-    
+    fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=2, col=1)
+    '''
     if 'POCDistance' in df.columns:
         colors = ['maroon']
         for val in range(1,len(df['POCDistance'])):
@@ -1110,6 +1207,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                     color='crimson' 
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=2, col=1)
+    '''
 
     #fig.add_hline(y=0, row=3, col=1)
     #posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
@@ -1269,6 +1367,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     )
     
     
+
+
+    
+    
     
     fig.update_layout(height=890, xaxis_rangeslider_visible=False, showlegend=False)
     fig.update_xaxes(autorange="reversed", row=1, col=2)
@@ -1282,7 +1384,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     fig.update_xaxes(showticklabels=False, row=1, col=1)
     fig.update_xaxes(showticklabels=False, row=2, col=2)
     fig.update_xaxes(showticklabels=False, row=2, col=1)
-    fig.update_xaxes(showticklabels=False, row=4, col=1)
+    fig.update_xaxes(showticklabels=False, row=3, col=1)
     #fig.show(config={'modeBarButtonsToAdd': ['drawline']})
     return fig
 
@@ -1558,7 +1660,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '10'
+        clustNum = '5'
         
     if stkName != previous_stkName or interv != previous_interv:
         stored_data = None
@@ -1802,7 +1904,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             else:
                 tempList = AllTrades
             #print(make[0][2],make[it+1][2], len(tempList))
-            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:100]
+            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:150]
                         
             bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A'])])
   
@@ -1870,7 +1972,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
                 tempList = AllTrades[0:make[it+1][2]]
             else:
                 tempList = AllTrades
-            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:100]
+            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:150]
                         
             bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A'])])
             
@@ -1976,17 +2078,15 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['HighVA'] = pd.Series([i for i in resampled_dfVA['HighVA']])
         df['POC']  = pd.Series([i for i in resampled_dfVA['POC']])
         '''
-
-
-
-
-
     except(NotFound):
         pass
         
      
+    try:
+        mboString = str(round((abs(df['HighVA'][len(df)-1] - df['LowVA'][len(df)-1]) / ((df['HighVA'][len(df)-1] + df['LowVA'][len(df)-1]) / 2)) * 100,3))
+    except(KeyError):
+        mboString = ''
 
-    mboString = ''
     #calculate_ttm_squeeze(df)
     
         
