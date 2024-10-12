@@ -1092,8 +1092,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
     '''
-    if '19:00:00' in df['time'].values:
-        fig.add_vline(x=df[df['time'] == '19:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top right', row=1, col=1)
+    if df['time'].str.contains('19:').any(): #'19:00:00' in df['time'].values:
+        fig.add_vline(x=df[df['time'].str.contains('19:')].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top right', row=1, col=1)
     
         if '01:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '01:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Sydney Close', annotation_position='top left', row=1, col=1)
