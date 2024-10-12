@@ -1826,7 +1826,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
 
     x = np.array([i for i in range(len(df))])
-    y = np.array([i for i in df['40ema']])
+    y = np.array([i for i in df['30ema']])
     
     
 
