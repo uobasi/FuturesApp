@@ -1092,6 +1092,17 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
     '''
+    fig.add_trace(go.Scatter(x=df['time'],
+                            y= [float(previousDay[3])]*len(df['time']) ,
+                            line_color='black',
+                            text = str(previousDay[3]),
+                            textposition="bottom left",
+                            name='Sydney Open',
+                            showlegend=False,
+                            visible=False,
+                            mode= 'lines',
+                            ))
+    
     if '19:00:00' in df['time'].values:
         fig.add_vline(x=df[df['time'] == '19:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top right', row=1, col=1)
         
@@ -1128,6 +1139,17 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     text = str(max_high),
                                     textposition="bottom left",
                                     name='Sydney High',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [df['close'][df[df['time'] == '01:00:00'].index[0]]]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(df['close'][df[df['time'] == '01:00:00'].index[0]]),
+                                    textposition="bottom left",
+                                    name='Sydney Close',
                                     showlegend=False,
                                     visible=False,
                                     mode= 'lines',
@@ -1173,6 +1195,18 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     mode= 'lines',
                                     ))
             
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [df['close'][df[df['time'] == '04:00:00'].index[0]]]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(df['close'][df[df['time'] == '04:00:00'].index[0]]),
+                                    textposition="bottom left",
+                                    name='Toyko Close',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+
+            
         if '08:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '08:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='NewYork Open', annotation_position='top left', row=1, col=1)
             fig.add_trace(go.Scatter(x=df['time'],
@@ -1208,6 +1242,17 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     text = str(min_low),
                                     textposition="bottom left",
                                     name='London Low',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [df['close'][df[df['time'] == '11:00:00'].index[0]]]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(df['close'][df[df['time'] == '11:00:00'].index[0]]),
+                                    textposition="bottom left",
+                                    name='London Close',
                                     showlegend=False,
                                     visible=False,
                                     mode= 'lines',
@@ -2045,7 +2090,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         csv_rows.append(row)
         
     try:   
-        previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1] ,csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
+        previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0], csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1], csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2], csv_rows[[i[4] for i in csv_rows].index(symbolNum)][6] ]
     except(ValueError):
         previousDay = []
     
@@ -2069,7 +2114,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
             df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
             #df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
-            df['POCDistance'] = ((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
+            #df['POCDistance'] = ((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
+            
         '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
         POCData = blob.download_as_text()
