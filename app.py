@@ -1687,7 +1687,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '3'
+        interv = '5'
         
     if clustNum not in vaildClust:
         clustNum = '5'
