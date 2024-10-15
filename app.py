@@ -616,8 +616,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     if 'POC' in df.columns:
         fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.50,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
       
     #fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.3, name='100ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.3, name='150ema', line=dict(color='black')))
@@ -1092,6 +1092,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     #df_dx = np.append(df_dx, df_dx[len(df_dx)-1])
     '''
+    '''
     fig.add_trace(go.Scatter(x=df['time'],
                             y= [float(previousDay[3])]*len(df['time']) ,
                             line_color='black',
@@ -1102,10 +1103,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                             visible=False,
                             mode= 'lines',
                             ))
+    '''
     
     if '19:00:00' in df['time'].values:
         fig.add_vline(x=df[df['time'] == '19:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top right', row=1, col=1)
-        
+        '''
         fig.add_trace(go.Scatter(x=df['time'],
                                 y= [df['open'][df[df['time'] == '19:00:00'].index[0]]]*len(df['time']) ,
                                 line_color='black',
@@ -1116,7 +1118,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                 visible=False,
                                 mode= 'lines',
                                 ))
-    
+        '''
         if '01:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '01:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Sydney Close', annotation_position='top left', row=1, col=1)
             tempDf = df.loc[:df[df['time'] == '01:00:00'].index[0]]
@@ -1143,7 +1145,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
-            
+            '''
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [df['close'][df[df['time'] == '01:00:00'].index[0]]]*len(df['time']) ,
                                     line_color='black',
@@ -1154,9 +1156,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
+            '''
 
         if '02:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '02:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='London Open', annotation_position='top right', row=1, col=1)
+            '''
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [df['open'][df[df['time'] == '02:00:00'].index[0]]]*len(df['time']) ,
                                     line_color='black',
@@ -1167,6 +1171,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
+            '''
     
         if '04:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top right', row=1, col=1)
@@ -1195,6 +1200,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     mode= 'lines',
                                     ))
             
+            '''
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [df['close'][df[df['time'] == '04:00:00'].index[0]]]*len(df['time']) ,
                                     line_color='black',
@@ -1205,10 +1211,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
+            '''
 
             
         if '08:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '08:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='NewYork Open', annotation_position='top left', row=1, col=1)
+            '''
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [df['open'][df[df['time'] == '08:00:00'].index[0]]]*len(df['time']) ,
                                     line_color='black',
@@ -1219,6 +1227,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
+            '''
     
         if '11:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '11:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='London Close', annotation_position='top left', row=1, col=1)
@@ -1246,7 +1255,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
-            
+            '''
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [df['close'][df[df['time'] == '11:00:00'].index[0]]]*len(df['time']) ,
                                     line_color='black',
@@ -1257,6 +1266,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
+            '''
             
         
             
