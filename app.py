@@ -1864,7 +1864,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     window_size = 11 # Must be odd
     poly_order = 2
     # Apply Savitzky-Golay filter to compute the first derivative
-    df['derivative'] = savgol_filter(df['20ema'], window_length=window_size, polyorder=poly_order, deriv=1)
+    df['derivative'] = savgol_filter(df['50ema'], window_length=window_size, polyorder=poly_order, deriv=1)
     
      
     mTrade = sorted(AllTrades, key=lambda d: d[1], reverse=True)
@@ -2083,10 +2083,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
         
             
-            df['cross_above'] = (df['1ema'] > df['POC2']) & (df['derivative'] >= 0)# &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+            df['cross_above'] = (df['1ema'] >= df['POC2']) & (df['derivative'] >= 0)# &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
             # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-            df['cross_below'] =  (df['1ema'] < df['POC2']) & (df['derivative'] <= 0)# & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+            df['cross_below'] =  (df['1ema'] <= df['POC2']) & (df['derivative'] <= 0)# & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
             
             # Get the indices where cross_above or cross_below happens
             #cross_above_indices = df[df['cross_above']].index
