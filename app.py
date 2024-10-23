@@ -625,7 +625,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                   num1, num2],  opacity=0.5), row=1, col=2)
     
     
-    if 'derivative' in df.columns
+    if 'derivative' in df.columns:
         fig.add_trace(go.Scatter(x=df['time'], y=df['derivative'], mode='lines',name='Derivative'), row=3, col=1)
     fig.add_hline(y=0, row=3, col=1)
 
