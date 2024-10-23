@@ -46,7 +46,7 @@ def ema(df):
     #df['150ema'] = df['close'].ewm(span=150, adjust=False).mean()
     #df['200ema'] = df['close'].ewm(span=200, adjust=False).mean()
     #df['2ema'] = df['close'].ewm(span=2, adjust=False).mean()
-    df['1ema'] = ((df['open'] + df['high'] + df['low'] + df['close']) / 4).ewm(span=1, adjust=False).mean()
+    df['1ema'] = df['close'].ewm(span=1, adjust=False).mean()
 
 
 def vwap(df):
@@ -1861,7 +1861,6 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df_dx = derivative(f, x_fake, dx=1e-6)
     df_dx = np.pad(df_dx, (1, 0), 'edge')
     #df['derivative'] = np.gradient(df['40ema'])
-    
     
     df['avg_price'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
     df[clustNum+'ema'] = df['avg_price'].ewm(span=int(clustNum), adjust=False).mean()
