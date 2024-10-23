@@ -25,18 +25,28 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 import plotly.io as pio
 pio.renderers.default='browser'
 import bisect
+from collections import defaultdict
 #import yfinance as yf
 #import dateutil.parser
 
 def ema(df):
     df['30ema'] = df['close'].ewm(span=30, adjust=False).mean()
+    df['35ema'] = df['close'].ewm(span=35, adjust=False).mean()
+    df['38ema'] = df['close'].ewm(span=38, adjust=False).mean()
     df['40ema'] = df['close'].ewm(span=40, adjust=False).mean()
     df['28ema'] = df['close'].ewm(span=28, adjust=False).mean()
+    df['25ema'] = df['close'].ewm(span=25, adjust=False).mean()
+    df['23ema'] = df['close'].ewm(span=23, adjust=False).mean()
     df['50ema'] = df['close'].ewm(span=50, adjust=False).mean()
+    df['15ema'] = df['close'].ewm(span=15, adjust=False).mean()
+    df['20ema'] = df['close'].ewm(span=20, adjust=False).mean()
+    df['10ema'] = df['close'].ewm(span=10, adjust=False).mean()
     df['100ema'] = df['close'].ewm(span=100, adjust=False).mean()
     df['150ema'] = df['close'].ewm(span=150, adjust=False).mean()
     df['200ema'] = df['close'].ewm(span=200, adjust=False).mean()
+    df['2ema'] = df['close'].ewm(span=2, adjust=False).mean()
     df['1ema'] = df['close'].ewm(span=1, adjust=False).mean()
+
 
 def vwap(df):
     v = df['volume'].values
@@ -144,6 +154,13 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[], rangt:int=1):
 def historV1(df, num, quodict, trad:list=[], quot:list=[]): #rangt:int=1
     #trad = AllTrades
     
+    pzie = [(i[0], i[1]) for i in trad]
+    dct = defaultdict(int)
+    
+    for key, value in pzie:
+        dct[key] += value
+    
+    '''
     pzie = [(i[0],i[1]) for i in trad] #rangt:int=1
     dct ={}
     for i in pzie:
@@ -151,7 +168,7 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[]): #rangt:int=1
             dct[i[0]] =  i[1]
         else:
             dct[i[0]] +=  i[1]
-            
+    '''
     
     pzie = [i for i in dct ]#  > 500 list(set(pzie))
     mTradek = sorted(trad, key=lambda d: d[0], reverse=False)
@@ -607,14 +624,15 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                   num1, num2],  opacity=0.5), row=1, col=2)
     
     
-    fig.add_trace(go.Scatter(x=df['time'], y=df_dx, mode='lines',name='Derivative'), row=3, col=1)
+    fig.add_trace(go.Scatter(x=df['time'], y=df['derivative'], mode='lines',name='Derivative'), row=3, col=1)
     fig.add_hline(y=0, row=3, col=1)
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
     
     
     if 'POC' in df.columns:
-        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.50,marker_color='#0000FF'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
@@ -703,9 +721,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
     
     tpCandle =  sorted([i for i in OptionTimeFrame if len(i[10]) > 0 if int(i[4]) < len(df)], key=lambda x: sum([trt[1] for trt in x[10]]),reverse=True)[:8] 
-    #print(tpCandle)
+
     
-    
+    '''
     est_now = datetime.utcnow() + timedelta(hours=-4)
     start_time = est_now.replace(hour=8, minute=00, second=0, microsecond=0)
     end_time = est_now.replace(hour=17, minute=30, second=0, microsecond=0)
@@ -714,7 +732,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     if start_time <= est_now <= end_time:
         ccheck = 0.64
     else:
-       ccheck = 0.64
+    '''
+    ccheck = 0.64
     indsAbove = [i for i in OptionTimeFrame if round(i[6],2) >= ccheck and int(i[4]) < len(df) and float(i[2]) >= (sum([i[2]+i[3] for i in OptionTimeFrame]) / len(OptionTimeFrame))]#  float(bms[i[4]])  # and int(i[4]) < len(df) [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(int(i[10]),i[1]) for i in sord if i[11] == stockName and i[1] == 'AboveAsk(BUY)']]
     
     indsBelow = [i for i in OptionTimeFrame if round(i[7],2) >= ccheck and int(i[4]) < len(df) and float(i[3]) >= (sum([i[3]+i[2] for i in OptionTimeFrame]) / len(OptionTimeFrame))]#  float(sms[i[4]]) # and int(i[4]) < len(df) imbalance = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[13] == 'Imbalance' and i[1] != 'BelowBid(SELL)' and i[1] != 'AboveAsk(BUY)']]
@@ -757,7 +776,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             i[11] = mks + tpStrings 
         except(IndexError):
             i.append(mks + tpStrings)
-            
+    
+    
     troAbove = []
     troBelow = []
     
@@ -776,7 +796,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                 troBelow.append(tro+[troSells, troBuys, troSells/(troBuys+troSells)])
         except(ZeroDivisionError):
             troBelow.append(tro+[troSells, troBuys, 0])
-        
+    
          
 
     
@@ -869,7 +889,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             name='Ask' ),
         row=1, col=1)
         trcount+=1
-        
+     
+    
     if len(tpCandle) > 0:
         fig.add_trace(go.Candlestick(
             x=[df['time'][i[4]] for i in tpCandle],
@@ -988,43 +1009,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     ),
                         )
             trcount+=1
-    '''   
-    fig.add_trace(go.Scatter(x=df['time'],
-                             y= [df['vwap'].mean()]*len(df['time']) ,
-                             line_color='#FF1493',
-                             text = str(df['vwap'].mean()),
-                             textposition="bottom left",
-                             name='Avg VWAP '+ str(df['vwap'].mean()),
-                             showlegend=False,
-                             visible=False,
-                             mode= 'lines',
-                            ),
-                 )    
-        
-    fig.add_trace(go.Scatter(x=df['time'],
-                             y= [df['STDEV_25'].mean()]*len(df['time']) ,
-                             line_color='chartreuse',
-                             text = str(df['STDEV_25'].mean()),
-                             textposition="bottom left",
-                             name='Avg UVWAP '+ str(df['STDEV_25'].mean()),
-                             showlegend=False,
-                             visible=False,
-                             mode= 'lines',
-                            ),
-                 )
-    
-    fig.add_trace(go.Scatter(x=df['time'],
-                             y= [df['STDEV_N25'].mean()]*len(df['time']) ,
-                             line_color='chartreuse',
-                             text = str(df['STDEV_N25'].mean()),
-                             textposition="bottom left",
-                             name='Avg LVWAP '+ str(df['STDEV_N25'].mean()),
-                             showlegend=False,
-                             visible=False,
-                             mode= 'lines',
-                            ),
-                 )
-    '''
+
     
     '''
     data =  [i[0] for i in sortadlist] #[i for i in df['close']]
@@ -1105,184 +1090,26 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                             ))
     '''
     
-    if '19:00:00' in df['time'].values or '19:01:00' in df['time'].values:
-        if '19:00:00' in df['time'].values:
-            opstr = '19:00:00'
-        elif '19:01:00' in df['time'].values:
-            opstr = '19:01:00'
-            
-        fig.add_vline(x=df[df['time'] == opstr].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top right', row=1, col=1)
-        '''
-        fig.add_trace(go.Scatter(x=df['time'],
-                                y= [df['open'][df[df['time'] == '19:00:00'].index[0]]]*len(df['time']) ,
-                                line_color='black',
-                                text = str(df['open'][df[df['time'] == '19:00:00'].index[0]]),
-                                textposition="bottom left",
-                                name='Toyko Open',
-                                showlegend=False,
-                                visible=False,
-                                mode= 'lines',
-                                ))
-        '''
-        if '01:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '01:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Sydney Close', annotation_position='top left', row=1, col=1)
-            tempDf = df.loc[:df[df['time'] == '01:00:00'].index[0]]
-            min_low = tempDf['low'].min()
-            max_high = tempDf['high'].max()
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [min_low]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(min_low),
-                                    textposition="bottom left",
-                                    name='Sydney Low',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [max_high]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(max_high),
-                                    textposition="bottom left",
-                                    name='Sydney High',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [df['close'][df[df['time'] == '01:00:00'].index[0]]]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(df['close'][df[df['time'] == '01:00:00'].index[0]]),
-                                    textposition="bottom left",
-                                    name='Sydney Close',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
-
-        if '02:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '02:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='London Open', annotation_position='top right', row=1, col=1)
-            '''
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [df['open'][df[df['time'] == '02:00:00'].index[0]]]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(df['open'][df[df['time'] == '02:00:00'].index[0]]),
-                                    textposition="bottom left",
-                                    name='London Open',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            '''
     
-        if '04:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top right', row=1, col=1)
-            tempDf = df.loc[df[df['time'] == opstr].index[0]:df[df['time'] == '04:00:00'].index[0]]
-            max_high = tempDf['high'].max()
-            min_low = tempDf['low'].min()
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [max_high]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(max_high),
-                                    textposition="bottom left",
-                                    name='Toyko High',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [min_low]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(min_low),
-                                    textposition="bottom left",
-                                    name='Toyko Low',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
-            
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [df['close'][df[df['time'] == '04:00:00'].index[0]]]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(df['close'][df[df['time'] == '04:00:00'].index[0]]),
-                                    textposition="bottom left",
-                                    name='Toyko Close',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
-
-            
-        if '08:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '08:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='NewYork Open', annotation_position='top left', row=1, col=1)
-            '''
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [df['open'][df[df['time'] == '08:00:00'].index[0]]]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(df['open'][df[df['time'] == '08:00:00'].index[0]]),
-                                    textposition="bottom left",
-                                    name='NewYork Open',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            '''
-    
-        if '11:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '11:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='London Close', annotation_position='top left', row=1, col=1)
-            tempDf = df.loc[df[df['time'] == '02:00:00'].index[0]:df[df['time'] == '11:00:00'].index[0]]
-            max_high = tempDf['high'].max()
-            min_low = tempDf['low'].min()
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [max_high]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(max_high),
-                                    textposition="bottom left",
-                                    name='London High',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [min_low]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(min_low),
-                                    textposition="bottom left",
-                                    name='London Low',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [df['close'][df[df['time'] == '11:00:00'].index[0]]]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(df['close'][df[df['time'] == '11:00:00'].index[0]]),
-                                    textposition="bottom left",
-                                    name='London Close',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
-            
         
             
         
     
-    
+    '''
     difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame]
     coll = [     'teal' if i[0] > 0
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
     fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=2, col=1)
+    '''
+    
+    fig.add_trace(go.Bar(x=df['time'], y=df['Histogram'], marker_color='black'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=df['time'], y=df['MACD'], marker_color='blue'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=df['time'], y=df['Signal'], marker_color='red'), row=2, col=1)
+    
+    #fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[5] for i in troInterval]), marker_color='teal'), row=2, col=1)
+    #fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[6] for i in troInterval]), marker_color='crimson'), row=2, col=1)
+    
     '''
     if 'POCDistance' in df.columns:
         colors = ['maroon']
@@ -1456,7 +1283,59 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         row=2, col=2
     )
     
+    '''
+    for p in range(len(df)):
+        if 'cross_above' in df.columns:
+            if df['cross_above'][p]:
+                fig.add_annotation(x=df['time'][p], y=df['close'][p],
+                                   text='<b>' + 'Buy' + '</b>',
+                                   showarrow=True,
+                                   arrowhead=4,
+                                   font=dict(
+                    #family="Courier New, monospace",
+                    size=8,
+                    # color="#ffffff"
+                ),)
+         
+        if 'cross_below' in df.columns:
+            if df['cross_below'][p]:
+                fig.add_annotation(x=df['time'][p], y=df['close'][p],
+                                   text='<b>' + 'Sell' + '</b>',
+                                   showarrow=True,
+                                   arrowhead=4,
+                                   font=dict(
+                    #family="Courier New, monospace",
+                    size=8,
+                    # color="#ffffff"
+                ),)
     
+    '''
+    for p in range(1, len(df)):  # Start from 1 to compare with the previous row
+        if 'cross_above' in df.columns:
+            # Check if the value of cross_above changed from the previous row
+            if df['cross_above'][p] != df['cross_above'][p-1]:
+                # Add annotation only if cross_above is True after the change
+                if df['cross_above'][p]:
+                    fig.add_annotation(x=df['time'][p], y=df['close'][p],
+                                       text='<b>' + 'Buy' + '</b>',
+                                       showarrow=True,
+                                       arrowhead=4,
+                                       font=dict(
+                                           size=8,
+                                       ),)
+        
+        if 'cross_below' in df.columns:
+            # Check if the value of cross_above changed from the previous row
+            if df['cross_below'][p] != df['cross_below'][p-1]:
+                # Add annotation only if cross_above is True after the change
+                if df['cross_below'][p]:
+                    fig.add_annotation(x=df['time'][p], y=df['close'][p],
+                                       text='<b>' + 'Sell' + '</b>',
+                                       showarrow=True,
+                                       arrowhead=4,
+                                       font=dict(
+                                           size=8,
+                                       ),)
 
 
     
@@ -1531,6 +1410,53 @@ def calculate_ttm_squeeze(df, n=13):
     fit_y = np.array(range(0,n))
     df['Momentum'] = df['Momentum'].rolling(window = n).apply(lambda x: np.polyfit(fit_y, x, 1)[0] * (n-1) + np.polyfit(fit_y, x, 1)[1], raw=True)
 
+
+
+def calculate_macd(df, short_window=12, long_window=26, signal_window=9, use_avg_price=True):
+    """
+    Calculate MACD, Signal line, and the histogram using open, high, low, and close prices.
+    
+    Parameters:
+    - df (DataFrame): DataFrame with 'open', 'high', 'low', 'close' columns.
+    - short_window (int): The short period for the MACD calculation. Default is 12.
+    - long_window (int): The long period for the MACD calculation. Default is 26.
+    - signal_window (int): The signal period for the MACD signal line. Default is 9.
+    - use_avg_price (bool): Whether to use average of OHLC (open, high, low, close) prices instead of just close. Default is False.
+    
+    Returns:
+    - DataFrame: DataFrame with MACD, Signal line, and the histogram.
+    """
+    
+    if use_avg_price:
+        df['avg_price'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
+        price_col = 'avg_price'
+    else:
+        price_col = 'close'
+    
+    # Calculate the short-term and long-term EMAs
+    df['ema_short'] = df[price_col].ewm(span=short_window, adjust=False).mean()
+    df['ema_long'] = df[price_col].ewm(span=long_window, adjust=False).mean()
+    
+    # Calculate the MACD line
+    df['MACD'] = df['ema_short'] - df['ema_long']
+    
+    # Calculate the Signal line (9-period EMA of MACD line)
+    df['Signal'] = df['MACD'].ewm(span=signal_window, adjust=False).mean()
+    
+    # Calculate the MACD histogram (difference between MACD line and Signal line)
+    df['Histogram'] = df['MACD'] - df['Signal']
+    
+    # Separate positive and negative histogram bars
+    #df['Positive_Histogram'] = df['Histogram'].apply(lambda x: x if x > 0 else 0)
+    #df['Negative_Histogram'] = df['Histogram'].apply(lambda x: x if x < 0 else 0)
+    
+    # Clean up intermediate columns if needed
+    df.drop(['ema_short', 'ema_long'], axis=1, inplace=True)
+    
+    #return df[['MACD', 'Signal', 'Histogram', 'Positive_Histogram', 'Negative_Histogram']]
+
+
+
 from concurrent.futures import ThreadPoolExecutor    
 def download_data(bucket_name, blob_name):
     blob = Blob(blob_name, bucket_name)
@@ -1539,8 +1465,8 @@ def download_data(bucket_name, blob_name):
 #symbolNumList = ['118', '4358', '42012334', '392826', '393','163699', '935', '11232']
 #symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY']
 
-symbolNumList = ['183748', '106364', '42006053', '230943', '393','163699', '923', '42018437', '4127886', '73370']
-symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', 'NKD']
+symbolNumList = ['183748', '106364', '42006053', '258644', '393','163699', '923', '42018437', '4127886', '147644', '146415', '39545', '148217']
+symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', '6E', '6J', 'SI', '6A' ]
 
 intList = ['1','2','3','4','5','6','10','15']
 
@@ -1596,7 +1522,7 @@ styles = {
 from google.api_core.exceptions import NotFound
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 300000  # Initial interval #210000#250000#80001
-subsequent_inter = 30000  # Subsequent interval
+subsequent_inter = 40000  # Subsequent interval
 app = Dash()
 app.title = "Initial Title"
 app.layout = html.Div([
@@ -1641,6 +1567,7 @@ app.layout = html.Div([
     dcc.Store(id='data-store'),
     dcc.Store(id='previous-interv'),
     dcc.Store(id='previous-stkName'),
+    dcc.Store(id='previous-tpoNum'),
     dcc.Store(id='interval-time', data=initial_inter),
   
 ])
@@ -1720,6 +1647,7 @@ def update_tpo(n_clicks, value):
         Output('graph', 'figure'),
         Output('previous-stkName', 'data'),
         Output('previous-interv', 'data'),
+        Output('previous-tpoNum', 'data'),
         Output('interval', 'interval')],
     [Input('interval', 'n_intervals')],
     [State('stkName-value', 'data'),
@@ -1729,11 +1657,13 @@ def update_tpo(n_clicks, value):
         State('previous-interv', 'data'),
         State('cluster-value', 'data'),
         State('tpo-value', 'data'),
+        State('previous-tpoNum', 'data'),
         State('interval-time', 'data'),
+        
     ],
 )
     
-def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum, tpoNum, interval_time): #interv
+def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum, tpoNum, previous_tpoNum ,interval_time): #interv
     
     #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
@@ -1747,12 +1677,12 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '5'
+        interv = '3'
         
     if clustNum not in vaildClust:
         clustNum = '5'
         
-    if stkName != previous_stkName or interv != previous_interv:
+    if stkName != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
         stored_data = None
 
 
@@ -1926,7 +1856,15 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
 
     # derivative of y with respect to x
     df_dx = derivative(f, x_fake, dx=1e-6)
-
+    df_dx = np.pad(df_dx, (1, 0), 'edge')
+    
+    #df['derivative'] = np.gradient(df['40ema'])
+    from scipy.signal import savgol_filter
+    # Define window size and polynomial order
+    window_size = 11 # Must be odd
+    poly_order = 2
+    # Apply Savitzky-Golay filter to compute the first derivative
+    df['derivative'] = savgol_filter(df['20ema'], window_length=window_size, polyorder=poly_order, deriv=1)
     
      
     mTrade = sorted(AllTrades, key=lambda d: d[1], reverse=True)
@@ -1994,12 +1932,18 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             else:
                 tempList = AllTrades
             #print(make[0][2],make[it+1][2], len(tempList))
-            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:150]
-                        
-            bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A'])])
+            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
+            
+            timestamp_s = make[it][0] / 1_000_000_000
+            new_timestamp_s = timestamp_s + (int(interv)*60)
+            new_timestamp_ns = int(new_timestamp_s * 1_000_000_000)
+
+            bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A']),  sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] <= new_timestamp_ns) and i[5] == 'B']), sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] <= new_timestamp_ns) and i[5] == 'A']) ])
+            
+            
   
         
-        dst = [[bful[row][0], bful[row][1], 0, bful[row][2], 0] for row in  range(len(bful))]
+        dst = [[bful[row][0], bful[row][1], 0, bful[row][2], 0, bful[row][3], bful[row][4]] for row in  range(len(bful))]
         
         stored_data['tro'] = stored_data['tro'][:len(stored_data['tro'])-1] + dst
         
@@ -2011,7 +1955,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         for i in range(len(stored_data['tro'])-1):
             solist.append(stored_data['tro'][i+1][3] - stored_data['tro'][i][3])
             
-        newst = [[stored_data['tro'][i][0], stored_data['tro'][i][1], bolist[i], stored_data['tro'][i][3], solist[i] ] for i in range(len(stored_data['tro']))]
+        newst = [[stored_data['tro'][i][0], stored_data['tro'][i][1], bolist[i], stored_data['tro'][i][3], solist[i], stored_data['tro'][i][5], stored_data['tro'][i][6]] for i in range(len(stored_data['tro']))]
         
         stored_data['tro'] = newst
             
@@ -2062,9 +2006,12 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
                 tempList = AllTrades[0:make[it+1][2]]
             else:
                 tempList = AllTrades
-            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:150]
-                        
-            bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A'])])
+            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
+            timestamp_s = make[it][0] / 1_000_000_000
+            new_timestamp_s = timestamp_s + (int(interv)*60)
+            new_timestamp_ns = int(new_timestamp_s * 1_000_000_000)
+
+            bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A']),  sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] <= new_timestamp_ns) and i[5] == 'B']), sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] <= new_timestamp_ns) and i[5] == 'A']) ])
             
         bolist = [0]
         for i in range(len(bful)-1):
@@ -2076,7 +2023,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             #buyse/sellle
             
         
-        dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row]] for row in  range(len(bful))]
+        dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row], bful[row][3], bful[row][4]] for row in  range(len(bful))]
             
         stored_data = {'timeFrame': timeFrame, 'tro':dst} 
         
@@ -2088,6 +2035,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     #OptionTimeFrame = stored_data['timeFrame']   
     previous_stkName = sname
     previous_interv = interv
+    previous_tpoNum = tpoNum
 
          
     
@@ -2109,7 +2057,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     except(ValueError):
         previousDay = []
     
-    
+    calculate_macd(df)
     try:
         
         blob = Blob('POCData'+str(symbolNum), bucket) 
@@ -2123,13 +2071,26 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         LowVA = [float(i[0]) for i in csv_rows]
         HighVA = [float(i[1]) for i in csv_rows]
         POC = [float(i[2]) for i in csv_rows]
+        pocc = [float(i[5]) for i in csv_rows]
         #if len(LowVA) > 0:
         if len(df) >= len(POC) and len(POC) > 0:
             df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
             df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
             df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
+            df['POC2']  = pd.Series(pocc + [pocc[len(pocc)-1]]*(len(df)-len(pocc)))
             #df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
-            #df['POCDistance'] = ((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
+            df['POCDistance'] = ((df['1ema'] - df['POC2']) / ((df['1ema'] + df['POC2']) / 2)) * 100
+            
+        
+            
+            df['cross_above'] = (df['1ema'] > df['POC2']) & (df['derivative'] >= 0)# &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+
+            # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
+            df['cross_below'] =  (df['1ema'] < df['POC2']) & (df['derivative'] <= 0)# & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+            
+            # Get the indices where cross_above or cross_below happens
+            #cross_above_indices = df[df['cross_above']].index
+            #cross_below_indices = df[df['cross_below']].index
             
         '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
@@ -2180,16 +2141,17 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
 
     #calculate_ttm_squeeze(df)
     
+    
         
     if interval_time == initial_inter:
         interval_time = subsequent_inter
     
-    if stkName != previous_stkName or interv != previous_interv:
+    if stkName != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
         interval_time = initial_inter
     
     fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
 
-    return stored_data, fg, previous_stkName, previous_interv, interval_time
+    return stored_data, fg, previous_stkName, previous_interv, previous_tpoNum, interval_time
 
 #[(i[2]-i[3],i[0]) for i in timeFrame ]
 if __name__ == '__main__':
