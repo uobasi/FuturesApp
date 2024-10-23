@@ -625,7 +625,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                   num1, num2],  opacity=0.5), row=1, col=2)
     
     
-    fig.add_trace(go.Scatter(x=df['time'], y=df['derivative'], mode='lines',name='Derivative'), row=3, col=1)
+    if 'derivative' in df.columns
+        fig.add_trace(go.Scatter(x=df['time'], y=df['derivative'], mode='lines',name='Derivative'), row=3, col=1)
     fig.add_hline(y=0, row=3, col=1)
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
@@ -1869,7 +1870,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     window_size = 11 # Must be odd
     poly_order = 2
     # Apply Savitzky-Golay filter to compute the first derivative
-    df['derivative'] = savgol_filter(df[clustNum+'ema'], window_length=window_size, polyorder=poly_order, deriv=1)
+    try:
+        df['derivative'] = savgol_filter(df[clustNum+'ema'], window_length=window_size, polyorder=poly_order, deriv=1)
+    except(ValueError):
+        pass
     
      
     mTrade = sorted(AllTrades, key=lambda d: d[1], reverse=True)
