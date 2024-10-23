@@ -26,26 +26,27 @@ import plotly.io as pio
 pio.renderers.default='browser'
 import bisect
 from collections import defaultdict
+from scipy.signal import savgol_filter
 #import yfinance as yf
 #import dateutil.parser
 
 def ema(df):
-    df['30ema'] = df['close'].ewm(span=30, adjust=False).mean()
-    df['35ema'] = df['close'].ewm(span=35, adjust=False).mean()
-    df['38ema'] = df['close'].ewm(span=38, adjust=False).mean()
+    #df['30ema'] = df['close'].ewm(span=30, adjust=False).mean()
+    #df['35ema'] = df['close'].ewm(span=35, adjust=False).mean()
+    #df['38ema'] = df['close'].ewm(span=38, adjust=False).mean()
     df['40ema'] = df['close'].ewm(span=40, adjust=False).mean()
-    df['28ema'] = df['close'].ewm(span=28, adjust=False).mean()
-    df['25ema'] = df['close'].ewm(span=25, adjust=False).mean()
-    df['23ema'] = df['close'].ewm(span=23, adjust=False).mean()
-    df['50ema'] = df['close'].ewm(span=50, adjust=False).mean()
-    df['15ema'] = df['close'].ewm(span=15, adjust=False).mean()
-    df['20ema'] = df['close'].ewm(span=20, adjust=False).mean()
-    df['10ema'] = df['close'].ewm(span=10, adjust=False).mean()
-    df['100ema'] = df['close'].ewm(span=100, adjust=False).mean()
-    df['150ema'] = df['close'].ewm(span=150, adjust=False).mean()
-    df['200ema'] = df['close'].ewm(span=200, adjust=False).mean()
-    df['2ema'] = df['close'].ewm(span=2, adjust=False).mean()
-    df['1ema'] = df['close'].ewm(span=1, adjust=False).mean()
+    #df['28ema'] = df['close'].ewm(span=28, adjust=False).mean()
+    #df['25ema'] = df['close'].ewm(span=25, adjust=False).mean()
+    #df['23ema'] = df['close'].ewm(span=23, adjust=False).mean()
+    #df['50ema'] = df['close'].ewm(span=50, adjust=False).mean()
+    #df['15ema'] = df['close'].ewm(span=15, adjust=False).mean()
+    #df['20ema'] = df['close'].ewm(span=20, adjust=False).mean()
+    #df['10ema'] = df['close'].ewm(span=10, adjust=False).mean()
+    #df['100ema'] = df['close'].ewm(span=100, adjust=False).mean()
+    #df['150ema'] = df['close'].ewm(span=150, adjust=False).mean()
+    #df['200ema'] = df['close'].ewm(span=200, adjust=False).mean()
+    #df['2ema'] = df['close'].ewm(span=2, adjust=False).mean()
+    df['1ema'] = ((df['open'] + df['high'] + df['low'] + df['close']) / 4).ewm(span=1, adjust=False).mean()
 
 
 def vwap(df):
@@ -1470,7 +1471,7 @@ symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', '6E', '6
 
 intList = ['1','2','3','4','5','6','10','15']
 
-vaildClust = [str(i) for i in range(3,20)]
+vaildClust = [str(i) for i in range(3,200)]
 
 vaildTPO = [str(i) for i in range(10,500)]
 
@@ -1551,7 +1552,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
             html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Enter a cluster number from 3 - 20", style=styles['label']),
+            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3 - 200", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='cluster-value'),
         
@@ -1617,10 +1618,10 @@ def update_clusterNum(n_clicks, value):
     value = str(value)
     
     if value in vaildClust:
-        print('The input cluster number was "{}" '.format(value))
+        print('The input Buy/Sell Signal number was "{}" '.format(value))
         return str(value), str(value), 
     else:
-        return 'The input cluster '+str(value)+" is not accepted please try different number from  3 - 20", 'The input cluster '+str(value)+" is not accepted please try different number from  3 - 20"
+        return 'The Buy/Sell Signal '+str(value)+" is not accepted please try different number from  3 - 20", 'The Buy/Sell Signal '+str(value)+" is not accepted please try different number from  3 - 20"
 
 
 @callback(
@@ -1680,14 +1681,16 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '5'
+        clustNum = '50'
         
-    if stkName != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
+    if tpoNum not in vaildTPO:
+        tpoNum = '100'
+        
+    if sname != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
         stored_data = None
 
 
-    if tpoNum not in vaildTPO:
-        tpoNum = '100'
+    
         
         
     print('inFunction '+sname)	
@@ -1857,14 +1860,17 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     # derivative of y with respect to x
     df_dx = derivative(f, x_fake, dx=1e-6)
     df_dx = np.pad(df_dx, (1, 0), 'edge')
-    
     #df['derivative'] = np.gradient(df['40ema'])
-    from scipy.signal import savgol_filter
+    
+    
+    df['avg_price'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
+    df[clustNum+'ema'] = df['avg_price'].ewm(span=int(clustNum), adjust=False).mean()
+    
     # Define window size and polynomial order
     window_size = 11 # Must be odd
     poly_order = 2
     # Apply Savitzky-Golay filter to compute the first derivative
-    df['derivative'] = savgol_filter(df['50ema'], window_length=window_size, polyorder=poly_order, deriv=1)
+    df['derivative'] = savgol_filter(df[clustNum+'ema'], window_length=window_size, polyorder=poly_order, deriv=1)
     
      
     mTrade = sorted(AllTrades, key=lambda d: d[1], reverse=True)
@@ -2146,7 +2152,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if interval_time == initial_inter:
         interval_time = subsequent_inter
     
-    if stkName != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
+    if sname != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
         interval_time = initial_inter
     
     fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
