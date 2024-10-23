@@ -1862,8 +1862,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df_dx = np.pad(df_dx, (1, 0), 'edge')
     #df['derivative'] = np.gradient(df['40ema'])
     
-    df['avg_price'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
-    df[clustNum+'ema'] = df['avg_price'].ewm(span=int(clustNum), adjust=False).mean()
+    #df['avg_price'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
+    df[clustNum+'ema'] = df['close'].ewm(span=int(clustNum), adjust=False).mean()
     
     # Define window size and polynomial order
     window_size = 11 # Must be odd
