@@ -1553,7 +1553,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
             html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3-200, Default = 6", style=styles['label']),
+            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3-200, Default = 50", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='cluster-value'),
         
@@ -1682,7 +1682,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '6'
+        clustNum = '50'
         
     if tpoNum not in vaildTPO:
         tpoNum = '100'
