@@ -1467,12 +1467,12 @@ def download_data(bucket_name, blob_name):
 #symbolNumList = ['118', '4358', '42012334', '392826', '393','163699', '935', '11232']
 #symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY']
 
-symbolNumList = ['183748', '106364', '42006053', '258644', '393','163699', '923', '42018437', '4127886', '147644', '146415', '39545', '148217']
-symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', '6E', '6J', 'SI', '6A' ]
+symbolNumList = ['183748', '106364', '42006053', '258644', '393','163699', '923', '42018437', '4127886', '147644', '146415', '39545', '148217', '3786', '146417']
+symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', '6E', '6J', 'SI', '6A', '6N', '6B']
 
 intList = ['1','2','3','4','5','6','10','15']
 
-vaildClust = [str(i) for i in range(3,200)]
+vaildClust = [str(i) for i in range(2,200)]
 
 vaildTPO = [str(i) for i in range(10,500)]
 
@@ -1553,7 +1553,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
             html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3 - 200", style=styles['label']),
+            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3-200, Default = 6", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='cluster-value'),
         
@@ -1682,7 +1682,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '5'
+        clustNum = '6'
         
     if tpoNum not in vaildTPO:
         tpoNum = '100'
