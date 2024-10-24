@@ -1867,7 +1867,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df[clustNum+'ema'] = df['close'].ewm(span=int(clustNum), adjust=False).mean()
     
     # Define window size and polynomial order
-    window_size = 11 # Must be odd
+    window_size = 9 # Must be odd
     poly_order = 2
     # Apply Savitzky-Golay filter to compute the first derivative
     try:
