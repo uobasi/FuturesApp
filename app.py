@@ -1682,7 +1682,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '50'
+        clustNum = '5'
         
     if tpoNum not in vaildTPO:
         tpoNum = '100'
