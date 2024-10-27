@@ -627,7 +627,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     if 'derivative' in df.columns:
         fig.add_trace(go.Scatter(x=df['time'], y=df['derivative'], mode='lines',name='Derivative'), row=3, col=1)
+        fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_1'], mode='lines',name='Derivative_1'), row=2, col=1)
     fig.add_hline(y=0, row=3, col=1)
+    fig.add_hline(y=0, row=2, col=1)
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
     
@@ -1103,14 +1105,16 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                 else 'crimson' if i[0] < 0
                 else 'gray' for i in difList]
     fig.add_trace(go.Bar(x=pd.Series([i[1] for i in difList]), y=pd.Series([i[0] for i in difList]), marker_color=coll), row=2, col=1)
-    '''
+    
+    
     
     fig.add_trace(go.Bar(x=df['time'], y=df['Histogram'], marker_color='black'), row=2, col=1)
     fig.add_trace(go.Scatter(x=df['time'], y=df['MACD'], marker_color='blue'), row=2, col=1)
     fig.add_trace(go.Scatter(x=df['time'], y=df['Signal'], marker_color='red'), row=2, col=1)
-    
+    '''
     #fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[5] for i in troInterval]), marker_color='teal'), row=2, col=1)
     #fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[6] for i in troInterval]), marker_color='crimson'), row=2, col=1)
+    
     
     '''
     if 'POCDistance' in df.columns:
@@ -1126,7 +1130,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                     color='crimson' 
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=2, col=1)
-    '''
+    
 
     #fig.add_hline(y=0, row=3, col=1)
     #posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
@@ -1137,7 +1141,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     
     #df['Momentum'] = df['Momentum'].fillna(0) ['teal' if val > 0 else 'crimson' for val in df['Momentum']]
-    '''
+    
     colors = ['maroon']
     for val in range(1,len(df['Momentum'])):
         if df['Momentum'][val] > 0:
@@ -1151,6 +1155,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         colors.append(color)
     fig.add_trace(go.Bar(x=df['time'], y=df['Momentum'], marker_color =colors ), row=2, col=1)
     '''
+    
     '''
     coll = [     'teal' if i[2] > 0
                 else 'crimson' if i[2] < 0
@@ -1279,8 +1284,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     fig.add_trace(
         go.Table(
-            header=dict(values=["Time", "Buyers", "Buyers Change", "Sellers", "Sellers Change",]),
-            cells=dict(values=transposed_data, fill_color=color_matrix, font=dict(color=textColor_matrix)),  # Transpose data to fit the table
+            header=dict(values=["Time", "Buyers", "Buyers Change", "Sellers", "Sellers Change","Buyers per Interval", "Sellers per Interval"], font=dict(size=9)),
+            cells=dict(values=transposed_data, fill_color=color_matrix, font=dict(color=textColor_matrix,size=9)),  # Transpose data to fit the table
         ),
         row=2, col=2
     )
@@ -1467,7 +1472,7 @@ def download_data(bucket_name, blob_name):
 #symbolNumList = ['118', '4358', '42012334', '392826', '393','163699', '935', '11232']
 #symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY']
 
-symbolNumList = ['183748', '106364', '42006053', '258644', '393','163699', '923', '42018437', '4127886', '147644', '146415', '39545', '148217', '3786', '146417']
+symbolNumList = ['183748', '106364', '42006053', '258644', '393','163699', '913', '42018437', '4127886', '147644', '146415', '39545', '148217', '3786', '146417']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', '6E', '6J', 'SI', '6A', '6N', '6B']
 
 intList = ['1','2','3','4','5','6','10','15']
@@ -1553,7 +1558,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
             html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3-200, Default = 50", style=styles['label']),
+            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3-200, Default = 25", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='cluster-value'),
         
@@ -1682,7 +1687,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '50'
+        clustNum = '25'
         
     if tpoNum not in vaildTPO:
         tpoNum = '100'
@@ -1867,11 +1872,14 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df[clustNum+'ema'] = df['close'].ewm(span=int(clustNum), adjust=False).mean()
     
     # Define window size and polynomial order
-    window_size = 9 # Must be odd
+    window_size = 19 # Must be odd
     poly_order = 2
+    
+    w1=9
     # Apply Savitzky-Golay filter to compute the first derivative
     try:
-        df['derivative'] = savgol_filter(df[clustNum+'ema'], window_length=window_size, polyorder=poly_order, deriv=1)
+        df['derivative'] = savgol_filter(df[clustNum+'ema'], window_length=window_size, polyorder=poly_order, deriv=2)
+        df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=w1, polyorder=poly_order, deriv=1)
     except(ValueError):
         pass
     
@@ -2066,7 +2074,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     except(ValueError):
         previousDay = []
     
-    calculate_macd(df)
+    #calculate_macd(df)
+    calculate_macd(df, short_window=30, long_window=50, signal_window=10, use_avg_price=True)
     try:
         
         blob = Blob('POCData'+str(symbolNum), bucket) 
@@ -2081,7 +2090,6 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         HighVA = [float(i[1]) for i in csv_rows]
         POC = [float(i[2]) for i in csv_rows]
         pocc = [float(i[5]) for i in csv_rows]
-        #if len(LowVA) > 0:
         if len(df) >= len(POC) and len(POC) > 0:
             df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
             df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
@@ -2092,10 +2100,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
         
             
-            df['cross_above'] = (df['1ema'] >= df['POC2']) & (df['derivative'] >= 0)# &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+            df['cross_above'] = (df['1ema'] >= df['POC2']) & ((df['derivative'] >= 0))# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
             # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-            df['cross_below'] =  (df['1ema'] <= df['POC2']) & (df['derivative'] <= 0)# & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+            df['cross_below'] =  (df['1ema'] <= df['POC2']) & ((df['derivative'] <= 0))# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
             
             # Get the indices where cross_above or cross_below happens
             #cross_above_indices = df[df['cross_above']].index
@@ -2148,7 +2156,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     except(KeyError):
         mboString = ''
 
-    #calculate_ttm_squeeze(df)
+    calculate_ttm_squeeze(df)
     
     
         
