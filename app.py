@@ -1558,7 +1558,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
             html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3-200, Default = 30", style=styles['label']),
+            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3-200, Default = 60", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='cluster-value'),
         
@@ -1687,7 +1687,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '30'
+        clustNum = '60'
         
     if tpoNum not in vaildTPO:
         tpoNum = '100'
@@ -1872,7 +1872,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df[clustNum+'ema'] = df['close'].ewm(span=int(clustNum), adjust=False).mean()
     
     # Define window size and polynomial order
-    window_size = 19 # Must be odd
+    window_size = 17 # Must be odd
     poly_order = 2
     
     w1=9
@@ -2101,10 +2101,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
         
             
-            df['cross_above'] = (df['1ema'] >= df['POC2']) & ((df['derivative_1'] >= 0))# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+            df['cross_above'] = (df['1ema'] > df['POC2']) & ((df['derivative_1'] >= 0))# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
             # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-            df['cross_below'] =  (df['1ema'] <= df['POC2']) & ((df['derivative_1'] <= 0))# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+            df['cross_below'] =  (df['1ema'] < df['POC2']) & ((df['derivative_1'] <= 0))# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
             
             # Get the indices where cross_above or cross_below happens
             #cross_above_indices = df[df['cross_above']].index
