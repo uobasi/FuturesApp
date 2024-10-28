@@ -1558,7 +1558,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
             html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3-200, Default = 25", style=styles['label']),
+            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3-200, Default = 30", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='cluster-value'),
         
@@ -1880,7 +1880,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     try:
         
         df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=w1, polyorder=poly_order, deriv=1)
-        df['derivative_2'] = savgol_filter(df[clustNum+'ema'], window_length=window_size, polyorder=poly_order, deriv=2,)
+        df['derivative_2'] = savgol_filter(df[clustNum+'ema'], window_length=window_size, polyorder=poly_order, deriv=2, mode='nearest')
     except(ValueError):
         pass
     
