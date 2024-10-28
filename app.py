@@ -1687,7 +1687,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '25'
+        clustNum = '30'
         
     if tpoNum not in vaildTPO:
         tpoNum = '100'
@@ -1878,8 +1878,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     w1=9
     # Apply Savitzky-Golay filter to compute the first derivative
     try:
-        df['derivative'] = savgol_filter(df[clustNum+'ema'], window_length=window_size, polyorder=poly_order, deriv=2)
+        
         df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=w1, polyorder=poly_order, deriv=1)
+        df['derivative'] = savgol_filter(df[clustNum+'ema'], window_length=window_size, polyorder=3, deriv=2,)
     except(ValueError):
         pass
     
