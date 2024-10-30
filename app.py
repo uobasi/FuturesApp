@@ -31,7 +31,7 @@ from scipy.signal import savgol_filter
 #import dateutil.parser
 
 def ema(df):
-    #df['30ema'] = df['close'].ewm(span=30, adjust=False).mean()
+    df['30ema'] = df['close'].ewm(span=30, adjust=False).mean()
     #df['35ema'] = df['close'].ewm(span=35, adjust=False).mean()
     #df['38ema'] = df['close'].ewm(span=38, adjust=False).mean()
     df['40ema'] = df['close'].ewm(span=40, adjust=False).mean()
@@ -626,9 +626,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     
     if 'derivative_1' in df.columns:
-        fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_2'], mode='lines',name='Derivative_2'), row=3, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_2'], mode='lines',name='Derivative_2'), row=2, col=1)
         fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_1'], mode='lines',name='Derivative_1'), row=2, col=1)
-    fig.add_hline(y=0, row=3, col=1)
+        fig.add_trace(go.Scatter(x=df['time'], y=df['kalman_velocity'], mode='lines',name='kalman_velocity'), row=2, col=1)
+
     fig.add_hline(y=0, row=2, col=1)
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
@@ -1111,12 +1112,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     fig.add_trace(go.Bar(x=df['time'], y=df['Histogram'], marker_color='black'), row=2, col=1)
     fig.add_trace(go.Scatter(x=df['time'], y=df['MACD'], marker_color='blue'), row=2, col=1)
     fig.add_trace(go.Scatter(x=df['time'], y=df['Signal'], marker_color='red'), row=2, col=1)
-    '''
+    
     #fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[5] for i in troInterval]), marker_color='teal'), row=2, col=1)
     #fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[6] for i in troInterval]), marker_color='crimson'), row=2, col=1)
-    
-    
     '''
+    
+    
     if 'POCDistance' in df.columns:
         colors = ['maroon']
         for val in range(1,len(df['POCDistance'])):
@@ -1129,9 +1130,14 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                 if df['POCDistance'][val] < df['POCDistance'][val-1]:
                     color='crimson' 
             colors.append(color)
-        fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=2, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=3, col=1)
+        
     
-
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['kalman_velocity'], mode='lines',name='kalman_velocity'), row=3, col=1)
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['kalman_acceleration'], mode='lines',name='kalman_acceleration'), row=3, col=1)
+    #fig.add_hline(y=0, row=3, col=1)
+    
+    '''
     #fig.add_hline(y=0, row=3, col=1)
     #posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
     #negati = pd.Series([i[0] if i[0] < 0 else 0 for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] < 0])/len([i[0] for i in difList if i[0] < 0])
@@ -1479,7 +1485,7 @@ intList = ['1','2','3','4','5','6','10','15']
 
 vaildClust = [str(i) for i in range(2,200)]
 
-vaildTPO = [str(i) for i in range(10,500)]
+vaildTPO = [str(i) for i in range(1,500)]
 
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
@@ -1526,10 +1532,11 @@ styles = {
 
 #import pandas_ta as ta
 #from collections import Counter
+from filterpy.kalman import KalmanFilter
 from google.api_core.exceptions import NotFound
 from dash import Dash, dcc, html, Input, Output, callback, State
-initial_inter = 300000  # Initial interval #210000#250000#80001
-subsequent_inter = 30000  # Subsequent interval
+initial_inter = 400000  # Initial interval #210000#250000#80001
+subsequent_inter = 45000  # Subsequent interval
 app = Dash()
 app.title = "Initial Title"
 app.layout = html.Div([
@@ -1558,7 +1565,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
             html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Adjust Buy/Sell Signal 3-200, Default = 60", style=styles['label']),
+            html.Div(id='cluster-button-basic',children="Adjust ema for Buy/Sell Signal 3-200, default = 29", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='cluster-value'),
         
@@ -1568,6 +1575,26 @@ app.layout = html.Div([
             html.Div(id='tpo-button-basic', children="Enter a top ranked order number from 10 - 500", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='tpo-value'),
+        
+        html.Div([
+            dcc.Input(id='input-on-curvature', type='text', style=styles['input']),
+            html.Button('Submit', id='submit-curvature', n_clicks=0, style=styles['button']),
+            html.Div(id='curvature-button-basic', children="Curvature Line for D1 : 1 - 500 has to be odd number, default = 12", style=styles['label']),
+        ], style=styles['sub_container']),
+        dcc.Store(id='curvature-value'),
+        
+        
+        html.Div([
+            dcc.Input(id='input-on-curvatured2', type='text', style=styles['input']),
+            html.Button('Submit', id='submit-curvatured2', n_clicks=0, style=styles['button']),
+            html.Div(id='curvatured2-button-basic', children="Curvature Line for D2 : 1 - 500 has to be odd number, default = 10", style=styles['label']),
+        ], style=styles['sub_container']),
+        dcc.Store(id='curvatured2-value'),
+        
+        
+        
+        
+        
     ], style=styles['main_container']),
     
     
@@ -1646,6 +1673,40 @@ def update_tpo(n_clicks, value):
     else:
         return 'The input top rank order was '+str(value)+" is not accepted please try different number from  10 - 500", 'The input top rank order '+str(value)+" is not accepted please try different number from  10 - 500"
 
+@callback(
+    Output('curvature-value', 'data'),
+    Output('curvature-button-basic', 'children'),
+    Input('submit-curvature', 'n_clicks'),
+    State('input-on-curvature', 'value'),
+    prevent_initial_call=True
+)
+def update_curvature(n_clicks, value):
+    value = str(value)
+    
+    if value in vaildTPO:
+        print('The curvature input for D1 was "{}" '.format(value))
+        return str(value), str(value), 
+    else:
+        return 'The input top rank order was '+str(value)+" is not accepted please try different number from  10 - 500", 'The input top rank order '+str(value)+" is not accepted please try different number from  10 - 500"
+
+
+@callback(
+    Output('curvatured2-value', 'data'),
+    Output('curvatured2-button-basic', 'children'),
+    Input('submit-curvatured2', 'n_clicks'),
+    State('input-on-curvatured2', 'value'),
+    prevent_initial_call=True
+)
+def update_curvature_D2(n_clicks, value):
+    value = str(value)
+    
+    if value in vaildTPO:
+        print('The curvature input for D2 was "{}" '.format(value))
+        return str(value), str(value), 
+    else:
+        return 'The input top rank order was '+str(value)+" is not accepted please try different number from  10 - 500", 'The input top rank order '+str(value)+" is not accepted please try different number from  10 - 500"
+
+
 
 
 
@@ -1665,12 +1726,14 @@ def update_tpo(n_clicks, value):
         State('cluster-value', 'data'),
         State('tpo-value', 'data'),
         State('previous-tpoNum', 'data'),
+        State('curvature-value', 'data'),
+        State('curvatured2-value', 'data'),
         State('interval-time', 'data'),
         
     ],
 )
     
-def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum, tpoNum, previous_tpoNum ,interval_time): #interv
+def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum, tpoNum, previous_tpoNum, curvature, curvatured2, interval_time): #interv
     
     #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
@@ -1687,10 +1750,17 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '3'
         
     if clustNum not in vaildClust:
-        clustNum = '60'
+        clustNum = '29'
         
     if tpoNum not in vaildTPO:
         tpoNum = '100'
+        
+    if curvature not in vaildTPO:
+        curvature = '12'
+        
+    if curvatured2 not in vaildTPO:
+        curvatured2 = '10'
+    
         
     if sname != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
         stored_data = None
@@ -1870,19 +1940,71 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     #df['avg_price'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
     df[clustNum+'ema'] = df['close'].ewm(span=int(clustNum), adjust=False).mean()
+
     
     # Define window size and polynomial order
-    window_size = 17 # Must be odd
+    window_size = 25 # Must be odd
     poly_order = 2
     
     w1=9
     # Apply Savitzky-Golay filter to compute the first derivative
     try:
         
-        df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=w1, polyorder=poly_order, deriv=1)
-        df['derivative_2'] = savgol_filter(df[clustNum+'ema'], window_length=window_size, polyorder=poly_order, deriv=2, mode='nearest')
+        df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvature), polyorder=poly_order, deriv=1)
+        df['derivative_2'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvatured2), polyorder=poly_order, deriv=2)
     except(ValueError):
         pass
+    
+    
+    
+    
+    kf = KalmanFilter(dim_x=3, dim_z=1)
+
+    # State transition matrix (F) for position, velocity, and acceleration
+    dt = 1  # Time step
+    kf.F = np.array([[1, dt, 0.5 * dt**2],
+                     [0, 1, dt],
+                     [0, 0, 1]])
+    
+    # Measurement function (H): We only observe the position (30 EMA)
+    kf.H = np.array([[1, 0, 0]])
+    
+    # Covariance matrix (P): Initial uncertainty in the estimates
+    kf.P *= 1000  # High initial uncertainty in all states
+    
+    # Measurement noise (R): Uncertainty in observations
+    kf.R = np.array([[5]])
+    
+    # Process noise (Q): Uncertainty in the model dynamics
+    kf.Q = np.array([[0.1, 0, 0],
+                     [0, 0.1, 0],
+                     [0, 0, 0.1]])
+    
+    # Initial state estimate: [position, velocity, acceleration]
+    kf.x = np.array([[df[clustNum+'ema'].iloc[0]], [0], [0]])  # Start with initial position, zero velocity, and zero acceleration
+    
+    # Lists to store the estimates
+    positions = []
+    velocities = []
+    accelerations = []
+    
+    # Iterate over each data point in '30ema'
+    for emaa in df[clustNum+'ema']:
+        kf.predict()  # Predict next state
+        kf.update([emaa])  # Update state with new measurement (position)
+        
+        # Store the estimated position, velocity, and acceleration
+        positions.append(kf.x[0][0])  # Position estimate (smoothed 30 EMA)
+        velocities.append(kf.x[1][0])  # Velocity (first derivative) estimate
+        accelerations.append(kf.x[2][0])  # Acceleration (second derivative) estimate
+    
+    # Add the estimates to the DataFrame
+    df['kalman_position'] = positions
+    df['kalman_velocity'] = velocities
+    df['kalman_acceleration'] = accelerations
+    
+    df['kalman_velocity'] = df['kalman_velocity'].ewm(span=int(curvatured2), adjust=False).mean()
+
     
      
     mTrade = sorted(AllTrades, key=lambda d: d[1], reverse=True)
@@ -2076,7 +2198,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         previousDay = []
     
     #calculate_macd(df)
-    calculate_macd(df, short_window=30, long_window=50, signal_window=10, use_avg_price=True)
+    #calculate_macd(df, short_window=30, long_window=50, signal_window=10, use_avg_price=True)
     try:
         
         blob = Blob('POCData'+str(symbolNum), bucket) 
@@ -2099,12 +2221,12 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             #df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
             df['POCDistance'] = ((df['1ema'] - df['POC2']) / ((df['1ema'] + df['POC2']) / 2)) * 100
             
-        
             
-            df['cross_above'] = (df['1ema'] > df['POC2']) & ((df['derivative_1'] >= 0))# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+            #chhk = "2" if toggle == '1' else "1" 
+            df['cross_above'] = (df['1ema'] >= df['POC2']) & (df['derivative_1'] >= 0) &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
             # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-            df['cross_below'] =  (df['1ema'] < df['POC2']) & ((df['derivative_1'] <= 0))# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+            df['cross_below'] =  (df['1ema'] <= df['POC2']) & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
             
             # Get the indices where cross_above or cross_below happens
             #cross_above_indices = df[df['cross_above']].index
@@ -2157,7 +2279,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     except(KeyError):
         mboString = ''
 
-    calculate_ttm_squeeze(df)
+    #calculate_ttm_squeeze(df)
     
     
         
