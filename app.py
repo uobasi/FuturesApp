@@ -1747,7 +1747,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '3'
+        interv = '2'
         
     if clustNum not in vaildClust:
         clustNum = '29'
@@ -2223,10 +2223,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
             
             #chhk = "2" if toggle == '1' else "1" 
-            df['cross_above'] = (df['1ema'] >= df['POC2']) & (df['derivative_1'] >= 0) &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+            df['cross_above'] = (df['derivative_1'] >= 0) &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
             # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-            df['cross_below'] =  (df['1ema'] <= df['POC2']) & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+            df['cross_below'] =  (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
             
             # Get the indices where cross_above or cross_below happens
             #cross_above_indices = df[df['cross_above']].index
