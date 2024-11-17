@@ -30,10 +30,32 @@ from scipy.signal import savgol_filter
 #import yfinance as yf
 #import dateutil.parser
 
+
+def calculate_tema(df, span):
+    ema1 = df['close'].ewm(span=span, adjust=False).mean()
+    ema2 = ema1.ewm(span=span, adjust=False).mean()
+    ema3 = ema2.ewm(span=span, adjust=False).mean()
+    
+    tema = 3 * ema1 - 3 * ema2 + ema3
+    return tema
+
+def calculate_custom_ema(df, span):
+    ema1 = df['close'].ewm(span=span, adjust=False).mean()
+    ema2 = ema1.ewm(span=span, adjust=False).mean()
+    ema3 = ema2.ewm(span=span, adjust=False).mean()
+    ema4 = ema3.ewm(span=span, adjust=False).mean()
+    ema5 = ema4.ewm(span=span, adjust=False).mean()
+    ema6 = ema5.ewm(span=span, adjust=False).mean()
+    ema7 = ema6.ewm(span=span, adjust=False).mean()
+    
+    # Custom formula for a higher-order EMA (you can customize this)
+    custom_ema = 7 * ema1 - 21 * ema2 + 35 * ema3 - 35 * ema4 + 21 * ema5 - 7 * ema6 + ema7
+    return custom_ema
+
 def ema(df):
     df['30ema'] = df['close'].ewm(span=30, adjust=False).mean()
-    #df['35ema'] = df['close'].ewm(span=35, adjust=False).mean()
-    #df['38ema'] = df['close'].ewm(span=38, adjust=False).mean()
+    df['9ema'] = df['close'].ewm(span=9, adjust=False).mean()
+    df['21ema'] = df['close'].ewm(span=21, adjust=False).mean()
     df['40ema'] = df['close'].ewm(span=40, adjust=False).mean()
     #df['28ema'] = df['close'].ewm(span=28, adjust=False).mean()
     #df['25ema'] = df['close'].ewm(span=25, adjust=False).mean()
@@ -491,7 +513,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                [{"colspan": 1},{"type": "table", "rowspan": 2},],
                                [{"colspan": 1},{},],], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') ' (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') 
                          horizontal_spacing=0.01, vertical_spacing=0.00, subplot_titles=(stockName + ' '+strTrend + '('+str(average)+') '+ str(now)+ ' '+ tpString, 'VP ' + str(datetime.now().time()) ), #' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '
-                         column_widths=[0.80,0.20], row_width=[0.12, 0.12, 0.76,] ) #,row_width=[0.30, 0.70,]
+                         column_widths=[0.80,0.20], row_width=[0.12, 0.15, 0.73,] ) #,row_width=[0.30, 0.70,]
 
     
             
@@ -586,12 +608,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #sPercent = sum([i[1] for i in adlist]) * .70
     #tp = valueAreaV1(lst2[0])
     
-
+    
     fig.add_shape(type="rect",
                   y0=num1, y1=num2, x0=-1, x1=len(df),
                   fillcolor="crimson",
                   opacity=0.09,
                   )
+    
 
 
     colo = []
@@ -625,19 +648,34 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                   num1, num2],  opacity=0.5), row=1, col=2)
     
     
-    if 'derivative_1' in df.columns:
+    if 'POC' in df.columns:
         #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_2'], mode='lines',name='Derivative_2'), row=2, col=1)
-        fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_1'], mode='lines',name='Derivative_1'), row=2, col=1)
-        fig.add_trace(go.Scatter(x=df['time'], y=df['kalman_velocity'], mode='lines',name='kalman_velocity'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_1'], mode='lines',name='Derivative_1'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative'], mode='lines',name='Derivative'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['kalman_velocity'], mode='lines',name='kalman_velocity'), row=2, col=1)
+        fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['lfilter'], mode='lines',name='lfilter'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['holt_winters'], mode='lines',name='holt_winters'), row=2, col=1)
+        
+        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df[str(clusterNum)+'ema'], mode='lines',name=str(clusterNum)+'ema'), row=2, col=1)
+        fig.add_trace(go.Scatter(x=df['time'], y=df['lsf'], mode='lines',name='lsf'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['lsfreal_time'], mode='lines',name='lsfreal_time'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'), row=2, col=1)
 
-    fig.add_hline(y=0, row=2, col=1)
+
+    #fig.add_hline(y=0, row=2, col=1)
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['9ema'], mode='lines',name='9ema'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['21ema'], mode='lines',name='21ema'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2'))
     
     
     if 'POC' in df.columns:
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
@@ -1096,7 +1134,179 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     '''
     
     
-        
+    if '19:00:00' in df['time'].values or '19:01:00' in df['time'].values:
+        if '19:00:00' in df['time'].values:
+            opstr = '19:00:00'
+        elif '19:01:00' in df['time'].values:
+            opstr = '19:01:00'
+            
+        fig.add_vline(x=df[df['time'] == opstr].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top right', row=1, col=1)
+        '''
+        fig.add_trace(go.Scatter(x=df['time'],
+                                y= [df['open'][df[df['time'] == '19:00:00'].index[0]]]*len(df['time']) ,
+                                line_color='black',
+                                text = str(df['open'][df[df['time'] == '19:00:00'].index[0]]),
+                                textposition="bottom left",
+                                name='Toyko Open',
+                                showlegend=False,
+                                visible=False,
+                                mode= 'lines',
+                                ))
+        '''
+        if '01:00:00' in df['time'].values:
+            fig.add_vline(x=df[df['time'] == '01:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Sydney Close', annotation_position='top left', row=1, col=1)
+            '''
+            tempDf = df.loc[:df[df['time'] == '01:00:00'].index[0]]
+            min_low = tempDf['low'].min()
+            max_high = tempDf['high'].max()
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [min_low]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(min_low),
+                                    textposition="bottom left",
+                                    name='Sydney Low',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [max_high]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(max_high),
+                                    textposition="bottom left",
+                                    name='Sydney High',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [df['close'][df[df['time'] == '00:58:00'].index[0]]]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(df['close'][df[df['time'] == '00:58:00'].index[0]]),
+                                    textposition="bottom left",
+                                    name='Sydney Close',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            '''
+            
+
+        if '02:00:00' in df['time'].values:
+            fig.add_vline(x=df[df['time'] == '02:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='London Open', annotation_position='top right', row=1, col=1)
+            '''
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [df['open'][df[df['time'] == '02:00:00'].index[0]]]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(df['open'][df[df['time'] == '02:00:00'].index[0]]),
+                                    textposition="bottom left",
+                                    name='London Open',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            '''
+    
+        if '04:00:00' in df['time'].values:
+            fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top right', row=1, col=1)
+            '''
+            tempDf = df.loc[df[df['time'] == opstr].index[0]:df[df['time'] == '04:00:00'].index[0]]
+            max_high = tempDf['high'].max()
+            min_low = tempDf['low'].min()
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [max_high]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(max_high),
+                                    textposition="bottom left",
+                                    name='Toyko High',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [min_low]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(min_low),
+                                    textposition="bottom left",
+                                    name='Toyko Low',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [df['close'][df[df['time'] == '03:58:00'].index[0]]]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(df['close'][df[df['time'] == '03:58:00'].index[0]]),
+                                    textposition="bottom left",
+                                    name='Toyko Close',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            '''
+            
+
+            
+        if '08:00:00' in df['time'].values:
+            fig.add_vline(x=df[df['time'] == '08:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='NewYork Open', annotation_position='top left', row=1, col=1)
+            '''
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [df['open'][df[df['time'] == '08:00:00'].index[0]]]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(df['open'][df[df['time'] == '08:00:00'].index[0]]),
+                                    textposition="bottom left",
+                                    name='NewYork Open',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            '''
+    
+        if '11:00:00' in df['time'].values:
+            fig.add_vline(x=df[df['time'] == '11:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='London Close', annotation_position='top left', row=1, col=1)
+            '''
+            tempDf = df.loc[df[df['time'] == '02:00:00'].index[0]:df[df['time'] == '11:00:00'].index[0]]
+            max_high = tempDf['high'].max()
+            min_low = tempDf['low'].min()
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [max_high]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(max_high),
+                                    textposition="bottom left",
+                                    name='London High',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [min_low]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(min_low),
+                                    textposition="bottom left",
+                                    name='London Low',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [df['close'][df[df['time'] == '10:58:00'].index[0]]]*len(df['time']) ,
+                                    line_color='black',
+                                    text = str(df['close'][df[df['time'] == '10:58:00'].index[0]]),
+                                    textposition="bottom left",
+                                    name='London Close',
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ))
+            '''
+            
             
         
     
@@ -1469,21 +1679,75 @@ def calculate_macd(df, short_window=12, long_window=26, signal_window=9, use_avg
     #return df[['MACD', 'Signal', 'Histogram', 'Positive_Histogram', 'Negative_Histogram']]
 
 
+def least_squares_filter(data, window_size, poly_order=2):
+    """
+    Applies a least squares polynomial fit to a moving window of the data.
+    
+    Parameters:
+    data (pd.Series): The input data series.
+    window_size (int): The number of data points in the moving window.
+    poly_order (int): The order of the polynomial for curve fitting.
+    
+    Returns:
+    pd.Series: The filtered data series.
+    """
+    half_window = window_size // 2
+    filtered_data = []
 
+    for i in range(len(data)):
+        # Define the window boundaries
+        start = max(0, i - half_window)
+        end = min(len(data), i + half_window + 1)
+
+        # Get the window of data
+        window_data = data[start:end]
+        x = np.arange(len(window_data))
+        
+        # Fit a polynomial of the specified order to the window
+        coefficients = np.polyfit(x, window_data, poly_order)
+        poly_func = np.poly1d(coefficients)
+        
+        # Estimate the current value using the polynomial fit
+        filtered_value = poly_func(half_window if i >= half_window else i)
+        filtered_data.append(filtered_value)
+
+    return pd.Series(filtered_data, index=data.index)
+
+
+def least_squares_filter_real_time(data, window_size, poly_order=2):
+    filtered_data = []
+
+    for i in range(len(data)):
+        start = max(0, i - window_size + 1)
+        window_data = data[start:i + 1]
+        x = np.arange(len(window_data))
+
+        try:
+            # Fit a polynomial to the trailing window
+            coefficients = np.polyfit(x, window_data, poly_order)
+            poly_func = np.poly1d(coefficients)
+            filtered_value = poly_func(len(window_data) - 1)
+        except np.linalg.LinAlgError:
+            # Handle the error by falling back to a simple estimate
+            filtered_value = window_data.iloc[-1]  # or use np.mean(window_data)
+
+        filtered_data.append(filtered_value)
+
+    return pd.Series(filtered_data, index=data.index)
+
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from concurrent.futures import ThreadPoolExecutor    
 def download_data(bucket_name, blob_name):
     blob = Blob(blob_name, bucket_name)
     return blob.download_as_text()    
 
-#symbolNumList = ['118', '4358', '42012334', '392826', '393','163699', '935', '11232']
-#symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY']
 
 symbolNumList = ['183748', '106364', '42006053', '258644', '393','163699', '913', '42018437', '4127886', '147644', '146415', '39545', '148217', '3786', '146417']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', '6E', '6J', 'SI', '6A', '6N', '6B']
 
 intList = ['1','2','3','4','5','6','10','15']
 
-vaildClust = [str(i) for i in range(2,200)]
+vaildClust = [str(i) for i in range(0,200)]
 
 vaildTPO = [str(i) for i in range(1,500)]
 
@@ -1532,8 +1796,9 @@ styles = {
 
 #import pandas_ta as ta
 #from collections import Counter
-from filterpy.kalman import KalmanFilter
+#from filterpy.kalman import KalmanFilter
 from google.api_core.exceptions import NotFound
+from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 400000  # Initial interval #210000#250000#80001
 subsequent_inter = 45000  # Subsequent interval
@@ -1579,7 +1844,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-curvature', type='text', style=styles['input']),
             html.Button('Submit', id='submit-curvature', n_clicks=0, style=styles['button']),
-            html.Div(id='curvature-button-basic', children="Curvature Line for D1 : 1 - 500 has to be odd number, default = 12", style=styles['label']),
+            html.Div(id='curvature-button-basic', children="Curvature Line for D1 : 1 - 500 has to be odd number, default = 10", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='curvature-value'),
         
@@ -1756,7 +2021,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         tpoNum = '100'
         
     if curvature not in vaildTPO:
-        curvature = '12'
+        curvature = '8'
         
     if curvatured2 not in vaildTPO:
         curvatured2 = '10'
@@ -1874,7 +2139,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['uppervwapAvg'] = df['STDEV_25'].cumsum() / (df.index + 1)
     df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
-
+    
+    # Apply TEMA calculation to the DataFrame
+    
     
     
     
@@ -1922,10 +2189,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     va = valueAreaV1(hs[0])
     
-    
+    df[clustNum+'ema'] = df['close'].ewm(span=int(clustNum), adjust=False).mean()
 
     x = np.array([i for i in range(len(df))])
-    y = np.array([i for i in df['40ema']])
+    y = np.array([i for i in df[clustNum+'ema']])
     
     
 
@@ -1936,11 +2203,14 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     # derivative of y with respect to x
     df_dx = derivative(f, x_fake, dx=1e-6)
     df_dx = np.pad(df_dx, (1, 0), 'edge')
-    #df['derivative'] = np.gradient(df['40ema'])
+    
+    df['derivative'] = df_dx
+    #df['derivative'] = df['derivative'].ewm(span=int(4), adjust=False).mean()
+    #df['derivative'] = np.gradient(df[clustNum+'ema'])
     
     #df['avg_price'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
-    df[clustNum+'ema'] = df['close'].ewm(span=int(clustNum), adjust=False).mean()
-
+    
+    '''
     
     # Define window size and polynomial order
     window_size = 25 # Must be odd
@@ -1950,7 +2220,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     # Apply Savitzky-Golay filter to compute the first derivative
     try:
         
-        df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvature), polyorder=poly_order, deriv=1)
+        df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvature), polyorder=poly_order, deriv=1, )
         df['derivative_2'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvatured2), polyorder=poly_order, deriv=2)
     except(ValueError):
         pass
@@ -2003,8 +2273,36 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['kalman_velocity'] = velocities
     df['kalman_acceleration'] = accelerations
     
-    df['kalman_velocity'] = df['kalman_velocity'].ewm(span=int(curvatured2), adjust=False).mean()
+    df['kalman_velocity'] = df['kalman_velocity'].ewm(span=1, adjust=False).mean()
+    '''
+    
+    order = 1     # Filter order
+    cutoff = 0.2  # Cutoff frequency, adjust based on desired smoothness
+    
+    # Design a low-pass Butterworth filter
+    b, a = butter(N=order, Wn=cutoff, btype='low')
+    
+    # Apply the filtfilt filter to df['30ema']
+    df['filtfilt'] = filtfilt(b, a, df['close'])
+    #df['lfilter'] = lfilter(b, a, df['close'])
+    
+    '''
+    model = ExponentialSmoothing(df[clustNum+'ema'], trend='add', seasonal=None)
+    fit_model = model.fit()
+    
+    # Add smoothed data to the DataFrame
+    df['holt_winters'] = fit_model.fittedvalues
+    
+    df['TEMA'] = calculate_custom_ema(df, span=int(clustNum))
+    '''
 
+    window_size = 3  # Define the window size
+    poly_order = 1   # Polynomial order (e.g., 2 for quadratic fit)
+    #df['lsfreal_time'] = least_squares_filter_real_time(df['close'], window_size, poly_order)
+    df['lsf'] = least_squares_filter(df['close'], window_size, poly_order)
+    df['lsf'] = df['lsf'].ewm(span=int(1), adjust=False).mean()
+    
+    #df['lsfreal_time'] = df['lsfreal_time'].ewm(span=1, adjust=False).mean()
     
      
     mTrade = sorted(AllTrades, key=lambda d: d[1], reverse=True)
@@ -2193,7 +2491,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         csv_rows.append(row)
         
     try:   
-        previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0], csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1], csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2], csv_rows[[i[4] for i in csv_rows].index(symbolNum)][6] ]
+        previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0], csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1], csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
     except(ValueError):
         previousDay = []
     
@@ -2219,14 +2517,14 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
             df['POC2']  = pd.Series(pocc + [pocc[len(pocc)-1]]*(len(df)-len(pocc)))
             #df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
-            df['POCDistance'] = ((df['1ema'] - df['POC2']) / ((df['1ema'] + df['POC2']) / 2)) * 100
+            df['POCDistance'] = ((df['lsf'] - df['POC']) / ((df['lsf'] + df['POC']) / 2)) * 100
             
             
             #chhk = "2" if toggle == '1' else "1" 
-            df['cross_above'] = (df['derivative_1'] >= 0) &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+            df['cross_above'] = (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
             # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-            df['cross_below'] =  (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+            df['cross_below'] = (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
             
             # Get the indices where cross_above or cross_below happens
             #cross_above_indices = df[df['cross_above']].index
