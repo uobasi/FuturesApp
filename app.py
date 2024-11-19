@@ -1738,7 +1738,7 @@ def least_squares_filter_real_time(data, window_size, poly_order=2):
 
     return pd.Series(filtered_data, index=data.index)
 
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
+#from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from concurrent.futures import ThreadPoolExecutor    
 def download_data(bucket_name, blob_name):
     blob = Blob(blob_name, bucket_name)
