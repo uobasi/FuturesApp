@@ -653,7 +653,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_1'], mode='lines',name='Derivative_1'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative'], mode='lines',name='Derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['kalman_velocity'], mode='lines',name='kalman_velocity'), row=2, col=1)
-        fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
         #fig.add_trace(go.Scatter(x=df['time'], y=df['lfilter'], mode='lines',name='lfilter'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['holt_winters'], mode='lines',name='holt_winters'), row=2, col=1)
         
@@ -1133,7 +1133,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                             ))
     '''
     
-    
+    '''
     if '19:00:00' in df['time'].values or '19:01:00' in df['time'].values:
         if '19:00:00' in df['time'].values:
             opstr = '19:00:00'
@@ -1141,7 +1141,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             opstr = '19:01:00'
             
         fig.add_vline(x=df[df['time'] == opstr].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top right', row=1, col=1)
-        '''
+        
         fig.add_trace(go.Scatter(x=df['time'],
                                 y= [df['open'][df[df['time'] == '19:00:00'].index[0]]]*len(df['time']) ,
                                 line_color='black',
@@ -1152,10 +1152,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                 visible=False,
                                 mode= 'lines',
                                 ))
-        '''
+        
         if '01:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '01:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Sydney Close', annotation_position='top left', row=1, col=1)
-            '''
+            
             tempDf = df.loc[:df[df['time'] == '01:00:00'].index[0]]
             min_low = tempDf['low'].min()
             max_high = tempDf['high'].max()
@@ -1191,12 +1191,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
-            '''
+            
             
 
         if '02:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '02:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='London Open', annotation_position='top right', row=1, col=1)
-            '''
+            
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [df['open'][df[df['time'] == '02:00:00'].index[0]]]*len(df['time']) ,
                                     line_color='black',
@@ -1207,11 +1207,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
-            '''
+            
     
         if '04:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top right', row=1, col=1)
-            '''
+            
             tempDf = df.loc[df[df['time'] == opstr].index[0]:df[df['time'] == '04:00:00'].index[0]]
             max_high = tempDf['high'].max()
             min_low = tempDf['low'].min()
@@ -1248,13 +1248,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
-            '''
+            
             
 
             
         if '08:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '08:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='NewYork Open', annotation_position='top left', row=1, col=1)
-            '''
+            
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [df['open'][df[df['time'] == '08:00:00'].index[0]]]*len(df['time']) ,
                                     line_color='black',
@@ -1265,11 +1265,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
-            '''
+            
     
         if '11:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '11:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='London Close', annotation_position='top left', row=1, col=1)
-            '''
+            
             tempDf = df.loc[df[df['time'] == '02:00:00'].index[0]:df[df['time'] == '11:00:00'].index[0]]
             max_high = tempDf['high'].max()
             min_low = tempDf['low'].min()
@@ -1305,9 +1305,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     visible=False,
                                     mode= 'lines',
                                     ))
-            '''
             
             
+    '''        
         
     
     '''
@@ -1327,7 +1327,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[6] for i in troInterval]), marker_color='crimson'), row=2, col=1)
     '''
     
-    
+    '''
     if 'POCDistance' in df.columns:
         colors = ['maroon']
         for val in range(1,len(df['POCDistance'])):
@@ -1341,21 +1341,24 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                     color='crimson' 
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=3, col=1)
+    '''
+    
+    fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[2]+i[3] for i in OptionTimeFrame]), marker_color='teal'), row=3, col=1)
+    #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[3] for i in OptionTimeFrame]), marker_color='crimson'), row=3, col=1)
         
     
     #fig.add_trace(go.Scatter(x=df['time'], y=df['kalman_velocity'], mode='lines',name='kalman_velocity'), row=3, col=1)
     #fig.add_trace(go.Scatter(x=df['time'], y=df['kalman_acceleration'], mode='lines',name='kalman_acceleration'), row=3, col=1)
     #fig.add_hline(y=0, row=3, col=1)
     
-    '''
-    #fig.add_hline(y=0, row=3, col=1)
+    
     #posti = pd.Series([i[0] if i[0] > 0 else 0  for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] > 0])/len([i[0] for i in difList if i[0] > 0])
     #negati = pd.Series([i[0] if i[0] < 0 else 0 for i in difList]).rolling(9).mean()#sum([i[0] for i in difList if i[0] < 0])/len([i[0] for i in difList if i[0] < 0])
     
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=posti, line=dict(color='teal'), mode='lines', name='Buy VMA'), row=3, col=1)
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=negati, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=3, col=1)
     
-    
+    '''
     #df['Momentum'] = df['Momentum'].fillna(0) ['teal' if val > 0 else 'crimson' for val in df['Momentum']]
     
     colors = ['maroon']
@@ -1735,7 +1738,7 @@ def least_squares_filter_real_time(data, window_size, poly_order=2):
 
     return pd.Series(filtered_data, index=data.index)
 
-#from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from concurrent.futures import ThreadPoolExecutor    
 def download_data(bucket_name, blob_name):
     blob = Blob(blob_name, bucket_name)
@@ -1798,7 +1801,7 @@ styles = {
 #from collections import Counter
 #from filterpy.kalman import KalmanFilter
 from google.api_core.exceptions import NotFound
-from scipy.signal import filtfilt, butter, lfilter
+#from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 400000  # Initial interval #210000#250000#80001
 subsequent_inter = 45000  # Subsequent interval
@@ -2275,7 +2278,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     df['kalman_velocity'] = df['kalman_velocity'].ewm(span=1, adjust=False).mean()
     '''
-    
+    '''
     order = 1     # Filter order
     cutoff = 0.2  # Cutoff frequency, adjust based on desired smoothness
     
@@ -2286,7 +2289,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['filtfilt'] = filtfilt(b, a, df['close'])
     #df['lfilter'] = lfilter(b, a, df['close'])
     
-    '''
+    
     model = ExponentialSmoothing(df[clustNum+'ema'], trend='add', seasonal=None)
     fit_model = model.fit()
     
@@ -2300,7 +2303,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     poly_order = 1   # Polynomial order (e.g., 2 for quadratic fit)
     #df['lsfreal_time'] = least_squares_filter_real_time(df['close'], window_size, poly_order)
     df['lsf'] = least_squares_filter(df['close'], window_size, poly_order)
-    df['lsf'] = df['lsf'].ewm(span=int(1), adjust=False).mean()
+    #df['lsf'] = df['lsf'].ewm(span=int(1), adjust=False).mean()
     
     #df['lsfreal_time'] = df['lsfreal_time'].ewm(span=1, adjust=False).mean()
     
