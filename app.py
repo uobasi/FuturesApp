@@ -2597,7 +2597,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
 #[(i[2]-i[3],i[0]) for i in timeFrame ]
 if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0', port=8080)
-    #app.run_server(debug=False, use_reloader=False)
+    #app.run_server(debug=False, use_reloader=False) 
 
 '''
 import time  
