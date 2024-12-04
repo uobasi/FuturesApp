@@ -58,7 +58,7 @@ def ema(df):
     df['21ema'] = df['close'].ewm(span=21, adjust=False).mean()
     df['40ema'] = df['close'].ewm(span=40, adjust=False).mean()
     #df['28ema'] = df['close'].ewm(span=28, adjust=False).mean()
-    #df['25ema'] = df['close'].ewm(span=25, adjust=False).mean()
+    df['3ema'] = df['close'].ewm(span=3, adjust=False).mean()
     #df['23ema'] = df['close'].ewm(span=23, adjust=False).mean()
     #df['50ema'] = df['close'].ewm(span=50, adjust=False).mean()
     #df['15ema'] = df['close'].ewm(span=15, adjust=False).mean()
@@ -67,7 +67,7 @@ def ema(df):
     #df['100ema'] = df['close'].ewm(span=100, adjust=False).mean()
     #df['150ema'] = df['close'].ewm(span=150, adjust=False).mean()
     #df['200ema'] = df['close'].ewm(span=200, adjust=False).mean()
-    #df['2ema'] = df['close'].ewm(span=2, adjust=False).mean()
+    df['2ema'] = df['close'].ewm(span=2, adjust=False).mean()
     df['1ema'] = df['close'].ewm(span=1, adjust=False).mean()
 
 
@@ -650,22 +650,24 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     if 'POC' in df.columns:
         #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_2'], mode='lines',name='Derivative_2'), row=2, col=1)
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_1'], mode='lines',name='Derivative_1'), row=2, col=1)
+        fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_1'], mode='lines',name='Derivative_1'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative'], mode='lines',name='Derivative'), row=2, col=1)
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['kalman_velocity'], mode='lines',name='kalman_velocity'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
         #fig.add_trace(go.Scatter(x=df['time'], y=df['lfilter'], mode='lines',name='lfilter'), row=2, col=1)
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['holt_winters'], mode='lines',name='holt_winters'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['holt_trend'], mode='lines',name='holt_trend'), row=2, col=1)
         
-        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC'), row=2, col=1)
-        #fig.add_trace(go.Scatter(x=df['time'], y=df[str(clusterNum)+'ema'], mode='lines',name=str(clusterNum)+'ema'), row=2, col=1)
-        fig.add_trace(go.Scatter(x=df['time'], y=df['lsf'], mode='lines',name='lsf'), row=2, col=1)
+        fig.add_trace(go.Scatter(x=df['time'], y=df['rolling_imbalance'], mode='lines',name='rolling_imbalance'), row=3, col=1)
+        
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['lsf'], mode='lines',name='lsf'))
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines',name='1ema'))
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['close'].rolling(window=clusterNum).mean(), mode='lines',name=str(clusterNum)+'ema'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['lsfreal_time'], mode='lines',name='lsfreal_time'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'), row=2, col=1)
 
 
-    #fig.add_hline(y=0, row=2, col=1)
+    fig.add_hline(y=0, row=2, col=1)
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['9ema'], mode='lines',name='9ema'))
@@ -677,8 +679,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
+        fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
       
     #fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.3, name='100ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.3, name='150ema', line=dict(color='black')))
@@ -1307,8 +1309,20 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     ))
             
             
-    '''        
-        
+    '''  
+
+    '''      
+    if '02:00:00' in df['time'].values:
+         fig.add_vline(x=df[df['time'] == '02:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='London Open', annotation_position='top right', row=1, col=1)
+    
+         
+    if '04:00:00' in df['time'].values:
+        fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top right', row=1, col=1)
+     
+    
+    if '08:00:00' in df['time'].values:
+        fig.add_vline(x=df[df['time'] == '08:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='NewYork Open', annotation_position='top left', row=1, col=1)
+    '''    
     
     '''
     difList = [(i[2]-i[3],i[0]) for i in OptionTimeFrame]
@@ -1327,7 +1341,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #fig.add_trace(go.Bar(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[6] for i in troInterval]), marker_color='crimson'), row=2, col=1)
     '''
     
-    '''
+    coll = [    'teal' if i > 0
+                else 'crimson' if i < 0
+                else 'gray' for i in df['imbalance']]
+    fig.add_trace(go.Bar(x=df['time'], y=df['imbalance'], marker_color=coll), row=3, col=1)
+    
+    
+    
     if 'POCDistance' in df.columns:
         colors = ['maroon']
         for val in range(1,len(df['POCDistance'])):
@@ -1340,10 +1360,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                 if df['POCDistance'][val] < df['POCDistance'][val-1]:
                     color='crimson' 
             colors.append(color)
-        fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=3, col=1)
-    '''
+        fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=2, col=1)
     
-    fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[2]+i[3] for i in OptionTimeFrame]), marker_color='teal'), row=3, col=1)
+    
+    #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[2] for i in OptionTimeFrame]), marker_color='teal'), row=3, col=1)
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[3] for i in OptionTimeFrame]), marker_color='crimson'), row=3, col=1)
         
     
@@ -1358,9 +1378,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=posti, line=dict(color='teal'), mode='lines', name='Buy VMA'), row=3, col=1)
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in OptionTimeFrame]), y=negati, line=dict(color='crimson'), mode='lines', name='Sell VMA'), row=3, col=1)
     
-    '''
-    #df['Momentum'] = df['Momentum'].fillna(0) ['teal' if val > 0 else 'crimson' for val in df['Momentum']]
     
+    #df['Momentum'] = df['Momentum'].fillna(0) ['teal' if val > 0 else 'crimson' for val in df['Momentum']]
+    '''
     colors = ['maroon']
     for val in range(1,len(df['Momentum'])):
         if df['Momentum'][val] > 0:
@@ -1372,10 +1392,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             if df['Momentum'][val] < df['Momentum'][val-1]:
                 color='crimson' 
         colors.append(color)
-    fig.add_trace(go.Bar(x=df['time'], y=df['Momentum'], marker_color =colors ), row=2, col=1)
-    '''
+    fig.add_trace(go.Bar(x=df['time'], y=df['Momentum'], marker_color =colors ), row=3, col=1)
     
-    '''
+    
+    
     coll = [     'teal' if i[2] > 0
                 else 'crimson' if i[2] < 0
                 else 'gray' for i in troInterval]
@@ -1536,24 +1556,65 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                 ),)
     
     '''
+    stillbuy = False
+    stillsell = False
+    for p in range(1, len(df)):  # Start from 1 to compare with the previous row
+        if 'buy_signal' in df.columns:
+            # Check if the value of cross_above changed from the previous row
+            if df['buy_signal'][p] != df['buy_signal'][p-1] and not stillbuy :
+                # Add 'Buy' only if cross_above is True after the change
+                stillbuy = True
+                stillsell = False
+                if df['buy_signal'][p]:
+                   fig.add_annotation(x=df['time'][p], y=df['close'][p],
+                                      text='<b>' + 'Buy' + '</b>',
+                                      showarrow=True,
+                                      arrowhead=4,
+                                      font=dict(
+                                          size=8, 
+                                      ),)
+        
+        if 'sell_signal' in df.columns:
+            # Check if the value of cross_below changed from the previous row
+            if df['sell_signal'][p] != df['sell_signal'][p-1] and not stillsell :
+                # Add 'Sell' only if cross_below is True after the change
+                stillsell = True
+                stillbuy = False
+                if df['sell_signal'][p]:
+                    fig.add_annotation(x=df['time'][p], y=df['close'][p],
+                                       text='<b>' + 'Sell' + '</b>',
+                                       showarrow=True,
+                                       arrowhead=4,
+                                       font=dict(
+                                           size=8,
+                                       ),)
+    
+    
+    '''
+    stillbuy = False
+    stillsell = False
     for p in range(1, len(df)):  # Start from 1 to compare with the previous row
         if 'cross_above' in df.columns:
             # Check if the value of cross_above changed from the previous row
-            if df['cross_above'][p] != df['cross_above'][p-1]:
+            if df['cross_above'][p] != df['cross_above'][p-1] and not stillbuy :
                 # Add annotation only if cross_above is True after the change
+                stillbuy = True
+                stillsell = False
                 if df['cross_above'][p]:
                     fig.add_annotation(x=df['time'][p], y=df['close'][p],
                                        text='<b>' + 'Buy' + '</b>',
                                        showarrow=True,
                                        arrowhead=4,
                                        font=dict(
-                                           size=8,
+                                           size=8, 
                                        ),)
         
         if 'cross_below' in df.columns:
             # Check if the value of cross_above changed from the previous row
-            if df['cross_below'][p] != df['cross_below'][p-1]:
+            if df['cross_below'][p] != df['cross_below'][p-1]  and not stillsell :
                 # Add annotation only if cross_above is True after the change
+                stillsell = True
+                stillbuy = False
                 if df['cross_below'][p]:
                     fig.add_annotation(x=df['time'][p], y=df['close'][p],
                                        text='<b>' + 'Sell' + '</b>',
@@ -1562,11 +1623,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                        font=dict(
                                            size=8,
                                        ),)
+    '''
 
 
-    
-    
-    
     fig.update_layout(height=890, xaxis_rangeslider_visible=False, showlegend=False)
     fig.update_xaxes(autorange="reversed", row=1, col=2)
     #fig.update_xaxes(autorange="reversed", row=1, col=3)
@@ -1745,8 +1804,8 @@ def download_data(bucket_name, blob_name):
     return blob.download_as_text()    
 
 
-symbolNumList = ['183748', '106364', '42006053', '258644', '393','163699', '913', '42018437', '4127886', '147644', '146415', '39545', '148217', '3786', '146417']
-symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', '6E', '6J', 'SI', '6A', '6N', '6B']
+symbolNumList = ['183748', '106364', '42006053', '38601', '1551','19222', '902', '42018437', '4127886', '147644', '146415', '5556', '148217', '3786', '146417', '121331']
+symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', '6E', '6J', 'SI', '6A', '6N', '6B', 'MBT']
 
 intList = ['1','2','3','4','5','6','10','15']
 
@@ -1801,10 +1860,10 @@ styles = {
 #from collections import Counter
 #from filterpy.kalman import KalmanFilter
 from google.api_core.exceptions import NotFound
-#from scipy.signal import filtfilt, butter, lfilter
+from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 400000  # Initial interval #210000#250000#80001
-subsequent_inter = 45000  # Subsequent interval
+subsequent_inter = 65000  # Subsequent interval
 app = Dash()
 app.title = "Initial Title"
 app.layout = html.Div([
@@ -2015,16 +2074,16 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '2'
+        interv = '1'
         
     if clustNum not in vaildClust:
-        clustNum = '29'
+        clustNum = '30'
         
     if tpoNum not in vaildTPO:
         tpoNum = '100'
         
     if curvature not in vaildTPO:
-        curvature = '8'
+        curvature = '7'
         
     if curvatured2 not in vaildTPO:
         curvatured2 = '10'
@@ -2213,21 +2272,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     #df['avg_price'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
     
+
+    
+    
     '''
-    
-    # Define window size and polynomial order
-    window_size = 25 # Must be odd
-    poly_order = 2
-    
-    w1=9
-    # Apply Savitzky-Golay filter to compute the first derivative
-    try:
-        
-        df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvature), polyorder=poly_order, deriv=1, )
-        df['derivative_2'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvatured2), polyorder=poly_order, deriv=2)
-    except(ValueError):
-        pass
-    
     
     
     
@@ -2278,9 +2326,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     df['kalman_velocity'] = df['kalman_velocity'].ewm(span=1, adjust=False).mean()
     '''
-    '''
+    
+    
     order = 1     # Filter order
-    cutoff = 0.2  # Cutoff frequency, adjust based on desired smoothness
+    cutoff = 0.04  # Cutoff frequency, adjust based on desired smoothness
     
     # Design a low-pass Butterworth filter
     b, a = butter(N=order, Wn=cutoff, btype='low')
@@ -2289,15 +2338,14 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['filtfilt'] = filtfilt(b, a, df['close'])
     #df['lfilter'] = lfilter(b, a, df['close'])
     
+    from scipy.signal import lfilter_zi
+
+    # Get initial conditions for the filter
+    zi = lfilter_zi(b, a) * df['close'].iloc[0]  # Scale initial conditions to match data
     
-    model = ExponentialSmoothing(df[clustNum+'ema'], trend='add', seasonal=None)
-    fit_model = model.fit()
+    # Apply lfilter with the initialized conditions
+    df['lfilter'], _ = lfilter(b, a, df['close'], zi=zi)
     
-    # Add smoothed data to the DataFrame
-    df['holt_winters'] = fit_model.fittedvalues
-    
-    df['TEMA'] = calculate_custom_ema(df, span=int(clustNum))
-    '''
 
     window_size = 3  # Define the window size
     poly_order = 1   # Polynomial order (e.g., 2 for quadratic fit)
@@ -2306,8 +2354,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     #df['lsf'] = df['lsf'].ewm(span=int(1), adjust=False).mean()
     
     #df['lsfreal_time'] = df['lsfreal_time'].ewm(span=1, adjust=False).mean()
-    
-     
+
     mTrade = sorted(AllTrades, key=lambda d: d[1], reverse=True)
     
     [mTrade[i].insert(4,i) for i in range(len(mTrade))] 
@@ -2500,6 +2547,35 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     #calculate_macd(df)
     #calculate_macd(df, short_window=30, long_window=50, signal_window=10, use_avg_price=True)
+    
+    # Define window size and polynomial order
+    window_size = 25 # Must be odd
+    poly_order = 2
+    threshold = 0.262
+    rollingThres = 0.03
+    
+    
+    df['total_buys'] =  [i[2] for i in stored_data['timeFrame']]
+    df['total_sells'] = [i[3] for i in stored_data['timeFrame']]
+    
+    # Calculate imbalance
+    df['imbalance'] = (df['total_buys'] - df['total_sells']) / (df['total_buys'] + df['total_sells'])
+    
+    window = 10  # Rolling window size in minutes
+    df['rolling_buys'] = df['total_buys'].rolling(window=window).sum()
+    df['rolling_sells'] = df['total_sells'].rolling(window=window).sum()
+    
+    df['rolling_imbalance'] = (df['rolling_buys'] - df['rolling_sells']) / (df['rolling_buys'] + df['rolling_sells'])
+
+    df['dominance'] = df['total_buys'] > df['total_sells']
+    # Apply Savitzky-Golay filter to compute the first derivative
+    try:
+        
+        df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvature), polyorder=poly_order, deriv=1)
+        #df['smoothed_derivative'] = savgol_filter(df['derivative'], window_length=int(curvature), polyorder=poly_order, deriv=1)
+        #df['derivative_2'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvatured2), polyorder=poly_order, deriv=2)
+    except(ValueError):
+        pass
     try:
         
         blob = Blob('POCData'+str(symbolNum), bucket) 
@@ -2518,20 +2594,19 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
             df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
             df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
-            df['POC2']  = pd.Series(pocc + [pocc[len(pocc)-1]]*(len(df)-len(pocc)))
+            #df['POC2']  = pd.Series(pocc + [pocc[len(pocc)-1]]*(len(df)-len(pocc)))
             #df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
-            df['POCDistance'] = ((df['lsf'] - df['POC']) / ((df['lsf'] + df['POC']) / 2)) * 100
-            
+            df['POCDistance'] = df['derivative_1']#((df['derivative_1'] - df['POC']) / ((df['derivative_1'] + df['POC']) / 2)) * 100
             
             #chhk = "2" if toggle == '1' else "1" 
-            df['cross_above'] = (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+            df['cross_above'] = (df['lsf'] >= df['POC']) & (df['derivative_1'] > 0)  #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
             # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-            df['cross_below'] = (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
-            
-            # Get the indices where cross_above or cross_below happens
-            #cross_above_indices = df[df['cross_above']].index
-            #cross_below_indices = df[df['cross_below']].index
+            df['cross_below'] = (df['lsf'] <= df['POC']) & (df['derivative_1'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+
+            df['buy_signal'] = (df['cross_above']) & (df['imbalance'] >= threshold) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
+            df['sell_signal'] = (df['cross_below']) & (df['imbalance'] <= -threshold) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
+
             
         '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
@@ -2589,9 +2664,11 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     if sname != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
         interval_time = initial_inter
+        
+    
     
     fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
-
+ 
     return stored_data, fg, previous_stkName, previous_interv, previous_tpoNum, interval_time
 
 #[(i[2]-i[3],i[0]) for i in timeFrame ]
