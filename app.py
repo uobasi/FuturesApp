@@ -27,6 +27,8 @@ pio.renderers.default='browser'
 import bisect
 from collections import defaultdict
 from scipy.signal import savgol_filter
+from scipy.stats import linregress
+from scipy.ndimage import gaussian_filter1d
 #import yfinance as yf
 #import dateutil.parser
 
@@ -62,7 +64,7 @@ def ema(df):
     #df['23ema'] = df['close'].ewm(span=23, adjust=False).mean()
     #df['50ema'] = df['close'].ewm(span=50, adjust=False).mean()
     #df['15ema'] = df['close'].ewm(span=15, adjust=False).mean()
-    #df['20ema'] = df['close'].ewm(span=20, adjust=False).mean()
+    df['20ema'] = df['close'].ewm(span=20, adjust=False).mean()
     #df['10ema'] = df['close'].ewm(span=10, adjust=False).mean()
     #df['100ema'] = df['close'].ewm(span=100, adjust=False).mean()
     #df['150ema'] = df['close'].ewm(span=150, adjust=False).mean()
@@ -86,6 +88,20 @@ def vwap(df):
     #df['myvwap'] = df['volume2Sum'] / df['volumeSum'] - df['vwap'].values * df['vwap']
     #tp = (df['low'] + df['close'] + df['high']).div(3).values
     # return df.assign(vwap=(tp * v).cumsum() / v.cumsum())
+    
+
+def vwapCum(df):
+    v = df['volume'].values
+    h = df['high'].values
+    l = df['low'].values
+    # print(v)
+    df['vwapCum'] = np.cumsum(v*(h+l)/2) / np.cumsum(v)
+    df['volumeSumCum'] = df['volume'].cumsum()
+    df['volume2SumCum'] = (v*((h+l)/2)*((h+l)/2)).cumsum()
+    #df['disVWAP'] = (abs(df['close'] - df['vwap']) / ((df['close'] + df['vwap']) / 2)) * 100
+    #df['disVWAPOpen'] = (abs(df['open'] - df['vwap']) / ((df['open'] + df['vwap']) / 2)) * 100
+    #df['disEMAtoVWAP'] = ((df['close'].ewm(span=12, adjust=False).mean() - df['vwap'])/df['vwap']) * 100
+
 
 
 def sigma(df):
@@ -94,6 +110,17 @@ def sigma(df):
     except(ZeroDivisionError):
         val = df.volume2Sum / (df.volumeSum+0.000000000001) - df.vwap * df.vwap
     return math.sqrt(val) if val >= 0 else val
+
+
+def sigmaCum(df):
+    try:
+        val = df.volume2SumCum / df.volumeSumCum - df.vwapCum * df.vwapCum
+    except(ZeroDivisionError):
+        val = df.volume2SumCum / (df.volumeSumCum+0.000000000001) - df.vwapCum * df.vwapCum
+    return math.sqrt(val) if val >= 0 else val
+
+
+
 
 
 def PPP(df):
@@ -119,6 +146,53 @@ def PPP(df):
     
     df['STDEV_25'] = df.vwap + stdev_multiple_25 * df['STDEV_TV']
     df['STDEV_N25'] = df.vwap - stdev_multiple_25 * df['STDEV_TV']
+
+
+
+def PPPCum(df):
+
+    df['STDEV_TVCum'] = df.apply(sigmaCum, axis=1)
+    stdev_multiple_0_25 = 0.25
+    stdev_multiple_0 = 0.50
+    stdev_multiple_0_75 = 0.75
+    stdev_multiple_1 = 1
+    stdev_multiple_1_25 = 1.25
+    stdev_multiple_1_5 = 1.5
+    stdev_multiple_1_75 = 1.75
+    stdev_multiple_2 = 2.00
+    stdev_multiple_2_25 = 2.25
+    stdev_multiple_25 = 2.50
+    
+    df['STDEV_025Cum'] = df.vwapCum + stdev_multiple_0_25 * df['STDEV_TVCum']
+    df['STDEV_N025Cum'] = df.vwapCum - stdev_multiple_0_25 * df['STDEV_TVCum']
+
+    df['STDEV_0Cum'] = df.vwapCum + stdev_multiple_0 * df['STDEV_TVCum']
+    df['STDEV_N0Cum'] = df.vwapCum - stdev_multiple_0 * df['STDEV_TVCum']
+    
+    df['STDEV_075Cum'] = df.vwapCum + stdev_multiple_0_75 * df['STDEV_TVCum']
+    df['STDEV_N075Cum'] = df.vwapCum - stdev_multiple_0_75 * df['STDEV_TVCum']
+
+    df['STDEV_1Cum'] = df.vwapCum + stdev_multiple_1 * df['STDEV_TVCum']
+    df['STDEV_N1Cum'] = df.vwapCum - stdev_multiple_1 * df['STDEV_TVCum']
+    
+    df['STDEV_125Cum'] = df.vwapCum + stdev_multiple_1_25 * df['STDEV_TVCum']
+    df['STDEV_N125Cum'] = df.vwapCum - stdev_multiple_1_25 * df['STDEV_TVCum']
+    
+    df['STDEV_15Cum'] = df.vwapCum + stdev_multiple_1_5 * df['STDEV_TVCum']
+    df['STDEV_N15Cum'] = df.vwapCum - stdev_multiple_1_5 * df['STDEV_TVCum']
+    
+    df['STDEV_175Cum'] = df.vwapCum + stdev_multiple_1_75 * df['STDEV_TVCum']
+    df['STDEV_N175Cum'] = df.vwapCum - stdev_multiple_1_75 * df['STDEV_TVCum']
+
+    df['STDEV_2Cum'] = df.vwapCum + stdev_multiple_2 * df['STDEV_TVCum']
+    df['STDEV_N2Cum'] = df.vwapCum - stdev_multiple_2 * df['STDEV_TVCum']
+    
+    df['STDEV_225Cum'] = df.vwapCum + stdev_multiple_2_25 * df['STDEV_TVCum']
+    df['STDEV_N225Cum'] = df.vwapCum - stdev_multiple_2_25 * df['STDEV_TVCum']
+    
+    df['STDEV_25Cum'] = df.vwapCum + stdev_multiple_25 * df['STDEV_TVCum']
+    df['STDEV_N25Cum'] = df.vwapCum - stdev_multiple_25 * df['STDEV_TVCum']
+
 
 
 def VMA(df):
@@ -345,9 +419,10 @@ def valueAreaV1(lst):
     return [lst[topIndex][0], lst[dwnIndex][0], lst[pocIndex][0]]
 '''
 def valueAreaV1(lst):
+    print(lst)
     mkk = [i for i in lst if i[1] > 0]
     if len(mkk) == 0:
-        mkk = hs[0]
+        mkk = lst
     for xm in range(len(mkk)):
         mkk[xm][2] = xm
         
@@ -433,6 +508,56 @@ def valueAreaV1(lst):
         # time.sleep(3)
 
     return [mkk[topIndex][0], mkk[dwnIndex][0], mkk[pocIndex][0]]
+
+def valueAreaV3(lst):
+    # Ensure list is not empty
+    if not lst:
+        return [None, None, None]
+
+    # Filter out entries with zero volume
+    mkk = [i for i in lst if i[1] > 0]
+    if not mkk:
+        mkk = lst
+
+    # Assign indices for tracking
+    for idx, item in enumerate(mkk):
+        item[2] = idx
+
+    # Total volume in mkk
+    total_volume = sum([i[1] for i in mkk])
+    if total_volume == 0:
+        return [None, None, None]
+
+    # Identify POC (Point of Control) by maximum volume
+    poc_item = max(mkk, key=lambda x: x[1])
+    pocIndex = poc_item[2]
+    sPercent = total_volume * 0.70  # 70% of total volume
+    accumulated_volume = poc_item[1]  # Start with POC volume
+
+    # Initialize Value Area boundaries
+    topIndex, dwnIndex = pocIndex, pocIndex
+
+    # Expand the value area until 70% of volume is captured
+    while accumulated_volume < sPercent:
+        topVol = mkk[topIndex - 1][1] if topIndex > 0 else 0
+        dwnVol = mkk[dwnIndex + 1][1] if dwnIndex < len(mkk) - 1 else 0
+
+        # Add the larger volume to the total and adjust indices
+        if topVol >= dwnVol:
+            if topIndex > 0:
+                topIndex -= 1
+                accumulated_volume += topVol
+        else:
+            if dwnIndex < len(mkk) - 1:
+                dwnIndex += 1
+                accumulated_volume += dwnVol
+
+        # Break if boundaries are fully expanded
+        if topIndex == 0 and dwnIndex == len(mkk) - 1:
+            break
+
+    # Return Value Area Low, Value Area High, and POC
+    return [mkk[topIndex][0], mkk[dwnIndex][0], poc_item[0]]
 
 
 def find_clusters(numbers, threshold):
@@ -648,19 +773,20 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                   num1, num2],  opacity=0.5), row=1, col=2)
     
     
-    if 'POC' in df.columns:
+    #if 'POC' in df.columns:
         #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_2'], mode='lines',name='Derivative_2'), row=2, col=1)
-        fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_1'], mode='lines',name='Derivative_1'), row=2, col=1)
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative'], mode='lines',name='Derivative'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['ema_slope'], mode='lines',name='ema_slope'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
         #fig.add_trace(go.Scatter(x=df['time'], y=df['lfilter'], mode='lines',name='lfilter'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['holt_trend'], mode='lines',name='holt_trend'), row=2, col=1)
         
-        fig.add_trace(go.Scatter(x=df['time'], y=df['rolling_imbalance'], mode='lines',name='rolling_imbalance'), row=3, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['rolling_imbalance'], mode='lines',name='rolling_imbalance'), row=3, col=1)
         
         #fig.add_trace(go.Scatter(x=df['time'], y=df['lsf'], mode='lines',name='lsf'))
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines',name='1ema'))
+
+
         #fig.add_trace(go.Scatter(x=df['time'], y=df['close'].rolling(window=clusterNum).mean(), mode='lines',name=str(clusterNum)+'ema'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['lsfreal_time'], mode='lines',name='lsfreal_time'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'), row=2, col=1)
@@ -671,7 +797,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['9ema'], mode='lines',name='9ema'))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['21ema'], mode='lines',name='21ema'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['20ema'], mode='lines',name='20ema'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2'))
     
     
@@ -679,8 +805,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
-        fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
       
     #fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.3, name='100ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.3, name='150ema', line=dict(color='black')))
@@ -1347,6 +1473,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     fig.add_trace(go.Bar(x=df['time'], y=df['imbalance'], marker_color=coll), row=3, col=1)
     
     
+    #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[5] for i in troInterval]), marker_color='teal'), row=3, col=1)
+    #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[6] for i in troInterval]), marker_color='crimson'), row=3, col=1)
+    
     
     if 'POCDistance' in df.columns:
         colors = ['maroon']
@@ -1801,7 +1930,22 @@ def least_squares_filter_real_time(data, window_size, poly_order=2):
 from concurrent.futures import ThreadPoolExecutor    
 def download_data(bucket_name, blob_name):
     blob = Blob(blob_name, bucket_name)
-    return blob.download_as_text()    
+    return blob.download_as_text()   
+
+
+def download_daily_data(bucket, stkName):
+    """Download and process the daily data."""
+    blob = Blob('Daily' + stkName, bucket)
+    buffer = io.BytesIO()
+    blob.download_to_file(buffer)
+    buffer.seek(0)
+    
+    # Read CSV and keep only required columns
+    columns_to_keep = ['open', 'high', 'low', 'close', 'volume']
+    prevDf = pd.read_csv(buffer, usecols=columns_to_keep)
+    
+    return prevDf
+
 
 
 symbolNumList = ['183748', '106364', '42006053', '38601', '1551','19222', '902', '42018437', '4127886', '147644', '146415', '5556', '148217', '3786', '146417', '121331']
@@ -1815,6 +1959,7 @@ vaildTPO = [str(i) for i in range(1,500)]
 
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
+#abg = download_data(bucket, 'DailyNQ')
 
 styles = {
     'main_container': {
@@ -1862,8 +2007,8 @@ styles = {
 from google.api_core.exceptions import NotFound
 from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
-initial_inter = 400000  # Initial interval #210000#250000#80001
-subsequent_inter = 65000  # Subsequent interval
+initial_inter = 900000  # Initial interval #210000#250000#80001
+subsequent_inter = 100000  # Subsequent interval
 app = Dash()
 app.title = "Initial Title"
 app.layout = html.Div([
@@ -2077,7 +2222,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         interv = '1'
         
     if clustNum not in vaildClust:
-        clustNum = '30'
+        clustNum = '25'
         
     if tpoNum not in vaildTPO:
         tpoNum = '100'
@@ -2091,6 +2236,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     if sname != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
         stored_data = None
+        
 
 
     
@@ -2098,14 +2244,25 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     print('inFunction '+sname)	
     
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        #if sname != previous_stkName:
+        # Download everything when stock name changes
         futures = [
             executor.submit(download_data, bucket, 'FuturesOHLC' + str(symbolNum)),
-            executor.submit(download_data, bucket, 'FuturesTrades' + str(symbolNum))
-        ]
+            executor.submit(download_data, bucket, 'FuturesTrades' + str(symbolNum)),]
+            #executor.submit(download_daily_data, bucket, stkName)]
         
-        # Wait for all downloads to complete
-        FuturesOHLC, FuturesTrades = [future.result() for future in futures]
+        FuturesOHLC, FuturesTrades = [future.result() for future in futures] #, prevDf
+        '''
+        else:
+            # Skip daily data when stock name is unchanged
+            futures = [
+                executor.submit(download_data, bucket, 'FuturesOHLC' + str(symbolNum)),
+                executor.submit(download_data, bucket, 'FuturesTrades' + str(symbolNum))]
+            
+            FuturesOHLC, FuturesTrades = [future.result() for future in futures]
+            prevDf = None  # No new daily data download
+        '''
     
     # Process data with pandas directly
     FuturesOHLC = pd.read_csv(io.StringIO(FuturesOHLC), header=None)
@@ -2202,11 +2359,19 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
     
+    '''
     # Apply TEMA calculation to the DataFrame
-    
-    
-    
-    
+    if prevDf is not None:
+        columns_to_keep = ['open', 'high', 'low', 'close', 'volume']
+        prevDf_filtered = prevDf[columns_to_keep]
+        #df_filtered = df[columns_to_keep]
+        
+        # Combine the two DataFrames row-wise
+        #combined_df = pd.concat([prevDf_filtered, df_filtered], ignore_index=True)
+        
+        #vwapCum(combined_df)
+        #PPPCum(combined_df)    
+    '''
 
     '''
     blob = Blob('FuturesTrades'+str(symbolNum), bucket) 
@@ -2249,7 +2414,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     hs = historV1(df,100,{},AllTrades,[])
     
-    va = valueAreaV1(hs[0])
+    va = valueAreaV3(hs[0])
     
     df[clustNum+'ema'] = df['close'].ewm(span=int(clustNum), adjust=False).mean()
 
@@ -2267,11 +2432,15 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df_dx = np.pad(df_dx, (1, 0), 'edge')
     
     df['derivative'] = df_dx
+    
+    
+
+    # Smooth the derivative using Gaussian filter
+    df['smoothed_derivative'] = gaussian_filter1d(df['derivative'], sigma=2)
     #df['derivative'] = df['derivative'].ewm(span=int(4), adjust=False).mean()
     #df['derivative'] = np.gradient(df[clustNum+'ema'])
     
     #df['avg_price'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
-    
 
     
     
@@ -2327,7 +2496,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['kalman_velocity'] = df['kalman_velocity'].ewm(span=1, adjust=False).mean()
     '''
     
-    
+    '''
     order = 1     # Filter order
     cutoff = 0.04  # Cutoff frequency, adjust based on desired smoothness
     
@@ -2345,12 +2514,12 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     # Apply lfilter with the initialized conditions
     df['lfilter'], _ = lfilter(b, a, df['close'], zi=zi)
-    
+    '''
 
     window_size = 3  # Define the window size
     poly_order = 1   # Polynomial order (e.g., 2 for quadratic fit)
     #df['lsfreal_time'] = least_squares_filter_real_time(df['close'], window_size, poly_order)
-    df['lsf'] = least_squares_filter(df['close'], window_size, poly_order)
+    df['lsf'] = least_squares_filter(df['1ema'], window_size, poly_order)
     #df['lsf'] = df['lsf'].ewm(span=int(1), adjust=False).mean()
     
     #df['lsfreal_time'] = df['lsfreal_time'].ewm(span=1, adjust=False).mean()
@@ -2414,12 +2583,16 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         stored_data['timeFrame'] = stored_data['timeFrame'][:len(stored_data['timeFrame'])-1] + timeFrame
         
         bful = []
+        valist = []
         for it in range(len(make)):
             if it+1 < len(make):
                 tempList = AllTrades[0:make[it+1][2]]
             else:
                 tempList = AllTrades
-            #print(make[0][2],make[it+1][2], len(tempList))
+                
+            hstp = historV1(df[:startIndex+it],100,{}, tempList, [])
+            vA = valueAreaV3(hstp[0])
+            valist.append(vA  + [df['timestamp'][startIndex+it], df['time'][startIndex+it]])
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
             
             timestamp_s = make[it][0] / 1_000_000_000
@@ -2434,6 +2607,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         dst = [[bful[row][0], bful[row][1], 0, bful[row][2], 0, bful[row][3], bful[row][4]] for row in  range(len(bful))]
         
         stored_data['tro'] = stored_data['tro'][:len(stored_data['tro'])-1] + dst
+        stored_data['pdata'] = stored_data['pdata'][:len(stored_data['pdata'])-1] + valist
+
         
         bolist = [0]
         for i in range(len(stored_data['tro'])-1):
@@ -2465,6 +2640,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
                 tempList = AllTrades[make[tr][2]:make[tr+1][2]]
             else:
                 tempList = AllTrades[make[tr][2]:len(AllTrades)]
+            
+            #secList = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
             for i in tempList:
                 if i[5] == 'B':
                     timeDict[make[tr][1]][0] += i[1]
@@ -2489,11 +2666,17 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
         
         bful = []
+        valist =[]
         for it in range(len(make)):
             if it+1 < len(make):
                 tempList = AllTrades[0:make[it+1][2]]
             else:
                 tempList = AllTrades
+            
+            temphs = historV1(df[:it+1],100,{}, tempList, [])
+            vA = valueAreaV3(temphs[0])
+            valist.append(vA  + [df['timestamp'][it], df['time'][it]])
+            
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
             timestamp_s = make[it][0] / 1_000_000_000
             new_timestamp_s = timestamp_s + (int(interv)*60)
@@ -2513,7 +2696,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
         dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row], bful[row][3], bful[row][4]] for row in  range(len(bful))]
             
-        stored_data = {'timeFrame': timeFrame, 'tro':dst} 
+        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist} 
         
     
     
@@ -2549,10 +2732,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     #calculate_macd(df, short_window=30, long_window=50, signal_window=10, use_avg_price=True)
     
     # Define window size and polynomial order
-    window_size = 25 # Must be odd
-    poly_order = 2
-    threshold = 0.262
-    rollingThres = 0.03
+    #window_size = 25 # Must be odd
+    #poly_order = 2
+    #threshold = 0.262
+    #rollingThres = 0.12
     
     
     df['total_buys'] =  [i[2] for i in stored_data['timeFrame']]
@@ -2561,23 +2744,26 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     # Calculate imbalance
     df['imbalance'] = (df['total_buys'] - df['total_sells']) / (df['total_buys'] + df['total_sells'])
     
-    window = 10  # Rolling window size in minutes
-    df['rolling_buys'] = df['total_buys'].rolling(window=window).sum()
-    df['rolling_sells'] = df['total_sells'].rolling(window=window).sum()
+    #window = 5  # Rolling window size in minutes
+    #df['rolling_buys'] = df['total_buys'].rolling(window=window).sum()
+    #df['rolling_sells'] = df['total_sells'].rolling(window=window).sum()
     
-    df['rolling_imbalance'] = (df['rolling_buys'] - df['rolling_sells']) / (df['rolling_buys'] + df['rolling_sells'])
+    #df['rolling_imbalance'] = (df['rolling_buys'] - df['rolling_sells']) / (df['rolling_buys'] + df['rolling_sells'])
 
-    df['dominance'] = df['total_buys'] > df['total_sells']
+    #df['dominance'] = df['total_buys'] > df['total_sells']
+    #df['ema_slope'] = df[clustNum+'ema'].rolling(window).apply(lambda x: linregress(range(len(x)), x).slope)
     # Apply Savitzky-Golay filter to compute the first derivative
-    try:
+    #try:
         
-        df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvature), polyorder=poly_order, deriv=1)
-        #df['smoothed_derivative'] = savgol_filter(df['derivative'], window_length=int(curvature), polyorder=poly_order, deriv=1)
+        #df['derivative_1'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvature), polyorder=poly_order, deriv=1)
         #df['derivative_2'] = savgol_filter(df[clustNum+'ema'], window_length=int(curvatured2), polyorder=poly_order, deriv=2)
-    except(ValueError):
-        pass
+    #except(ValueError):
+        #pass
     try:
-        
+        df['LowVA'] = pd.Series([i[0] for i in stored_data['pdata']])
+        df['HighVA'] = pd.Series([i[1] for i in stored_data['pdata']])
+        df['POC'] = pd.Series([i[2] for i in stored_data['pdata']])
+        '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
         POCData = blob.download_as_text()
         csv_reader  = csv.reader(io.StringIO(POCData))
@@ -2594,18 +2780,28 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             df['LowVA'] = pd.Series(LowVA + [LowVA[len(LowVA)-1]]*(len(df)-len(LowVA)))
             df['HighVA'] = pd.Series(HighVA + [HighVA[len(HighVA)-1]]*(len(df)-len(HighVA)))
             df['POC']  = pd.Series(POC + [POC[len(POC)-1]]*(len(df)-len(POC)))
+            '''
             #df['POC2']  = pd.Series(pocc + [pocc[len(pocc)-1]]*(len(df)-len(pocc)))
             #df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
-            df['POCDistance'] = df['derivative_1']#((df['derivative_1'] - df['POC']) / ((df['derivative_1'] + df['POC']) / 2)) * 100
-            
-            #chhk = "2" if toggle == '1' else "1" 
-            df['cross_above'] = (df['lsf'] >= df['POC']) & (df['derivative_1'] > 0)  #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+        df['POCDistance'] = df['smoothed_derivative']#df['derivative_1']#((df['derivative_1'] - df['POC']) / ((df['derivative_1'] + df['POC']) / 2)) * 100
+        
+        #buffer = 0.002  # 0.2% buffer
 
-            # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-            df['cross_below'] = (df['lsf'] <= df['POC']) & (df['derivative_1'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+        # Define the buffer zone
+        #df['upper_buffer'] = df['POC'] * (1 + buffer)
+        #df['lower_buffer'] = df['POC'] * (1 - buffer)
+        
+        df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
+        df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
+        
+        
+        df['cross_above'] = (df['2ema'] >= df['POC']) & (df['smoothed_derivative'] > 0)  #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
-            df['buy_signal'] = (df['cross_above']) & (df['imbalance'] >= threshold) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
-            df['sell_signal'] = (df['cross_below']) & (df['imbalance'] <= -threshold) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
+        # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
+        df['cross_below'] = (df['2ema'] <= df['POC']) & (df['smoothed_derivative'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+
+        df['buy_signal'] = (df['cross_above']) & (df['smoothed_derivative'] > df['positive_mean'])#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
+        df['sell_signal'] = (df['cross_below']) & (df['smoothed_derivative'] < df['negative_mean'])#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
 
             
         '''
@@ -2651,7 +2847,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
      
     try:
-        mboString = str(round((abs(df['HighVA'][len(df)-1] - df['LowVA'][len(df)-1]) / ((df['HighVA'][len(df)-1] + df['LowVA'][len(df)-1]) / 2)) * 100,3))
+        mboString = '('+str(df['positive_mean'].iloc[-1]) + ' | ' + str(df['negative_mean'].iloc[-1])+')'#str(round((abs(df['HighVA'][len(df)-1] - df['LowVA'][len(df)-1]) / ((df['HighVA'][len(df)-1] + df['LowVA'][len(df)-1]) / 2)) * 100,3))
     except(KeyError):
         mboString = ''
 
