@@ -635,8 +635,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     '''
     fig = make_subplots(rows=3, cols=2, shared_xaxes=True, shared_yaxes=True,
                         specs=[[{}, {},],
-                               [{"colspan": 1},{"type": "table", "rowspan": 2},],
-                               [{"colspan": 1},{},],], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') ' (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') 
+                               [{"colspan": 1, "rowspan": 2},{"type": "table", "rowspan": 2},],
+                               [{},{},],], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') ' (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') 
                          horizontal_spacing=0.01, vertical_spacing=0.00, subplot_titles=(stockName + ' '+strTrend + '('+str(average)+') '+ str(now)+ ' '+ tpString, 'VP ' + str(datetime.now().time()) ), #' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '
                          column_widths=[0.80,0.20], row_width=[0.12, 0.15, 0.73,] ) #,row_width=[0.30, 0.70,]
 
@@ -775,7 +775,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     #if 'POC' in df.columns:
         #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_2'], mode='lines',name='Derivative_2'), row=2, col=1)
-    fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['ema_slope'], mode='lines',name='ema_slope'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
@@ -793,7 +793,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'), row=2, col=1)
 
 
-    fig.add_hline(y=0, row=2, col=1)
+    #fig.add_hline(y=0, row=2, col=1)
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['9ema'], mode='lines',name='9ema'))
@@ -1475,7 +1475,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[5] for i in troInterval]), marker_color='teal'), row=3, col=1)
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[6] for i in troInterval]), marker_color='crimson'), row=3, col=1)
-    '''
+    
     
     if 'POCDistance' in df.columns:
         colors = ['maroon']
@@ -1490,7 +1490,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                     color='crimson' 
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=2, col=1)
-        
+     '''   
         
     
     if 'POCDistanceEMA' in df.columns:
@@ -1505,7 +1505,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                 if df['POCDistanceEMA'][val] < df['POCDistanceEMA'][val-1]:
                     color='crimson' 
             colors.append(color)
-        fig.add_trace(go.Bar(x=df['time'], y=df['POCDistanceEMA'], marker_color=colors), row=3, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['POCDistanceEMA'], marker_color=colors), row=2, col=1)
     
     
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[2] for i in OptionTimeFrame]), marker_color='teal'), row=3, col=1)
@@ -1783,7 +1783,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     fig.update_xaxes(showticklabels=False, row=1, col=1)
     fig.update_xaxes(showticklabels=False, row=2, col=2)
     fig.update_xaxes(showticklabels=False, row=2, col=1)
-    fig.update_xaxes(showticklabels=False, row=3, col=1)
+    #fig.update_xaxes(showticklabels=False, row=3, col=1)
     #fig.show(config={'modeBarButtonsToAdd': ['drawline']})
     return fig
 
@@ -1942,6 +1942,20 @@ def least_squares_filter_real_time(data, window_size, poly_order=2):
 
     return pd.Series(filtered_data, index=data.index)
 
+
+def ewm_median(series, span):
+    alpha = 2 / (span + 1)  # Exponential smoothing parameter
+    weights = (1 - alpha) ** np.arange(len(series))[::-1]  # Reverse weights
+    medians = []
+    
+    for i in range(len(series)):
+        current_window = series.iloc[max(0, i - span + 1):i + 1]
+        weighted_values = current_window * weights[-len(current_window):]
+        weighted_values = weighted_values.dropna()
+        medians.append(np.median(weighted_values))
+    
+    return pd.Series(medians, index=series.index)
+
 #from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from concurrent.futures import ThreadPoolExecutor    
 def download_data(bucket_name, blob_name):
@@ -1964,7 +1978,7 @@ def download_daily_data(bucket, stkName):
 
 
 
-symbolNumList = ['183748', '106364', '42006053', '38601', '1551','19222', '902', '42018437', '4127886', '147644', '146415', '5556', '148217', '3786', '146417', '121331', '148071']
+symbolNumList = ['5002', '42288528', '42002868', '615689', '1551','19222', '902', '42001620', '4127886', '42272', '57969', '5556', '52126', '42008173', '29307', '121331', '148071']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL', '6E', '6J', 'SI', '6A', '6N', '6B', 'MBT', 'NIY']
 
 intList = ['1','2','3','4','5','6','10','15']
@@ -2800,7 +2814,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             #df['POC2']  = pd.Series(pocc + [pocc[len(pocc)-1]]*(len(df)-len(pocc)))
             #df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
         df['POCDistance'] = df['smoothed_derivative']#df['derivative_1']#((df['derivative_1'] - df['POC']) / ((df['derivative_1'] + df['POC']) / 2)) * 100
-        df['POCDistanceEMA'] = ((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
+        
         #buffer = 0.002  # 0.2% buffer
 
         # Define the buffer zone
@@ -2810,9 +2824,40 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
+        df['POCDistanceEMA'] = ((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
+        df['POCDistanceEMA'] = gaussian_filter1d(df['POCDistanceEMA'], sigma=int(2))
+        
         df['positive_meanEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         df['negative_meanEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
+        df['positive_medianEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: np.median(x[x > 0]), raw=False)
+        df['negative_medianEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: np.median(x[x < 0]), raw=False)
+        
+        positive_values = df['POCDistanceEMA'].apply(lambda x: x if x > 0 else None)
+        negative_values = df['POCDistanceEMA'].apply(lambda x: x if x < 0 else None)
+        
+        # Calculate EMA separately for positive and negative values
+        df['positive_emaEmaRoll'] = positive_values.ewm(span=50, adjust=False).mean()
+        df['negative_emaEmaRoll'] = negative_values.ewm(span=50, adjust=False).mean()
+        
+        df['rolling_std'] = df['POCDistanceEMA'].rolling(window=3, min_periods=1).std()
+
+
+        df['positive_dynamicEma'] = df['positive_medianEma'] + df['rolling_std']
+        df['negative_dynamicEma'] = df['negative_medianEma'] - df['rolling_std']
+        
+        df['positive_emaEmaRoll_median'] = ewm_median(positive_values, span=100)
+        df['negative_emaEmaRoll_median'] = ewm_median(negative_values, span=100)
+        
+        positive_percentile = np.percentile(df['POCDistanceEMA'], 75)  # 75th percentile
+        negative_percentile = np.percentile(df['POCDistanceEMA'], 25)  # 25th percentile
+        
+        # Assign the calculated percentiles to new columns for reference
+        df['positive_percentile'] = positive_percentile
+        df['negative_percentile'] = negative_percentile
+
+
+                
         #df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].sum() / len(x), raw=False)
         #df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].sum() / len(x), raw=False)
         
@@ -2822,8 +2867,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
         df['cross_below'] = (df['1ema'] <= df['POC']) #& (df['smoothed_derivative'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
 
-        df['buy_signal'] = (df['cross_above']) & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
-        df['sell_signal'] = (df['cross_below']) & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['negative_meanEma'])#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
+        df['buy_signal'] = (df['cross_above']) & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_medianEma'])#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
+        df['sell_signal'] = (df['cross_below']) & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['negative_medianEma'])#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
 
             
         '''
@@ -2869,7 +2914,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
      
     try:
-        mboString = '('+str(round(df['positive_mean'].iloc[-1], 3)) + ' | ' + str(round(df['negative_mean'].iloc[-1], 3))+') --' + ' ('+str(round(df['positive_meanEma'].iloc[-1], 3)) + ' | ' + str(round(df['negative_meanEma'].iloc[-1], 3))+')'#str(round((abs(df['HighVA'][len(df)-1] - df['LowVA'][len(df)-1]) / ((df['HighVA'][len(df)-1] + df['LowVA'][len(df)-1]) / 2)) * 100,3))
+        mboString = '('+str(round(df['positive_mean'].iloc[-1], 3)) + ' | ' + str(round(df['negative_mean'].iloc[-1], 3))+') --' + ' ('+str(round(df['positive_medianEma'].iloc[-1], 3)) + ' | ' + str(round(df['negative_medianEma'].iloc[-1], 3))+')'#str(round((abs(df['HighVA'][len(df)-1] - df['LowVA'][len(df)-1]) / ((df['HighVA'][len(df)-1] + df['LowVA'][len(df)-1]) / 2)) * 100,3))
     except(KeyError):
         mboString = ''
 
