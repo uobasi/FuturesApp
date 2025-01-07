@@ -62,7 +62,7 @@ def ema(df):
     df['40ema'] = df['close'].ewm(span=40, adjust=False).mean()
     #df['28ema'] = df['close'].ewm(span=28, adjust=False).mean()
     df['3ema'] = df['close'].ewm(span=3, adjust=False).mean()
-    #df['23ema'] = df['close'].ewm(span=23, adjust=False).mean()
+    df['5ema'] = df['close'].ewm(span=5, adjust=False).mean()
     #df['50ema'] = df['close'].ewm(span=50, adjust=False).mean()
     #df['15ema'] = df['close'].ewm(span=15, adjust=False).mean()
     df['20ema'] = df['close'].ewm(span=20, adjust=False).mean()
@@ -267,6 +267,7 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[]): #rangt:int=1
         else:
             dct[i[0]] +=  i[1]
     '''
+    pocT = max(dct, key=dct.get)
     
     pzie = [i for i in dct ]#  > 500 list(set(pzie))
     mTradek = sorted(trad, key=lambda d: d[0], reverse=False)
@@ -307,7 +308,7 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[]): #rangt:int=1
     
     sortadlist = sorted(cptemp, key=lambda stock: float(stock[1]), reverse=True)
     
-    return [cptemp,sortadlist]  
+    return [cptemp,sortadlist,pocT]  
 
 
 def countCandle(trad,quot,num1,num2, stkName, quodict):
@@ -777,7 +778,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #if 'POC' in df.columns:
         #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_2'], mode='lines',name='Derivative_2'), row=2, col=1)
     fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['ema_slope'], mode='lines',name='ema_slope'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=df['time'], y=df['positive_threshold'], mode='lines',name='positive_threshold'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['negative_threshold'], mode='lines',name='negative_threshold'))
+    #fig.add_hline(y=70, row=2, col=1)
+    #fig.add_hline(y=30, row=2, col=1)
+    
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
         #fig.add_trace(go.Scatter(x=df['time'], y=df['lfilter'], mode='lines',name='lfilter'), row=2, col=1)
@@ -785,7 +790,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         
     #fig.add_trace(go.Scatter(x=df['time'], y=df['rolling_imbalance'], mode='lines',name='rolling_imbalance'), row=3, col=1)
         
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['lsf'], mode='lines',name='lsf'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_1ema'], mode='lines',name='smoothed_1ema',marker_color='rgba(0,0,0)'))
 
 
         #fig.add_trace(go.Scatter(x=df['time'], y=df['close'].rolling(window=clusterNum).mean(), mode='lines',name=str(clusterNum)+'ema'), row=2, col=1)
@@ -802,11 +807,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2'))
     
     
-    if 'POC' in df.columns:
-        fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
+    #if 'POC' in df.columns:
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
       
     #fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.3, name='100ema', line=dict(color='black')))
@@ -1493,7 +1498,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=3, col=1)
         
         
-    
+
     if 'POCDistanceEMA' in df.columns:
         colors = ['maroon']
         for val in range(1,len(df['POCDistanceEMA'])):
@@ -1507,7 +1512,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                     color='crimson' 
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistanceEMA'], marker_color=colors), row=2, col=1)
-    
+
     
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[2] for i in OptionTimeFrame]), marker_color='teal'), row=3, col=1)
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[3] for i in OptionTimeFrame]), marker_color='crimson'), row=3, col=1)
@@ -1716,8 +1721,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                       text='<b>' + 'Buy' + '</b>',
                                       showarrow=True,
                                       arrowhead=4,
+                                      arrowcolor='green',
                                       font=dict(
-                                          size=8, 
+                                          size=10,
+                                          color='green',
                                       ),)
         
         if 'sell_signal' in df.columns:
@@ -1731,8 +1738,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                        text='<b>' + 'Sell' + '</b>',
                                        showarrow=True,
                                        arrowhead=4,
+                                       arrowcolor='red',
                                        font=dict(
-                                           size=8,
+                                           size=10,
+                                           color='red'
                                        ),)
     
     
@@ -1989,14 +1998,218 @@ def exponential_median(data, span):
     return exp_median
 
 
-symbolNumList = ['5002', '42288528', '42002868', '615689', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880']
-symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET']
+def mean_shift_filter(data, bandwidth, max_iterations=10, tolerance=1e-4):
+    """
+    Apply a mean shift filter to reduce noise in time series data.
+
+    Parameters:
+    - data: pd.Series - Input time series data (e.g., '1ema').
+    - bandwidth: float - Size of the neighborhood for mean calculation.
+    - max_iterations: int - Maximum number of iterations for the mean shift.
+    - tolerance: float - Convergence tolerance for stopping the iterations.
+
+    Returns:
+    - pd.Series - Smoothed data.
+    """
+    smoothed = data.copy()
+    for iteration in range(max_iterations):
+        shifted = smoothed.copy()
+        for i in range(len(data)):
+            # Determine the neighborhood
+            start = max(0, i - bandwidth)
+            end = min(len(data), i + bandwidth)
+            # Update value based on the mean of the neighborhood
+            shifted.iloc[i] = smoothed.iloc[start:end].mean()
+        
+        # Check for convergence
+        if np.abs(shifted - smoothed).max() < tolerance:
+            break
+        smoothed = shifted
+
+    return smoothed
+
+
+def mean_shift_filter_realtime(data, bandwidth, max_iterations=5, tolerance=1e-4):
+    """
+    Real-time Mean Shift Filter to smooth time series without relying on future data.
+
+    Parameters:
+    - data: pd.Series - Input time series data (e.g., '1ema').
+    - bandwidth: int - Number of past points to consider for smoothing.
+    - max_iterations: int - Maximum iterations for the mean shift process.
+    - tolerance: float - Convergence tolerance for stopping the iterations.
+
+    Returns:
+    - pd.Series - Smoothed data.
+    """
+    smoothed = data.copy()
+    for iteration in range(max_iterations):
+        shifted = smoothed.copy()
+        for i in range(len(data)):
+            # Use only past and current points within the bandwidth
+            start = max(0, i - bandwidth)
+            window = smoothed.iloc[start:i + 1]  # Causal window
+            # Update the current point based on the mean of the causal window
+            shifted.iloc[i] = window.mean()
+        
+        # Check for convergence
+        if np.abs(shifted - smoothed).max() < tolerance:
+            break
+        smoothed = shifted
+
+    return smoothed
+
+
+from sklearn.linear_model import LinearRegression
+
+def linear_regression_smoothing(data, window_size):
+    """
+    Smooth a line using linear regression over a sliding window.
+    
+    Parameters:
+    - data: pd.Series - The input data series.
+    - window_size: int - The size of the sliding window.
+    
+    Returns:
+    - pd.Series - Smoothed data.
+    """
+    smoothed = []
+    half_window = window_size // 2
+    
+    for i in range(len(data)):
+        # Define the window boundaries
+        start = max(0, i - window_size + 1)
+        end = min(len(data), i + half_window + 1)     
+                               
+        # Extract the windowed data
+        x = np.arange(start, end).reshape(-1, 1)
+        y = data[start:end].values
+        
+        # Fit linear regression
+        model = LinearRegression()
+        model.fit(x, y)
+        
+        # Predict the value at the current index
+        smoothed_value = model.predict([[i]])
+        smoothed.append(smoothed_value[0])
+    
+    return pd.Series(smoothed, index=data.index)
+
+def random_walk_filter(data, alpha=0.5):
+    """
+    Apply a Random Walk Filter to smooth the data.
+
+    Parameters:
+    - data: pandas Series or numpy array of the original time-series data.
+    - alpha: Smoothing factor, between 0 and 1.
+
+    Returns:
+    - Smoothed data as a pandas Series (if input is a pandas Series).
+    """
+    smoothed = np.zeros_like(data)
+    smoothed[0] = data[0]  # Initialize with the first data point
+
+    for t in range(1, len(data)):
+        # Update rule for the random walk filter
+        smoothed[t] = alpha * data[t] + (1 - alpha) * smoothed[t - 1]
+    
+    return pd.Series(smoothed, index=data.index) if isinstance(data, pd.Series) else smoothed
+
+from pykalman import KalmanFilter
+
+# Function to apply the Kalman filter
+def apply_kalman_filter(data, transition_covariance, observation_covariance):
+    """
+    Applies Kalman Filter to smooth a time-series dataset.
+
+    Parameters:
+    - data (array-like): Time series to be smoothed (e.g., EMA or price).
+
+    Returns:
+    - np.array: Smoothed time series.
+    """
+    # Initialize the Kalman Filter
+    kf = KalmanFilter(
+        transition_matrices=[1],  # State transition matrix
+        observation_matrices=[1],  # Observation matrix
+        initial_state_mean=data[0],  # Initial state estimate
+        initial_state_covariance=1,  # Initial covariance estimate
+        observation_covariance=observation_covariance,  # Measurement noise covariance
+        transition_covariance=transition_covariance  # Process noise covariance
+    )
+
+    # Use the Kalman filter to estimate the state
+    state_means, _ = kf.filter(data)
+
+    return state_means
+
+def calculate_rsi(data, window=14):
+    """
+    Calculate the Relative Strength Index (RSI).
+    
+    Parameters:
+        data (pd.Series): A pandas Series of prices (e.g., closing prices).
+        window (int): The lookback period for RSI calculation (default is 14).
+    
+    Returns:
+        pd.Series: The RSI values.
+    """
+    # Calculate price changes
+    delta = data.diff()
+    
+    # Separate positive and negative gains
+    gain = np.where(delta > 0, delta, 0)
+    loss = np.where(delta < 0, -delta, 0)
+    
+    # Average gain and loss using exponential moving average
+    avg_gain = pd.Series(gain).rolling(window=window, min_periods=1).mean()
+    avg_loss = pd.Series(loss).rolling(window=window, min_periods=1).mean()
+    
+    # Compute relative strength (RS)
+    rs = avg_gain / avg_loss
+    
+    # Calculate RSI
+    rsi = 100 - (100 / (1 + rs))
+    
+    return pd.Series(rsi, index=data.index)
+
+
+def compute_atr(df, period=14):
+    """
+    Compute the Average True Range (ATR) for a given DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): The input DataFrame with 'high', 'low', and 'close' columns.
+        period (int): The period over which to calculate the ATR (default: 14).
+
+    Returns:
+        pd.Series: A Pandas Series containing the ATR values.
+    """
+    # Calculate True Range (TR)
+    df['high_low'] = df['high'] - df['low']
+    df['high_close'] = abs(df['high'] - df['close'].shift(1))
+    df['low_close'] = abs(df['low'] - df['close'].shift(1))
+    
+    df['TR'] = df[['high_low', 'high_close', 'low_close']].max(axis=1)
+
+    # Calculate ATR
+    atr = df['TR'].rolling(window=period, min_periods=1).mean()
+    
+    # Clean up temporary columns
+    df.drop(['high_low', 'high_close', 'low_close', 'TR'], axis=1, inplace=True)
+    
+    return atr
+
+symbolNumList = ['5002', '42288528', '42002868', '615689', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
+symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
 intList = [str(i) for i in range(1,30)]
 
 vaildClust = [str(i) for i in range(0,200)]
 
 vaildTPO = [str(i) for i in range(1,500)]
+
+covarianceList = [str(round(i, 2)) for i in [x * 0.01 for x in range(1, 1000)]]
 
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
@@ -2194,14 +2407,25 @@ def update_tpo(n_clicks, value):
     prevent_initial_call=True
 )
 def update_curvature(n_clicks, value):
-    value = str(value)
-    
-    if value in vaildTPO:
-        print('The curvature input for D1 was "{}" '.format(value))
-        return str(value), str(value), 
-    else:
-        return 'The input top rank order was '+str(value)+" is not accepted please try different number from  10 - 500", 'The input top rank order '+str(value)+" is not accepted please try different number from  10 - 500"
+    try:
+        # Try to convert the value to a float
+        value = float(value)
 
+        # Check if it's within an acceptable range
+        if 0.0001 <= value <= 10:  # Replace with your range if different
+            print(f'The curvature input for D1 was "{value}"')
+            return str(value), f"The curvature input was successfully set to {value}"
+        else:
+            return (
+                f'The input "{value}" is not accepted. Please try a value between 10 and 500.',
+                f'Invalid input: {value}. Accepted range is 10 - 500.'
+            )
+    except ValueError:
+        # Handle cases where value cannot be converted to float
+        return (
+            f'The input "{value}" is not a valid number. Please enter a numeric value.',
+            f'Invalid input: {value}. Please enter a valid number.'
+        )
 
 @callback(
     Output('curvatured2-value', 'data'),
@@ -2211,15 +2435,25 @@ def update_curvature(n_clicks, value):
     prevent_initial_call=True
 )
 def update_curvature_D2(n_clicks, value):
-    value = str(value)
-    
-    if value in vaildTPO:
-        print('The curvature input for D2 was "{}" '.format(value))
-        return str(value), str(value), 
-    else:
-        return 'The input top rank order was '+str(value)+" is not accepted please try different number from  10 - 500", 'The input top rank order '+str(value)+" is not accepted please try different number from  10 - 500"
+    try:
+        # Try to convert the value to a float
+        value = float(value)
 
-
+        # Check if it's within an acceptable range
+        if 0.0001 <= value <= 10:  # Replace with your range if different
+            print(f'The curvature input for D1 was "{value}"')
+            return str(value), f"The curvature input was successfully set to {value}"
+        else:
+            return (
+                f'The input "{value}" is not accepted. Please try a value between 10 and 500.',
+                f'Invalid input: {value}. Accepted range is 10 - 500.'
+            )
+    except ValueError:
+        # Handle cases where value cannot be converted to float
+        return (
+            f'The input "{value}" is not a valid number. Please enter a numeric value.',
+            f'Invalid input: {value}. Please enter a valid number.'
+        )
 
 
 
@@ -2255,12 +2489,12 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         stkName = sname
         symbolNum = symbolNumList[symbolNameList.index(stkName)]   
     else:
-        stkName = 'HG' 
-        sname = 'HG'
+        stkName = 'NQ' 
+        sname = 'NQ'
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '9'
+        interv = '8'
         
     if clustNum not in vaildClust:
         clustNum = '20'
@@ -2268,11 +2502,25 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if tpoNum not in vaildTPO:
         tpoNum = '100'
         
-    if curvature not in vaildTPO:
-        curvature = '3'
-        
-    if curvatured2 not in vaildTPO:
-        curvatured2 = '10'
+    # Validate curvature
+    try:
+        #curvature = float(curvature)
+        if not 0.0001 <= float(curvature) <= 10:
+            print(f"Invalid curvature value: {curvature}. Setting to default: 0.6")
+            curvature = '0.9'
+    except (ValueError, TypeError):
+        print(f"Curvature input {curvature} is not a number. Setting to default: 0.6")
+        curvature = '0.9'
+    
+    try:
+        #curvatured2 = float(curvatured2)
+        if not 0.0001 <= float(curvatured2) <= 10:
+            print(f"Invalid curvatured2 value: {curvatured2}. Setting to default: 0.7")
+            curvatured2 = '0.7'
+    except (ValueError, TypeError):
+        print(f"curvatured2 input {curvatured2} is not a number. Setting to default: 0.7")
+        curvatured2 = '0.7'
+
     
         
     if sname != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
@@ -2389,15 +2637,12 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df.dropna(inplace=True)
     df.reset_index(drop=True, inplace=True) 
 
-    
-    
-    
 
     vwap(df)
     ema(df)
     PPP(df)
-    df['uppervwapAvg'] = df['STDEV_25'].cumsum() / (df.index + 1)
-    df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
+    df['uppervwapAvg'] = df['STDEV_2'].cumsum() / (df.index + 1)
+    df['lowervwapAvg'] = df['STDEV_N2'].cumsum() / (df.index + 1)
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
     
     '''
@@ -2633,7 +2878,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
                 
             hstp = historV1(df[:startIndex+it],100,{}, tempList, [])
             vA = valueAreaV3(hstp[0])
-            valist.append(vA  + [df['timestamp'][startIndex+it], df['time'][startIndex+it]])
+            valist.append(vA  + [df['timestamp'][startIndex+it], df['time'][startIndex+it], hstp[2]])
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
             
             timestamp_s = make[it][0] / 1_000_000_000
@@ -2716,7 +2961,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
             temphs = historV1(df[:it+1],100,{}, tempList, [])
             vA = valueAreaV3(temphs[0])
-            valist.append(vA  + [df['timestamp'][it], df['time'][it]])
+            valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2]])
             
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
             timestamp_s = make[it][0] / 1_000_000_000
@@ -2795,6 +3040,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['LowVA'] = pd.Series([i[0] for i in stored_data['pdata']])
         df['HighVA'] = pd.Series([i[1] for i in stored_data['pdata']])
         df['POC'] = pd.Series([i[2] for i in stored_data['pdata']])
+        df['POC2'] = pd.Series([i[5] for i in stored_data['pdata']])
         '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
         POCData = blob.download_as_text()
@@ -2826,7 +3072,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
-        df['POCDistanceEMA'] = ((df['2ema'] - df['POC']) / ((df['2ema'] + df['POC']) / 2)) * 100
+        df['smoothed_1ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
+        df['POCDistanceEMA'] = ((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
         #df['POCDistanceEMA'] = df['POCDistanceEMA'].ewm(span=2, adjust=False).mean()#gaussian_filter1d(df['POCDistanceEMA'], sigma=int(1))##
         #df['POCDistanceEMA'] = exponential_median(df['POCDistanceEMA'].values, span=2)
         
@@ -2844,6 +3091,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['negative_emaEmaRoll'] = negative_values.ewm(span=30, adjust=False).mean()
         '''
         df['rolling_std'] = df['close'].rolling(window=150, min_periods=1).std()
+        df['rollingPositive_std'] = positive_values.std()
+        df['rollingNegative_std'] = negative_values.std()
 
 
         df['positive_dynamicEma'] = df['positive_meanEma'] + df['rolling_std']
@@ -2884,15 +3133,23 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['positive_percentile'] = positive_percentile
         df['negative_percentile'] = negative_percentile
         '''
+        #df['smoothed_1ema'] = linear_regression_smoothing(df['1ema'],window_size=8)#mean_shift_filter(df['close'], bandwidth=3, max_iterations=5)
+        #alpha = 0.6  # Smoothing factor
+        #df['momentum'] = df['smoothed_1ema'].diff() 
+        #df['RSI'] = calculate_rsi(df['close'])
+        #df['divergence'] = (df['RSI'].diff() * df['close'].diff()) < 0
         
-        df['cross_above'] = (df['close'] >= df['POC']) #& (df['smoothed_derivative'] > 0)  #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+        df['atr'] = compute_atr(df) #period=int(clustNum)
+        df['positive_threshold'] = df['POC'] + 1.3 * df['atr']
+        df['negative_threshold'] = df['POC'] - 1.3 * df['atr']
+        df['cross_above'] = (df['smoothed_1ema'] >= df['POC'])  & (df['POCDistanceEMA'] > df['positive_meanEma']) & (df['smoothed_derivative'] > 0) #&  (df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
         # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-        df['cross_below'] = (df['close'] <= df['POC']) #& (df['smoothed_derivative'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+        df['cross_below'] = (df['smoothed_1ema'] <= df['POC'])  & (df['POCDistanceEMA'] < df['negative_meanEma']) & (df['smoothed_derivative'] < 0)  #&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
 
-        df['buy_signal'] = (df['cross_above']) & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_emaEmaRoll'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
-        df['sell_signal'] = (df['cross_below']) & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['negative_emaEmaRoll'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
-
+        df['buy_signal'] = (df['cross_above']) & (df['smoothed_1ema'] >= df['positive_threshold'])# & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
+        df['sell_signal'] = (df['cross_below']) & (df['smoothed_1ema'] <= df['negative_threshold'])# & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['positive_meanEma'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
+        
     except(NotFound):
         pass
         
@@ -2918,7 +3175,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
  
     return stored_data, fg, previous_stkName, previous_interv, previous_tpoNum, interval_time
 
-#[(i[2]-i[3],i[0]) for i in timeFrame ]
+#[(i[2]-i[3],i[0]) for i in timeFrame ]valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2]])
 if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0', port=8080)
     #app.run_server(debug=False, use_reloader=False)
@@ -2932,4 +3189,74 @@ end_time = time.time()
 # Calculate the elapsed time
 elapsed_time = end_time - start_time
 print(f"Elapsed time: {elapsed_time} seconds")
+
+def generate_renko(data, brick_size):
+    """
+    Generate Renko chart data with timestamps.
+
+    Parameters:
+    - data: pandas DataFrame with 'close' prices and timestamps ('time').
+    - brick_size: The size of each Renko brick.
+
+    Returns:
+    - renko_df: A DataFrame with Renko bricks and timestamps.
+    """
+    renko_bricks = []
+    last_price = data['close'].iloc[0]
+    last_direction = None
+
+    for i in range(len(data)):
+        current_price = data['close'].iloc[i]
+        current_time = data['time'].iloc[i]
+
+        while abs(current_price - last_price) >= brick_size:
+            if current_price > last_price:
+                new_price = last_price + brick_size
+                direction = 'up'
+            else:
+                new_price = last_price - brick_size
+                direction = 'down'
+
+            renko_bricks.append({
+                'time': current_time,
+                'price': new_price,
+                'direction': direction
+            })
+            last_price = new_price
+            last_direction = direction
+
+    renko_df = pd.DataFrame(renko_bricks)
+    return renko_df
+
+brick_size = 2  # Size of each Renko brick
+renko_df = generate_renko(df, 2)
+
+# Prepare Plotly chart
+#renko_df = generate_renko(data, brick_size)
+
+    # Create Renko chart with Plotly
+fig = go.Figure()
+
+for i in range(len(renko_df)):
+    color = "green" if renko_df["direction"].iloc[i] == "up" else "red"
+    fig.add_trace(go.Candlestick(
+        x=[renko_df['time'].iloc[i], renko_df['time'].iloc[i]],
+        open=[renko_df['price'].iloc[i]],
+        high=[renko_df['price'].iloc[i] + brick_size / 2],
+        low=[renko_df['price'].iloc[i] - brick_size / 2],
+        close=[renko_df['price'].iloc[i]],
+        increasing_line_color="green",
+        decreasing_line_color="red",
+        showlegend=False
+    ))
+
+fig.update_layout(
+    title="Renko Chart with Time",
+    xaxis_title="Time",
+    yaxis_title="Price",
+    xaxis_rangeslider_visible=False,
+    template="plotly_dark"
+)
+
+fig.show()
 '''
