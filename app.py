@@ -1966,7 +1966,7 @@ def ewm_median(series, span):
     
     return pd.Series(medians, index=series.index)
 
-#from statsmodels.tsa.holtwinters import ExponentialSmoothing
+
 from concurrent.futures import ThreadPoolExecutor    
 def download_data(bucket_name, blob_name):
     blob = Blob(blob_name, bucket_name)
@@ -2059,9 +2059,8 @@ def mean_shift_filter_realtime(data, bandwidth, max_iterations=5, tolerance=1e-4
 
     return smoothed
 
-
-from sklearn.linear_model import LinearRegression
-
+'''
+#from sklearn.linear_model import LinearRegression
 def linear_regression_smoothing(data, window_size):
     """
     Smooth a line using linear regression over a sliding window.
@@ -2094,7 +2093,7 @@ def linear_regression_smoothing(data, window_size):
         smoothed.append(smoothed_value[0])
     
     return pd.Series(smoothed, index=data.index)
-
+'''
 def random_walk_filter(data, alpha=0.5):
     """
     Apply a Random Walk Filter to smooth the data.
