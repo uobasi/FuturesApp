@@ -30,6 +30,7 @@ from collections import defaultdict
 from scipy.signal import savgol_filter
 from scipy.stats import linregress
 from scipy.ndimage import gaussian_filter1d
+from numpy.polynomial import Polynomial
 #import yfinance as yf
 #import dateutil.parser
 
@@ -777,11 +778,16 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     #if 'POC' in df.columns:
         #fig.add_trace(go.Scatter(x=df['time'], y=df['derivative_2'], mode='lines',name='Derivative_2'), row=2, col=1)
-    fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
-    fig.add_trace(go.Scatter(x=df['time'], y=df['positive_threshold'], mode='lines',name='positive_threshold'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['negative_threshold'], mode='lines',name='negative_threshold'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['positive_threshold'], mode='lines',name='positive_threshold'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['negative_threshold'], mode='lines',name='negative_threshold'))
     #fig.add_hline(y=70, row=2, col=1)
     #fig.add_hline(y=30, row=2, col=1)
+    
+    fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
+    fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['hybrid'], mode='lines',name='hybrid'), row=3, col=1)
+    
     
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
@@ -790,7 +796,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         
     #fig.add_trace(go.Scatter(x=df['time'], y=df['rolling_imbalance'], mode='lines',name='rolling_imbalance'), row=3, col=1)
         
-    fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_1ema'], mode='lines',name='smoothed_1ema',marker_color='rgba(0,0,0)'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_1ema'], mode='lines',name='smoothed_1ema',marker_color='rgba(0,0,0)'))
 
 
         #fig.add_trace(go.Scatter(x=df['time'], y=df['close'].rolling(window=clusterNum).mean(), mode='lines',name=str(clusterNum)+'ema'), row=2, col=1)
@@ -1482,22 +1488,22 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[5] for i in troInterval]), marker_color='teal'), row=3, col=1)
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[6] for i in troInterval]), marker_color='crimson'), row=3, col=1)
     
-    '''
-    if 'POCDistance' in df.columns:
+    
+    if 'smoothed_derivative' in df.columns:
         colors = ['maroon']
-        for val in range(1,len(df['POCDistance'])):
-            if df['POCDistance'][val] > 0:
+        for val in range(1,len(df['smoothed_derivative'])):
+            if df['smoothed_derivative'][val] > 0:
                 color = 'teal'
-                if df['POCDistance'][val] > df['POCDistance'][val-1]:
+                if df['smoothed_derivative'][val] > df['smoothed_derivative'][val-1]:
                     color = '#54C4C1' 
             else:
                 color = 'maroon'
-                if df['POCDistance'][val] < df['POCDistance'][val-1]:
+                if df['smoothed_derivative'][val] < df['smoothed_derivative'][val-1]:
                     color='crimson' 
             colors.append(color)
-        fig.add_trace(go.Bar(x=df['time'], y=df['POCDistance'], marker_color=colors), row=3, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['smoothed_derivative'], marker_color=colors), row=3, col=1)
         
-        
+     '''   
 
     if 'POCDistanceEMA' in df.columns:
         colors = ['maroon']
@@ -2199,6 +2205,88 @@ def compute_atr(df, period=14):
     
     return atr
 
+def calculate_slope_to_row(index, values):
+    x = np.arange(index + 1)  # Indices from 0 to the current row
+    y = values[: index + 1]  # Values from 0 to the current row
+    slope, _, _, _, _ = linregress(x, y)
+    return round(math.degrees(math.atan(slope)), 3)
+
+def calculate_polyfit_slope_to_row(index, values):
+    try:
+        x = np.arange(index + 1)
+        y = values[: index + 1]
+        poly = Polynomial.fit(x, y, 1)
+        return round(poly.coef[1], 3)
+    except np.linalg.LinAlgError:
+        return 0.0 
+
+def calculate_slope_rolling(index, values, window_size):
+    """
+    Calculate the slope using a rolling window.
+    
+    Parameters:
+    - index: The current index in the DataFrame.
+    - values: The column values to calculate the slope on.
+    - window_size: The size of the rolling window.
+    
+    Returns:
+    - The slope in degrees for the given rolling window.
+    """
+    start = max(0, index - window_size + 1)
+    x = np.arange(start, index + 1)
+    y = values[start: index + 1]
+    slope, _, _, _, _ = linregress(x, y)
+    return round(math.degrees(math.atan(slope)), 3)
+
+
+def calculate_polyfit_slope_rolling(index, values, window_size):
+    """
+    Calculate the slope using a rolling window and Polynomial fit.
+    
+    Parameters:
+    - index: The current index in the DataFrame.
+    - values: The column values to calculate the slope on.
+    - window_size: The size of the rolling window.
+    
+    Returns:
+    - The slope from the Polynomial fit for the given rolling window.
+    """
+    try:
+        start = max(0, index - window_size + 1)
+        x = np.arange(start, index + 1)
+        y = values[start: index + 1]
+        poly = Polynomial.fit(x, y, 1)
+        return round(poly.coef[1], 3)
+    except np.linalg.LinAlgError:
+        return 0.0
+    
+    
+def calculate_slope_weighted(index, values, window_size):
+    start = max(0, index - window_size + 1)
+    x = np.arange(start, index + 1)
+    y = values[start: index + 1]
+    weights = np.exp(-0.1 * (x - x[-1]))  # Apply exponential decay weights
+    slope, _, _, _, _ = linregress(x, y * weights)
+    return round(math.degrees(math.atan(slope)), 3)
+
+
+def calculate_polyfit_slope_weighted(index, values, window_size):
+    try:
+        start = max(0, index - window_size + 1)
+        x = np.arange(start, index + 1)
+        y = values[start: index + 1]
+        weights = np.exp(-0.1 * (x - x[-1]))  # Apply exponential decay weights
+        poly = Polynomial.fit(x, y * weights, 1)
+        return round(poly.coef[1], 3)
+    except np.linalg.LinAlgError:
+        return 0.0
+
+
+def calculate_hybrid_slope(index, values, window_size):
+    slope_rolling = calculate_slope_rolling(index, values, window_size)
+    polyfit_slope = calculate_polyfit_slope_rolling(index, values, window_size)
+    return round((slope_rolling + polyfit_slope) / 2, 3)
+
 symbolNumList = ['5002', '42288528', '42002868', '615689', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
@@ -2493,7 +2581,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '8'
+        interv = '4'
         
     if clustNum not in vaildClust:
         clustNum = '20'
@@ -2506,10 +2594,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #curvature = float(curvature)
         if not 0.0001 <= float(curvature) <= 10:
             print(f"Invalid curvature value: {curvature}. Setting to default: 0.6")
-            curvature = '0.7'
+            curvature = '0.6'
     except (ValueError, TypeError):
         print(f"Curvature input {curvature} is not a number. Setting to default: 0.6")
-        curvature = '0.7'
+        curvature = '0.6'
     
     try:
         #curvatured2 = float(curvatured2)
@@ -2697,7 +2785,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         AllTrades.append([int(row[1]) / 1e9, int(row[2]), int(row[0]), 0, row[3], opttimeStamp])
     
         
-    hs = historV1(df,100,{},AllTrades,[])
+    hs = historV1(df,int(tpoNum),{},AllTrades,[])
     
     va = valueAreaV3(hs[0])
     
@@ -2875,7 +2963,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             else:
                 tempList = AllTrades
                 
-            hstp = historV1(df[:startIndex+it],100,{}, tempList, [])
+            hstp = historV1(df[:startIndex+it],int(tpoNum),{}, tempList, [])
             vA = valueAreaV3(hstp[0])
             valist.append(vA  + [df['timestamp'][startIndex+it], df['time'][startIndex+it], hstp[2]])
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
@@ -2958,7 +3046,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             else:
                 tempList = AllTrades
             
-            temphs = historV1(df[:it+1],100,{}, tempList, [])
+            temphs = historV1(df[:it+1],int(tpoNum),{}, tempList, [])
             vA = valueAreaV3(temphs[0])
             valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2]])
             
@@ -3060,7 +3148,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             '''
             #df['POC2']  = pd.Series(pocc + [pocc[len(pocc)-1]]*(len(df)-len(pocc)))
             #df['POCDistance'] = (abs(df['1ema'] - df['POC']) / ((df['1ema']+ df['POC']) / 2)) * 100
-        df['POCDistance'] = df['smoothed_derivative']#df['derivative_1']#((df['derivative_1'] - df['POC']) / ((df['derivative_1'] + df['POC']) / 2)) * 100
+        # df['smoothed_derivative']#df['derivative_1']#((df['derivative_1'] - df['POC']) / ((df['derivative_1'] + df['POC']) / 2)) * 100
         
         #buffer = 0.002  # 0.2% buffer
 
@@ -3072,7 +3160,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
         df['smoothed_1ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
-        df['POCDistanceEMA'] = ((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
+        df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
+        df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
         #df['POCDistanceEMA'] = df['POCDistanceEMA'].ewm(span=2, adjust=False).mean()#gaussian_filter1d(df['POCDistanceEMA'], sigma=int(1))##
         #df['POCDistanceEMA'] = exponential_median(df['POCDistanceEMA'].values, span=2)
         
@@ -3138,23 +3227,39 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #df['RSI'] = calculate_rsi(df['close'])
         #df['divergence'] = (df['RSI'].diff() * df['close'].diff()) < 0
         
+        
+
+        df['slope_degrees'] = [calculate_slope_rolling(i, df['smoothed_1ema'].values, int(30)) for i in range(len(df))]
+        df['polyfit_slope'] = [calculate_polyfit_slope_rolling(i, df['smoothed_1ema'].values, int(30)) for i in range(len(df))]
+        #df['hybrid'] = [calculate_hybrid_slope(i, df['smoothed_1ema'].values, int(30)) for i in range(len(df))]
+        
+        slope = str(df['slope_degrees'].iloc[-1]) + ' ' + str(df['polyfit_slope'].iloc[-1])
+        
         df['atr'] = compute_atr(df) #period=int(clustNum)
-        df['positive_threshold'] = df['POC'] + 1.3 * df['atr']
-        df['negative_threshold'] = df['POC'] - 1.3 * df['atr']
-        df['cross_above'] = (df['smoothed_1ema'] >= df['POC'])  & (df['POCDistanceEMA'] > df['positive_meanEma']) & (df['smoothed_derivative'] > 0) #&  (df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+        df['positive_threshold'] = df['POC'] + 1.2 * df['atr']
+        df['negative_threshold'] = df['POC'] - 1.2 * df['atr']
+        
+        
+        #df['atr_multiplier'] = 1.3 + (df['atr'] / df['atr'].mean()) * 0.5
+        #df['positive_threshold'] = df['POC'] + df['atr_multiplier'] * df['atr']
+        #df['negative_threshold'] = df['POC'] - df['atr_multiplier'] * df['atr']
+        #& (df['POCDistanceEMA'] > df['positive_meanEma']) & (df['smoothed_derivative'] > 0)
+        #(df['POCDistanceEMA'] < df['negative_meanEma']) & (df['smoothed_derivative'] < 0)  &
+        
+        df['cross_above'] = (df['smoothed_1ema'] >= df['POC'])   &  ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['smoothed_derivative'] > 0) #(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
         # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-        df['cross_below'] = (df['smoothed_1ema'] <= df['POC'])  & (df['POCDistanceEMA'] < df['negative_meanEma']) & (df['smoothed_derivative'] < 0)  #&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+        df['cross_below'] = (df['smoothed_1ema'] <= df['POC'])  &  ((df['polyfit_slope'] < 0) | (df['slope_degrees'] < 0)) & (df['smoothed_derivative'] < 0)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
 
-        df['buy_signal'] = (df['cross_above']) & (df['smoothed_1ema'] >= df['positive_threshold'])# & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
-        df['sell_signal'] = (df['cross_below']) & (df['smoothed_1ema'] <= df['negative_threshold'])# & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['positive_meanEma'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
+        df['buy_signal'] = (df['cross_above']) #& (df['smoothed_1ema'] >= df['positive_threshold'])# & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
+        df['sell_signal'] = (df['cross_below']) #& (df['smoothed_1ema'] <= df['negative_threshold'])# & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['positive_meanEma'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
         
     except(NotFound):
         pass
         
      
     try:
-        mboString = '('+str(round(df['positive_mean'].iloc[-1], 3)) + ' | ' + str(round(df['negative_mean'].iloc[-1], 3))+') --' + ' ('+str(round(df['positive_meanEma'].iloc[-1], 3)) + ' | ' + str(round(df['negative_meanEma'].iloc[-1], 3))+')'#str(round((abs(df['HighVA'][len(df)-1] - df['LowVA'][len(df)-1]) / ((df['HighVA'][len(df)-1] + df['LowVA'][len(df)-1]) / 2)) * 100,3))
+        mboString = '('+str(round(df['positive_mean'].iloc[-1], 3)) + ' | ' + str(round(df['negative_mean'].iloc[-1], 3))+') --' + ' ('+str(round(df['positive_meanEma'].iloc[-1], 3)) + ' | ' + str(round(df['negative_meanEma'].iloc[-1], 3))+') '+slope#str(round((abs(df['HighVA'][len(df)-1] - df['LowVA'][len(df)-1]) / ((df['HighVA'][len(df)-1] + df['LowVA'][len(df)-1]) / 2)) * 100,3))
     except(KeyError):
         mboString = ''
 
@@ -3178,84 +3283,3 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
 if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0', port=8080)
     #app.run_server(debug=False, use_reloader=False)
-
-'''
-import time  
-start_time = time.time()
-
-
-end_time = time.time()
-# Calculate the elapsed time
-elapsed_time = end_time - start_time
-print(f"Elapsed time: {elapsed_time} seconds")
-
-def generate_renko(data, brick_size):
-    """
-    Generate Renko chart data with timestamps.
-
-    Parameters:
-    - data: pandas DataFrame with 'close' prices and timestamps ('time').
-    - brick_size: The size of each Renko brick.
-
-    Returns:
-    - renko_df: A DataFrame with Renko bricks and timestamps.
-    """
-    renko_bricks = []
-    last_price = data['close'].iloc[0]
-    last_direction = None
-
-    for i in range(len(data)):
-        current_price = data['close'].iloc[i]
-        current_time = data['time'].iloc[i]
-
-        while abs(current_price - last_price) >= brick_size:
-            if current_price > last_price:
-                new_price = last_price + brick_size
-                direction = 'up'
-            else:
-                new_price = last_price - brick_size
-                direction = 'down'
-
-            renko_bricks.append({
-                'time': current_time,
-                'price': new_price,
-                'direction': direction
-            })
-            last_price = new_price
-            last_direction = direction
-
-    renko_df = pd.DataFrame(renko_bricks)
-    return renko_df
-
-brick_size = 2  # Size of each Renko brick
-renko_df = generate_renko(df, 2)
-
-# Prepare Plotly chart
-#renko_df = generate_renko(data, brick_size)
-
-    # Create Renko chart with Plotly
-fig = go.Figure()
-
-for i in range(len(renko_df)):
-    color = "green" if renko_df["direction"].iloc[i] == "up" else "red"
-    fig.add_trace(go.Candlestick(
-        x=[renko_df['time'].iloc[i], renko_df['time'].iloc[i]],
-        open=[renko_df['price'].iloc[i]],
-        high=[renko_df['price'].iloc[i] + brick_size / 2],
-        low=[renko_df['price'].iloc[i] - brick_size / 2],
-        close=[renko_df['price'].iloc[i]],
-        increasing_line_color="green",
-        decreasing_line_color="red",
-        showlegend=False
-    ))
-
-fig.update_layout(
-    title="Renko Chart with Time",
-    xaxis_title="Time",
-    yaxis_title="Price",
-    xaxis_rangeslider_visible=False,
-    template="plotly_dark"
-)
-
-fig.show()
-'''
