@@ -2594,10 +2594,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #curvature = float(curvature)
         if not 0.0001 <= float(curvature) <= 10:
             print(f"Invalid curvature value: {curvature}. Setting to default: 0.6")
-            curvature = '0.6'
+            curvature = '0.4'
     except (ValueError, TypeError):
         print(f"Curvature input {curvature} is not a number. Setting to default: 0.6")
-        curvature = '0.6'
+        curvature = '0.4'
     
     try:
         #curvatured2 = float(curvatured2)
