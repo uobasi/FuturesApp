@@ -2282,11 +2282,6 @@ def calculate_polyfit_slope_weighted(index, values, window_size):
         return 0.0
 
 
-def calculate_hybrid_slope(index, values, window_size):
-    slope_rolling = calculate_slope_rolling(index, values, window_size)
-    polyfit_slope = calculate_polyfit_slope_rolling(index, values, window_size)
-    return round((slope_rolling + polyfit_slope) / 2, 3)
-
 symbolNumList = ['5002', '42288528', '42002868', '615689', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
@@ -2581,7 +2576,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '4'
+        interv = '10'
         
     if clustNum not in vaildClust:
         clustNum = '20'
@@ -2594,10 +2589,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #curvature = float(curvature)
         if not 0.0001 <= float(curvature) <= 10:
             print(f"Invalid curvature value: {curvature}. Setting to default: 0.6")
-            curvature = '0.4'
+            curvature = '0.6'
     except (ValueError, TypeError):
         print(f"Curvature input {curvature} is not a number. Setting to default: 0.6")
-        curvature = '0.4'
+        curvature = '0.6'
     
     try:
         #curvatured2 = float(curvatured2)
@@ -3126,7 +3121,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     try:
         df['LowVA'] = pd.Series([i[0] for i in stored_data['pdata']])
         df['HighVA'] = pd.Series([i[1] for i in stored_data['pdata']])
-        df['POC'] = pd.Series([i[2] for i in stored_data['pdata']])
+        df['POC'] = pd.Series([i[5] for i in stored_data['pdata']])
         df['POC2'] = pd.Series([i[5] for i in stored_data['pdata']])
         '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
@@ -3246,10 +3241,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #& (df['POCDistanceEMA'] > df['positive_meanEma']) & (df['smoothed_derivative'] > 0)
         #(df['POCDistanceEMA'] < df['negative_meanEma']) & (df['smoothed_derivative'] < 0)  &
         
-        df['cross_above'] = (df['smoothed_1ema'] >= df['POC'])   &  ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+        df['cross_above'] = (df['smoothed_1ema'] >= df['POC'])   &  ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) #& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
         # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-        df['cross_below'] = (df['smoothed_1ema'] <= df['POC'])  &  ((df['polyfit_slope'] < 0) | (df['slope_degrees'] < 0)) & (df['smoothed_derivative'] < 0) & (df['POCDistanceEMA'] < -0.01)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+        df['cross_below'] = (df['smoothed_1ema'] <= df['POC'])  &  ((df['polyfit_slope'] < 0) | (df['slope_degrees'] < 0)) #& (df['smoothed_derivative'] < 0) & (df['POCDistanceEMA'] < -0.01)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
 
         df['buy_signal'] = (df['cross_above']) #& (df['smoothed_1ema'] >= df['positive_threshold'])# & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
         df['sell_signal'] = (df['cross_below']) #& (df['smoothed_1ema'] <= df['negative_threshold'])# & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['positive_meanEma'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
