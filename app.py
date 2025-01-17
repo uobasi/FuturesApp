@@ -585,12 +585,12 @@ def find_clusters(numbers, threshold):
 
 def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = '',   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5, troInterval:list=[]):
   
-    
+    notround = np.average(df_dx)
     average = round(np.average(df_dx), 3)
     now = round(df_dx[len(df_dx)-1], 3)
-    if average > 0:
+    if notround > 0:
         strTrend = "Uptrend"
-    elif average < 0:
+    elif notround < 0:
         strTrend = "Downtrend"
     else:
         strTrend = "No trend!"
