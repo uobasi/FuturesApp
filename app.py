@@ -2343,7 +2343,7 @@ styles = {
 from google.api_core.exceptions import NotFound
 from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
-initial_inter = 1500000  # Initial interval #210000#250000#80001
+initial_inter = 100000  # Initial interval #210000#250000#80001
 subsequent_inter = 60000  # Subsequent interval
 app = Dash()
 app.title = "Initial Title"
