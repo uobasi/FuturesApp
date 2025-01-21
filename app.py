@@ -2282,7 +2282,7 @@ def calculate_polyfit_slope_weighted(index, values, window_size):
         return 0.0
 
 
-symbolNumList = ['5002', '42288528', '42002868', '615689', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
+symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
 intList = [str(i) for i in range(1,30)]
