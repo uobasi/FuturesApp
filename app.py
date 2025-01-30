@@ -1,5 +1,19 @@
 # -*- coding: utf-8 -*-
 """
+Created on Mon Jan 27 09:35:54 2025
+
+@author: UOBASUB
+"""
+
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jan 21 16:42:48 2025
+
+@author: UOBASUB
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Dec 13 01:11:16 2023
 
 @author: UOBASUB
@@ -608,8 +622,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     tosells = sum([x[1] for x in [i for i in sortadlist if i[3] == 'A']])
     
     ratio = str(round(max(tosells,tobuys)/min(tosells,tobuys),3))
-    
-    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))  Ratio : '+str(ratio)+' ' + mboString
+    # Ratio : '+str(ratio)+' ' 
+    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))'+ mboString
     
     '''
     putDec = 0
@@ -785,8 +799,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #fig.add_hline(y=30, row=2, col=1)
     
     fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
-    fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['hybrid'], mode='lines',name='hybrid'), row=3, col=1)
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
+    fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
     
     
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
@@ -797,7 +811,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     #fig.add_trace(go.Scatter(x=df['time'], y=df['rolling_imbalance'], mode='lines',name='rolling_imbalance'), row=3, col=1)
         
     #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_1ema'], mode='lines',name='smoothed_1ema',marker_color='rgba(0,0,0)'))
-
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_2ema'], mode='lines',name='smoothed_2ema',marker_color='red'))
 
         #fig.add_trace(go.Scatter(x=df['time'], y=df['close'].rolling(window=clusterNum).mean(), mode='lines',name=str(clusterNum)+'ema'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['lsfreal_time'], mode='lines',name='lsfreal_time'), row=2, col=1)
@@ -1715,40 +1729,64 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     '''
     stillbuy = False
     stillsell = False
-    for p in range(1, len(df)):  # Start from 1 to compare with the previous row
-        if 'buy_signal' in df.columns:
-            # Check if the value of cross_above changed from the previous row
-            if df['buy_signal'][p] != df['buy_signal'][p-1] and not stillbuy :
-                # Add 'Buy' only if cross_above is True after the change
-                stillbuy = True
-                stillsell = False
-                if df['buy_signal'][p]:
-                   fig.add_annotation(x=df['time'][p], y=df['close'][p],
-                                      text='<b>' + 'Buy' + '</b>',
-                                      showarrow=True,
-                                      arrowhead=4,
-                                      arrowcolor='green',
-                                      font=dict(
-                                          size=10,
-                                          color='green',
-                                      ),)
+
+    if df['buy_signal'][0]:
+        stillbuy = True
+        fig.add_annotation(x=df['time'][0], y=df['close'][0],
+                        text='<b>' + 'Buy' + '</b>',
+                        showarrow=True,
+                        arrowhead=4,
+                        arrowcolor='green',
+                        font=dict(
+                            size=10,
+                            color='green',
+                        ),)
+
+    if df['sell_signal'][0]:
+        stillsell = True
+        fig.add_annotation(x=df['time'][0], y=df['close'][0],
+                        text='<b>' + 'Sell' + '</b>',
+                        showarrow=True,
+                        arrowhead=4,
+                        arrowcolor='red',
+                        font=dict(
+                            size=10,
+                            color='red',
+                        ),)
         
-        if 'sell_signal' in df.columns:
-            # Check if the value of cross_below changed from the previous row
-            if df['sell_signal'][p] != df['sell_signal'][p-1] and not stillsell :
-                # Add 'Sell' only if cross_below is True after the change
-                stillsell = True
-                stillbuy = False
-                if df['sell_signal'][p]:
-                    fig.add_annotation(x=df['time'][p], y=df['close'][p],
-                                       text='<b>' + 'Sell' + '</b>',
-                                       showarrow=True,
-                                       arrowhead=4,
-                                       arrowcolor='red',
-                                       font=dict(
-                                           size=10,
-                                           color='red'
-                                       ),)
+
+    for p in range(1, len(df)):  # Start from 1 to compare with the previous row
+        # Check if the value of cross_above changed from the previous row
+        if df['buy_signal'][p] != df['buy_signal'][p-1] and not stillbuy :
+            # Add 'Buy' only if cross_above is True after the change
+            stillbuy = True
+            stillsell = False
+            if df['buy_signal'][p]:
+                fig.add_annotation(x=df['time'][p], y=df['close'][p],
+                                    text='<b>' + 'Buy' + '</b>',
+                                    showarrow=True,
+                                    arrowhead=4,
+                                    arrowcolor='green',
+                                    font=dict(
+                                        size=10,
+                                        color='green',
+                                    ),)
+        
+        # Check if the value of cross_below changed from the previous row
+        if df['sell_signal'][p] != df['sell_signal'][p-1] and not stillsell :
+            # Add 'Sell' only if cross_below is True after the change
+            stillsell = True
+            stillbuy = False
+            if df['sell_signal'][p]:
+                fig.add_annotation(x=df['time'][p], y=df['close'][p],
+                                    text='<b>' + 'Sell' + '</b>',
+                                    showarrow=True,
+                                    arrowhead=4,
+                                    arrowcolor='red',
+                                    font=dict(
+                                        size=10,
+                                        color='red'
+                                    ),)
     
     
     '''
@@ -2239,7 +2277,7 @@ def calculate_slope_rolling(index, values, window_size):
     return round(math.degrees(math.atan(slope)), 3)
 
 
-def calculate_polyfit_slope_rolling(index, values, window_size):
+def calculate_polyfit_slope_rolling_1(index, values, window_size):
     """
     Calculate the slope using a rolling window and Polynomial fit.
     
@@ -2257,6 +2295,32 @@ def calculate_polyfit_slope_rolling(index, values, window_size):
         y = values[start: index + 1]
         poly = Polynomial.fit(x, y, 1)
         return round(poly.coef[1], 3)
+    except np.linalg.LinAlgError:
+        return 0.0
+    
+
+def calculate_polyfit_slope_rolling(index, values, window_size):
+    """
+    Calculate the slope using a rolling window and weighted Polynomial fit.
+    
+    Parameters:
+    - index: The current index in the DataFrame.
+    - values: The column values to calculate the slope on.
+    - window_size: The size of the rolling window.
+    
+    Returns:
+    - The slope from the weighted Polynomial fit for the given rolling window.
+    """
+    try:
+        start = max(0, index - window_size + 1)
+        x = np.arange(start, index + 1)
+        y = values[start: index + 1]
+        
+        # Weighted Polynomial Fit (more weight to recent data)
+        weights = np.exp(np.linspace(0.1, 3, len(y)))
+        weights = weights / weights.sum()  
+        poly = np.polyfit(x, y, 1, w=weights)
+        return round(poly[0], 3)  # Slope is the first coefficient
     except np.linalg.LinAlgError:
         return 0.0
     
@@ -2285,7 +2349,7 @@ def calculate_polyfit_slope_weighted(index, values, window_size):
 symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
-intList = [str(i) for i in range(1,30)]
+intList = [str(i) for i in range(3,30)]
 
 vaildClust = [str(i) for i in range(0,200)]
 
@@ -2344,9 +2408,9 @@ from google.api_core.exceptions import NotFound
 from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 1000000  # Initial interval #210000#250000#80001
-subsequent_inter = 60000  # Subsequent interval
+subsequent_inter = 80000  # Subsequent interval
 app = Dash()
-app.title = "Initial Title"
+app.title = "EnVisage"
 app.layout = html.Div([
     
     dcc.Graph(id='graph', config={'modeBarButtonsToAdd': ['drawline']}),
@@ -2359,48 +2423,16 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-submit', type='text', style=styles['input']),
             html.Button('Submit', id='submit-val', n_clicks=0, style=styles['button']),
-            html.Div(id='container-button-basic', children="Enter a symbol from 'ES', 'NQ', 'YM', 'CL', 'GC', 'HG', 'NG', 'RTY'", style=styles['label']),
+            html.Div(id='container-button-basic', children="Enter a symbol from ES, NQ, CL, GC, NG,", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='stkName-value'),
         
         html.Div([
             dcc.Input(id='input-on-interv', type='text', style=styles['input']),
             html.Button('Submit', id='submit-interv', n_clicks=0, style=styles['button']),
-            html.Div(id='interv-button-basic',children="Enter interval from 5, 10, 15, 30", style=styles['label']),
+            html.Div(id='interv-button-basic',children="Enter interval from 3-30, Default 10 mins", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='interv-value'),
-        
-        html.Div([
-            dcc.Input(id='input-on-cluster', type='text', style=styles['input']),
-            html.Button('Submit', id='submit-cluster', n_clicks=0, style=styles['button']),
-            html.Div(id='cluster-button-basic',children="Adjust ema for Buy/Sell Signal 3-200, default = 30", style=styles['label']),
-        ], style=styles['sub_container']),
-        dcc.Store(id='cluster-value'),
-        
-        html.Div([
-            dcc.Input(id='input-on-tpo', type='text', style=styles['input']),
-            html.Button('Submit', id='submit-tpo', n_clicks=0, style=styles['button']),
-            html.Div(id='tpo-button-basic', children="Enter a top ranked order number from 10 - 500", style=styles['label']),
-        ], style=styles['sub_container']),
-        dcc.Store(id='tpo-value'),
-        
-        html.Div([
-            dcc.Input(id='input-on-curvature', type='text', style=styles['input']),
-            html.Button('Submit', id='submit-curvature', n_clicks=0, style=styles['button']),
-            html.Div(id='curvature-button-basic', children="Curvature Line for D1 : 1 - 500 has to be odd number, default = 5", style=styles['label']),
-        ], style=styles['sub_container']),
-        dcc.Store(id='curvature-value'),
-        
-        
-        html.Div([
-            dcc.Input(id='input-on-curvatured2', type='text', style=styles['input']),
-            html.Button('Submit', id='submit-curvatured2', n_clicks=0, style=styles['button']),
-            html.Div(id='curvatured2-button-basic', children="Curvature Line for D2 : 1 - 500 has to be odd number, default = 10", style=styles['label']),
-        ], style=styles['sub_container']),
-        dcc.Store(id='curvatured2-value'),
-        
-        
-        
         
         
     ], style=styles['main_container']),
@@ -2409,7 +2441,6 @@ app.layout = html.Div([
     dcc.Store(id='data-store'),
     dcc.Store(id='previous-interv'),
     dcc.Store(id='previous-stkName'),
-    dcc.Store(id='previous-tpoNum'),
     dcc.Store(id='interval-time', data=initial_inter),
   
 ])
@@ -2448,94 +2479,6 @@ def update_interval(n_clicks, value):
         return 'The input interval '+str(value)+" is not accepted please try different interval from  |'1' '2' '3' '5' '10' '15'|", 'The input interval '+str(value)+" is not accepted please try different interval from  |'1' '2' '3' '5' '10' '15'|"
 
 
-@callback(
-    Output('cluster-value', 'data'),
-    Output('cluster-button-basic', 'children'),
-    Input('submit-cluster', 'n_clicks'),
-    State('input-on-cluster', 'value'),
-    prevent_initial_call=True
-)
-def update_clusterNum(n_clicks, value):
-    value = str(value)
-    
-    if value in vaildClust:
-        print('The input Buy/Sell Signal number was "{}" '.format(value))
-        return str(value), str(value), 
-    else:
-        return 'The Buy/Sell Signal '+str(value)+" is not accepted please try different number from  3 - 20", 'The Buy/Sell Signal '+str(value)+" is not accepted please try different number from  3 - 20"
-
-
-@callback(
-    Output('tpo-value', 'data'),
-    Output('tpo-button-basic', 'children'),
-    Input('submit-tpo', 'n_clicks'),
-    State('input-on-tpo', 'value'),
-    prevent_initial_call=True
-)
-def update_tpo(n_clicks, value):
-    value = str(value)
-    
-    if value in vaildTPO:
-        print('The input top rank order was "{}" '.format(value))
-        return str(value), str(value), 
-    else:
-        return 'The input top rank order was '+str(value)+" is not accepted please try different number from  10 - 500", 'The input top rank order '+str(value)+" is not accepted please try different number from  10 - 500"
-
-@callback(
-    Output('curvature-value', 'data'),
-    Output('curvature-button-basic', 'children'),
-    Input('submit-curvature', 'n_clicks'),
-    State('input-on-curvature', 'value'),
-    prevent_initial_call=True
-)
-def update_curvature(n_clicks, value):
-    try:
-        # Try to convert the value to a float
-        value = float(value)
-
-        # Check if it's within an acceptable range
-        if 0.0001 <= value <= 10:  # Replace with your range if different
-            print(f'The curvature input for D1 was "{value}"')
-            return str(value), f"The curvature input was successfully set to {value}"
-        else:
-            return (
-                f'The input "{value}" is not accepted. Please try a value between 10 and 500.',
-                f'Invalid input: {value}. Accepted range is 10 - 500.'
-            )
-    except ValueError:
-        # Handle cases where value cannot be converted to float
-        return (
-            f'The input "{value}" is not a valid number. Please enter a numeric value.',
-            f'Invalid input: {value}. Please enter a valid number.'
-        )
-
-@callback(
-    Output('curvatured2-value', 'data'),
-    Output('curvatured2-button-basic', 'children'),
-    Input('submit-curvatured2', 'n_clicks'),
-    State('input-on-curvatured2', 'value'),
-    prevent_initial_call=True
-)
-def update_curvature_D2(n_clicks, value):
-    try:
-        # Try to convert the value to a float
-        value = float(value)
-
-        # Check if it's within an acceptable range
-        if 0.0001 <= value <= 10:  # Replace with your range if different
-            print(f'The curvature input for D1 was "{value}"')
-            return str(value), f"The curvature input was successfully set to {value}"
-        else:
-            return (
-                f'The input "{value}" is not accepted. Please try a value between 10 and 500.',
-                f'Invalid input: {value}. Accepted range is 10 - 500.'
-            )
-    except ValueError:
-        # Handle cases where value cannot be converted to float
-        return (
-            f'The input "{value}" is not a valid number. Please enter a numeric value.',
-            f'Invalid input: {value}. Please enter a valid number.'
-        )
 
 
 
@@ -2544,7 +2487,6 @@ def update_curvature_D2(n_clicks, value):
         Output('graph', 'figure'),
         Output('previous-stkName', 'data'),
         Output('previous-interv', 'data'),
-        Output('previous-tpoNum', 'data'),
         Output('interval', 'interval')],
     [Input('interval', 'n_intervals')],
     [State('stkName-value', 'data'),
@@ -2552,17 +2494,12 @@ def update_curvature_D2(n_clicks, value):
         State('data-store', 'data'),
         State('previous-stkName', 'data'),
         State('previous-interv', 'data'),
-        State('cluster-value', 'data'),
-        State('tpo-value', 'data'),
-        State('previous-tpoNum', 'data'),
-        State('curvature-value', 'data'),
-        State('curvatured2-value', 'data'),
         State('interval-time', 'data'),
         
     ],
 )
     
-def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, clustNum, tpoNum, previous_tpoNum, curvature, curvatured2, interval_time): #interv
+def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, interval_time): #interv
     
     #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
@@ -2576,36 +2513,19 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '10'
+        interv = '1'
         
-    if clustNum not in vaildClust:
-        clustNum = '20'
+    clustNum = '20'
         
-    if tpoNum not in vaildTPO:
-        tpoNum = '100'
-        
-    # Validate curvature
-    try:
-        #curvature = float(curvature)
-        if not 0.0001 <= float(curvature) <= 10:
-            print(f"Invalid curvature value: {curvature}. Setting to default: 0.6")
-            curvature = '0.6'
-    except (ValueError, TypeError):
-        print(f"Curvature input {curvature} is not a number. Setting to default: 0.6")
-        curvature = '0.6'
+    tpoNum = '100'
+
+    curvature = '0.6'
     
-    try:
-        #curvatured2 = float(curvatured2)
-        if not 0.0001 <= float(curvatured2) <= 10:
-            print(f"Invalid curvatured2 value: {curvatured2}. Setting to default: 0.7")
-            curvatured2 = '0.7'
-    except (ValueError, TypeError):
-        print(f"curvatured2 input {curvatured2} is not a number. Setting to default: 0.7")
-        curvatured2 = '0.7'
+    curvatured2 = '0.7'
 
     
         
-    if sname != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
+    if sname != previous_stkName or interv != previous_interv:
         stored_data = None
         
 
@@ -3074,7 +2994,6 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     #OptionTimeFrame = stored_data['timeFrame']   
     previous_stkName = sname
     previous_interv = interv
-    previous_tpoNum = tpoNum
 
          
     
@@ -3150,15 +3069,26 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         # Define the buffer zone
         #df['upper_buffer'] = df['POC'] * (1 + buffer)
         #df['lower_buffer'] = df['POC'] * (1 - buffer)
+        window_size = 2  # Define the window size
+        poly_order = 1    # Polynomial order (e.g., 2 for quadratic fit)
+        
+        curvature = '1.5'
+        curvatured2 = '0.7'
         
         df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
-        df['smoothed_1ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
+        df['smoothed_1ema'] = least_squares_filter(df['1ema'], window_size, poly_order)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
+        #df['smoothed_2ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
         df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
-        #df['POCDistanceEMA'] = df['POCDistanceEMA'].ewm(span=2, adjust=False).mean()#gaussian_filter1d(df['POCDistanceEMA'], sigma=int(1))##
-        #df['POCDistanceEMA'] = exponential_median(df['POCDistanceEMA'].values, span=2)
+        
+        df['positive_meanEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
+        df['POCDistanceEMA_rolling_ps'] = df['positive_meanEma'].ewm(span=10, adjust=False).mean()
+        
+        df['negative_meanEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
+        #df['negative_meanEma'] = df['POCDistanceEMA'].rolling(window=100).apply(lambda x: x[x < 0].mean(), raw=False)
+        df['POCDistanceEMA_rolling_ng'] = df['negative_meanEma'].ewm(span=10, adjust=False).mean()
         
         df['positive_meanEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         df['negative_meanEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
@@ -3172,61 +3102,15 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         # Calculate EMA separately for positive and negative values
         df['positive_emaEmaRoll'] = positive_values.ewm(span=30, adjust=False).mean()
         df['negative_emaEmaRoll'] = negative_values.ewm(span=30, adjust=False).mean()
-        '''
-        df['rolling_std'] = df['close'].rolling(window=150, min_periods=1).std()
-        df['rollingPositive_std'] = positive_values.std()
-        df['rollingNegative_std'] = negative_values.std()
 
-
-        df['positive_dynamicEma'] = df['positive_meanEma'] + df['rolling_std']
-        df['negative_dynamicEma'] = df['negative_meanEma'] - df['rolling_std']
-        
-        df['positive_emaEmaRoll_median'] = ewm_median(positive_values, span=20)
-        df['negative_emaEmaRoll_median'] = ewm_median(negative_values, span=20)
-        
-        
-        df['total_buys'] =  [i[2] for i in stored_data['timeFrame']]
-        df['total_sells'] = [i[3] for i in stored_data['timeFrame']]
-        
-        # Calculate imbalance
-        df['imbalance'] = (df['total_buys'] - df['total_sells']) / (df['total_buys'] + df['total_sells'])
-        
-        df['rolling_buys'] = df['total_buys'].rolling(window=20).sum()
-        df['rolling_sells'] = df['total_sells'].rolling(window=20).sum()
-        
-        df['rolling_imbalance'] = (df['rolling_buys'] - df['rolling_sells']) / (df['rolling_buys'] + df['rolling_sells'])
         
 
-        rolling_window = 30
-        df['positive_percentile'] = df['POCDistanceEMA'].rolling(window=rolling_window, min_periods=1).apply(
-            lambda x: np.percentile(x[x > 0], 75) if len(x[x > 0]) > 0 else np.nan)
-        df['negative_percentile'] = df['POCDistanceEMA'].rolling(window=rolling_window, min_periods=1).apply(
-            lambda x: np.percentile(x[x < 0], 25) if len(x[x < 0]) > 0 else np.nan)
+        #df['slope_degrees'] = [calculate_slope_rolling(i, df['smoothed_1ema'].values, int(15)) for i in range(len(df))]
+        #df['polyfit_slope'] = [calculate_polyfit_slope_rolling(i, df['smoothed_1ema'].values, int(15)) for i in range(len(df))]
         
-        positive_values = df['POCDistanceEMA'][df['POCDistanceEMA'] > 0]
-        negative_values = df['POCDistanceEMA'][df['POCDistanceEMA'] < 0]
-        
-        # Calculate the 75th percentile for positive values
-        positive_percentile = np.percentile(positive_values, 15) if len(positive_values) > 0 else np.nan
-        
-        # Calculate the 25th percentile for negative values
-        negative_percentile = np.percentile(negative_values, 15) if len(negative_values) > 0 else np.nan
-        
-        # Assign the computed percentiles to the dataframe
-        df['positive_percentile'] = positive_percentile
-        df['negative_percentile'] = negative_percentile
-        '''
-        #df['smoothed_1ema'] = linear_regression_smoothing(df['1ema'],window_size=8)#mean_shift_filter(df['close'], bandwidth=3, max_iterations=5)
-        #alpha = 0.6  # Smoothing factor
-        #df['momentum'] = df['smoothed_1ema'].diff() 
-        #df['RSI'] = calculate_rsi(df['close'])
-        #df['divergence'] = (df['RSI'].diff() * df['close'].diff()) < 0
-        
-        
-
         df['slope_degrees'] = [calculate_slope_rolling(i, df['smoothed_1ema'].values, int(30)) for i in range(len(df))]
         df['polyfit_slope'] = [calculate_polyfit_slope_rolling(i, df['smoothed_1ema'].values, int(30)) for i in range(len(df))]
-        #df['hybrid'] = [calculate_hybrid_slope(i, df['smoothed_1ema'].values, int(30)) for i in range(len(df))]
+
         
         slope = str(df['slope_degrees'].iloc[-1]) + ' ' + str(df['polyfit_slope'].iloc[-1])
         
@@ -3241,22 +3125,20 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #& (df['POCDistanceEMA'] > df['positive_meanEma']) & (df['smoothed_derivative'] > 0)
         #(df['POCDistanceEMA'] < df['negative_meanEma']) & (df['smoothed_derivative'] < 0)  &
         
-        df['cross_above'] = (df['smoothed_1ema'] >= df['POC'])   &  ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['POCDistanceEMA'] > 0.01)#& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+        df['cross_above'] = (df['smoothed_1ema'] >= df['POC']) & (df['smoothed_derivative'] > 0) & ((df['POCDistanceEMA'] > 0.034)) & (df['polyfit_slope'] > 0) & (df['smoothed_derivative'] > df['polyfit_slope']) #0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+        df['cross_below'] = (df['smoothed_1ema'] <= df['POC']) & (df['smoothed_derivative'] < 0) & ((df['POCDistanceEMA'] < -0.034)) & (df['polyfit_slope'] < 0) & (df['smoothed_derivative'] < df['polyfit_slope']) #-0.03 -0.0183& (df['smoothed_derivative'] < 0) & (df['POCDistanceEMA'] < -0.01)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
 
-        # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-        df['cross_below'] = (df['smoothed_1ema'] <= df['POC'])  &  ((df['polyfit_slope'] < 0) | (df['slope_degrees'] < 0)) & (df['POCDistanceEMA'] < -0.01)#& (df['smoothed_derivative'] < 0) & (df['POCDistanceEMA'] < -0.01)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
-
-        df['buy_signal'] = (df['cross_above']) #& (df['smoothed_1ema'] >= df['positive_threshold'])# & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
-        df['sell_signal'] = (df['cross_below']) #& (df['smoothed_1ema'] <= df['negative_threshold'])# & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['positive_meanEma'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
+        df['buy_signal'] = df['cross_above'].rolling(window=2, min_periods=2).sum() == 2#(df['cross_above']) #& (df['smoothed_1ema'] >= df['positive_threshold'])# & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
+        df['sell_signal'] = df['cross_below'].rolling(window=2, min_periods=2).sum() == 2#(df['cross_below']) #& (df['smoothed_1ema'] <= df['negative_threshold'])# & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['positive_meanEma'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
         
     except(NotFound):
         pass
         
      
-    try:
-        mboString = '('+str(round(df['positive_mean'].iloc[-1], 3)) + ' | ' + str(round(df['negative_mean'].iloc[-1], 3))+') --' + ' ('+str(round(df['positive_meanEma'].iloc[-1], 3)) + ' | ' + str(round(df['negative_meanEma'].iloc[-1], 3))+') '+slope#str(round((abs(df['HighVA'][len(df)-1] - df['LowVA'][len(df)-1]) / ((df['HighVA'][len(df)-1] + df['LowVA'][len(df)-1]) / 2)) * 100,3))
-    except(KeyError):
-        mboString = ''
+    #try:
+        #mboString = '('+str(round(df['positive_mean'].iloc[-1], 3)) + ' | ' + str(round(df['negative_mean'].iloc[-1], 3))+') --' + ' ('+str(round(df['positive_meanEma'].iloc[-1], 3)) + ' | ' + str(round(df['negative_meanEma'].iloc[-1], 3))+') '+slope#str(round((abs(df['HighVA'][len(df)-1] - df['LowVA'][len(df)-1]) / ((df['HighVA'][len(df)-1] + df['LowVA'][len(df)-1]) / 2)) * 100,3))
+    #except(KeyError):
+    mboString = ''
 
     #calculate_ttm_squeeze(df)
     
@@ -3265,14 +3147,14 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if interval_time == initial_inter:
         interval_time = subsequent_inter
     
-    if sname != previous_stkName or interv != previous_interv or tpoNum != previous_tpoNum:
+    if sname != previous_stkName or interv != previous_interv:
         interval_time = initial_inter
         
     
     
     fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
  
-    return stored_data, fg, previous_stkName, previous_interv, previous_tpoNum, interval_time
+    return stored_data, fg, previous_stkName, previous_interv, interval_time
 
 #[(i[2]-i[3],i[0]) for i in timeFrame ]valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2]])
 if __name__ == '__main__':
