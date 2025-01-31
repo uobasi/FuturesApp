@@ -3084,7 +3084,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #df['smoothed'] = [lowess(df['close'][:i+1], df.index[:i+1], frac=frac, return_sorted=False)[-1] for i in range(len(df))] 
     
         
-        df['smoothed_1ema'] = [lowess(df['close'][:i+1], df.index[:i+1], frac=frac, return_sorted=False)[-1] for i in range(len(df))]#lowess(df['1ema'], df.index, frac=frac, return_sorted=False)
+        df['smoothed_1ema'] = [lowess(df['1ema'][:i+1], df.index[:i+1], frac=frac, return_sorted=False)[-1] for i in range(len(df))]#lowess(df['1ema'], df.index, frac=frac, return_sorted=False)
         
         #df['smoothed_1ema'] = least_squares_filter(df['1ema'], window_size, poly_order)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
         #df['smoothed_2ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))
