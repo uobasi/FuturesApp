@@ -8,3 +8,4 @@ werkzeug==2.2.3
 google-cloud-storage==2.6.0
 databento==0.24.0
 pykalman==0.9.7
+statsmodels==0.14.2
