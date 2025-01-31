@@ -45,6 +45,7 @@ from scipy.signal import savgol_filter
 from scipy.stats import linregress
 from scipy.ndimage import gaussian_filter1d
 from numpy.polynomial import Polynomial
+from statsmodels.nonparametric.smoothers_lowess import lowess 
 #import yfinance as yf
 #import dateutil.parser
 
@@ -832,7 +833,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
     fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_1ema'], mode='lines', opacity=0.50,name='smoothed_1ema',marker_color='rgba(0,0,0)'))
       
     #fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.3, name='100ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.3, name='150ema', line=dict(color='black')))
@@ -3077,8 +3078,15 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
         df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
+
+
+        frac = 0.1 # Fraction of data used for smoothing 
+        #df['smoothed'] = [lowess(df['close'][:i+1], df.index[:i+1], frac=frac, return_sorted=False)[-1] for i in range(len(df))] 
+    
         
-        df['smoothed_1ema'] = least_squares_filter(df['1ema'], window_size, poly_order)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
+        df['smoothed_1ema'] = lowess(df['1ema'], df.index, frac=frac, return_sorted=False)
+        
+        #df['smoothed_1ema'] = least_squares_filter(df['1ema'], window_size, poly_order)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
         #df['smoothed_2ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
         df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
@@ -3125,8 +3133,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #& (df['POCDistanceEMA'] > df['positive_meanEma']) & (df['smoothed_derivative'] > 0)
         #(df['POCDistanceEMA'] < df['negative_meanEma']) & (df['smoothed_derivative'] < 0)  &
         
-        df['cross_above'] = (df['smoothed_1ema'] >= df['POC']) & (df['smoothed_derivative'] > 0) & ((df['POCDistanceEMA'] > 0.034)) & (df['polyfit_slope'] > 0) & (df['smoothed_derivative'] > df['polyfit_slope']) #0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
-        df['cross_below'] = (df['smoothed_1ema'] <= df['POC']) & (df['smoothed_derivative'] < 0) & ((df['POCDistanceEMA'] < -0.034)) & (df['polyfit_slope'] < 0) & (df['smoothed_derivative'] < df['polyfit_slope']) #-0.03 -0.0183& (df['smoothed_derivative'] < 0) & (df['POCDistanceEMA'] < -0.01)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+        df['cross_above'] = (df['smoothed_1ema'] >= df['POC']) & (df['smoothed_derivative'] > 0) & ((df['POCDistanceEMA'] > 0.037)) & (df['polyfit_slope'] > 0) #& (df['smoothed_derivative'] > df['polyfit_slope']) #0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+        df['cross_below'] = (df['smoothed_1ema'] <= df['POC']) & (df['smoothed_derivative'] < 0) & ((df['POCDistanceEMA'] < -0.037)) & (df['polyfit_slope'] < 0) #& (df['smoothed_derivative'] < df['polyfit_slope']) #-0.03 -0.0183& (df['smoothed_derivative'] < 0) & (df['POCDistanceEMA'] < -0.01)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
 
         df['buy_signal'] = df['cross_above'].rolling(window=2, min_periods=2).sum() == 2#(df['cross_above']) #& (df['smoothed_1ema'] >= df['positive_threshold'])# & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
         df['sell_signal'] = df['cross_below'].rolling(window=2, min_periods=2).sum() == 2#(df['cross_below']) #& (df['smoothed_1ema'] <= df['negative_threshold'])# & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['positive_meanEma'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
