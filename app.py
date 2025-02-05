@@ -2499,7 +2499,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if interv not in intList:
         interv = '10'
         
-    clustNum = '20'
+    clustNum = '10'
         
     tpoNum = '500'
 
