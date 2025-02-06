@@ -3220,12 +3220,12 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     for p in range(len(df)):
         # Initial trade entry conditions (fixed for better execution) not stillsell and
-        if ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
+        if not stillsell and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
             df.at[p, 'buy_signal'] = True
             stillbuy = True
             stillsell = False  
     #not stillbuy and
-        if ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021) & (df.at[p, 'smoothed_derivative'] < 0) & ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0))):
+        if not stillbuy and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021) & (df.at[p, 'smoothed_derivative'] < 0) & ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0))):
             df.at[p, 'sell_signal'] = True
             stillsell = True
             stillbuy = False  
