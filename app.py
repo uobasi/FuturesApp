@@ -597,6 +597,21 @@ def find_clusters(numbers, threshold):
     return clusters
 
 
+def find_spikes(data, high_percentile=97, low_percentile=3):
+    # Compute the high and low thresholds
+    high_threshold = np.percentile(data, high_percentile)
+    low_threshold = np.percentile(data, low_percentile)
+    
+    # Find and collect spikes
+    spikes = {'high_spikes': [], 'low_spikes': []}
+    for index, value in enumerate(data):
+        if value > high_threshold:
+            spikes['high_spikes'].append((index, value))
+        elif value < low_threshold:
+            spikes['low_spikes'].append((index, value))
+    
+    return spikes
+
 def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = '',   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5, troInterval:list=[]):
   
     notround = np.average(df_dx)
@@ -828,7 +843,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     
     #if 'POC' in df.columns:
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
@@ -1087,7 +1102,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         row=1, col=1)
         trcount+=1
      
-    
+    '''
     if len(tpCandle) > 0:
         fig.add_trace(go.Candlestick(
             x=[df['time'][i[4]] for i in tpCandle],
@@ -1105,7 +1120,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             name='TRO' ),
         row=1, col=1)
         trcount+=1
-        
+     
+    
     if len(troAbove) > 0:
         fig.add_trace(go.Candlestick(
             x=[df['time'][i[4]] for i in troAbove],
@@ -1140,6 +1156,43 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                  font=dict(color="white", size=10),
                  ),
             name='TroSellimbalance' ),
+        row=1, col=1)
+        trcount+=1
+    '''
+    tmpdict = find_spikes(df['weights'])
+    if len(tmpdict['low_spikes']) > 0:
+        fig.add_trace(go.Candlestick(
+            x=[df['time'][i[0]] for i in tmpdict['low_spikes']],
+            open=[df['open'][i[0]] for i in tmpdict['low_spikes']],
+            high=[df['high'][i[0]] for i in tmpdict['low_spikes']],
+            low=[df['low'][i[0]] for i in tmpdict['low_spikes']],
+            close=[df['close'][i[0]] for i in tmpdict['low_spikes']],
+            increasing={'line': {'color': 'crimson'}},
+            decreasing={'line': {'color': 'crimson'}}, 
+            hovertext=['('+str(OptionTimeFrame[i[0]][2])+')'+str(round(OptionTimeFrame[i[0]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[0]][3])+')'+str(round(OptionTimeFrame[i[0]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[0]][11])+ str(OptionTimeFrame[i[0]][2]-OptionTimeFrame[i[0]][3]) for i in tmpdict['low_spikes']],
+            hoverlabel=dict(
+                 bgcolor="crimson",
+                 font=dict(color="white", size=10),
+                 ),
+            name='Sellimbalance' ),
+        row=1, col=1)
+        trcount+=1
+        
+    if len(tmpdict['high_spikes']) > 0:
+        fig.add_trace(go.Candlestick(
+            x=[df['time'][i[0]] for i in tmpdict['high_spikes']],
+            open=[df['open'][i[0]] for i in tmpdict['high_spikes']],
+            high=[df['high'][i[0]] for i in tmpdict['high_spikes']],
+            low=[df['low'][i[0]] for i in tmpdict['high_spikes']],
+            close=[df['close'][i[0]] for i in tmpdict['high_spikes']],
+            increasing={'line': {'color': '#16FF32'}},
+            decreasing={'line': {'color': '#16FF32'}},
+            hovertext=['('+str(OptionTimeFrame[i[0]][2])+')'+str(round(OptionTimeFrame[i[0]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[0]][3])+')'+str(round(OptionTimeFrame[i[0]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[0]][11])+ str(OptionTimeFrame[i[0]][2]-OptionTimeFrame[i[0]][3]) for i in tmpdict['high_spikes']], 
+            hoverlabel=dict(
+                 bgcolor="#2CA02C",
+                 font=dict(color="white", size=10),
+                 ),
+            name='BuyImbalance' ),
         row=1, col=1)
         trcount+=1
     
@@ -1842,20 +1895,6 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     return fig
 
 
-def find_spikes(data, high_percentile=97, low_percentile=3):
-    # Compute the high and low thresholds
-    high_threshold = np.percentile(data, high_percentile)
-    low_threshold = np.percentile(data, low_percentile)
-    
-    # Find and collect spikes
-    spikes = {'high_spikes': [], 'low_spikes': []}
-    for index, value in enumerate(data):
-        if value > high_threshold:
-            spikes['high_spikes'].append((index, value))
-        elif value < low_threshold:
-            spikes['low_spikes'].append((index, value))
-    
-    return spikes
 
 def calculate_bollinger_bands(df):
    df['20sma'] = df['close'].rolling(window=20).mean()
@@ -2329,7 +2368,48 @@ def vwapDistanceCheckSell(df):
         return df['smoothed_1ema'] < df['vwap']
     return True
 
+def double_exponential_smoothing(X, alpha, beta):
+    """
+    Applies double exponential smoothing (Holt's linear trend method) to a pandas Series.
+
+    Parameters:
+    - X (pandas.Series or pandas.DataFrame column): Time series data.
+    - alpha (float): Smoothing factor for the level (0 < alpha < 1).
+    - beta (float): Smoothing factor for the trend (0 < beta < 1).
+
+    Returns:
+    - numpy.ndarray: Smoothed series forecast.
+    """
+    # If X is a DataFrame column (Series), convert it to a NumPy array
+    if isinstance(X, (pd.Series, pd.DataFrame)):
+        # If X is a DataFrame, assume the first column is the time series data.
+        X = X.iloc[:, 0] if isinstance(X, pd.DataFrame) else X
+        X = X.values
+
+    # Ensure X is now a NumPy array
+    X = np.asarray(X)
     
+    # Check that X has at least 2 data points
+    if X.shape[0] < 2:
+        raise ValueError("Input series X must contain at least two elements.")
+    
+    # Initialize arrays for the smoothed values (S), level (A), and trend (B)
+    S, A, B = [np.zeros(len(X)) for _ in range(3)]
+    
+    # Initial values: set initial level as the first observation,
+    # and initial trend as the difference between the first two observations.
+    S[0] = X[0]
+    A[0] = X[0]
+    B[0] = X[1] - X[0]
+    
+    # Main loop: update the level, trend, and forecast for each time step.
+    for t in range(1, len(X)):
+        A[t] = alpha * X[t] + (1 - alpha) * S[t - 1]
+        B[t] = beta * (A[t] - A[t - 1]) + (1 - beta) * B[t - 1]
+        S[t] = A[t] + B[t]
+    
+    return S
+   
 symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
@@ -3026,6 +3106,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['HighVA'] = pd.Series([i[1] for i in stored_data['pdata']])
         df['POC'] = pd.Series([i[2] for i in stored_data['pdata']])
         df['POC2'] = pd.Series([i[5] for i in stored_data['pdata']])
+        df['weights'] = [i[2]-i[3] for i in stored_data['timeFrame']]
         '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
         POCData = blob.download_as_text()
@@ -3057,7 +3138,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         #df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
-        df['smoothed_1ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
+        df['smoothed_1ema'] = double_exponential_smoothing(df['1ema'], 0.5, 0.01)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
         df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
         df['vwapDistance'] = (df['smoothed_1ema'] - df['vwap']) / df['vwap'] * 100
