@@ -3353,12 +3353,38 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             df.at[p, 'buy_signal'] = True  # Trigger buy
             stillsell = False  # Stop sell tracking
             stillbuy = True  # Start buy tracking
+            
+            
+        if (
+            not stillsell and not stillbuy and 
+            (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and 
+            (df.at[p, 'POCDistanceEMA'] > 0.048) and 
+            (df.at[p, 'smoothed_derivative'] > 0) and 
+            ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
+            (df.at[p, 'vwap_signalBuy'])
+        ):
+            df.at[p, 'buy_signal'] = True  # Trigger buy
+            stillsell = False  # Stop sell tracking
+            stillbuy = True  # Start buy tracking
+            
+        if (
+            not stillsell and not stillbuy and 
+            (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and 
+            (df.at[p, 'POCDistanceEMA'] < -0.048) and 
+            (df.at[p, 'smoothed_derivative'] < 0) and 
+            ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
+            (df.at[p, 'vwap_signalSell'])
+        ):
+            df.at[p, 'sell_signal'] = True  # Trigger sell
+            stillbuy = False  # Stop buy tracking
+            stillsell = True  # Start sell tracking
+            
     
         # Update tracking columns
         df.at[p, 'stillbuy'] = stillbuy
         df.at[p, 'stillsell'] = stillsell
     
-    mboString = ''
+
 
     #calculate_ttm_squeeze(df)
     
