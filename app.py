@@ -612,7 +612,7 @@ def find_spikes(data, high_percentile=97, low_percentile=3):
     
     return spikes
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = '',   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5, troInterval:list=[]):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5, troInterval:list=[]):
   
     notround = np.average(df_dx)
     average = round(np.average(df_dx), 3)
@@ -638,7 +638,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     ratio = str(round(max(tosells,tobuys)/min(tosells,tobuys),3))
     # Ratio : '+str(ratio)+' ' 
-    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))'+ mboString
+    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))'
     
     '''
     putDec = 0
@@ -928,14 +928,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         OptionTimeFrame[i[7]][10].append(i)
         
 
-    putCand = [i for i in OptionTimeFrame if int(i[2]) > int(i[3]) if int(i[4]) < len(df)] # if int(i[4]) < len(df)
-    callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df) +i[3]+i[5] +i[2]+i[5]
-    MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
     
+    '''
     tpCandle =  sorted([i for i in OptionTimeFrame if len(i[10]) > 0 if int(i[4]) < len(df)], key=lambda x: sum([trt[1] for trt in x[10]]),reverse=True)[:8] 
 
     
-    '''
+    
     est_now = datetime.utcnow() + timedelta(hours=-4)
     start_time = est_now.replace(hour=8, minute=00, second=0, microsecond=0)
     end_time = est_now.replace(hour=17, minute=30, second=0, microsecond=0)
@@ -944,39 +942,24 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     if start_time <= est_now <= end_time:
         ccheck = 0.64
     else:
-    '''
+    
     ccheck = 0.64
     indsAbove = [i for i in OptionTimeFrame if round(i[6],2) >= ccheck and int(i[4]) < len(df) and float(i[2]) >= (sum([i[2]+i[3] for i in OptionTimeFrame]) / len(OptionTimeFrame))]#  float(bms[i[4]])  # and int(i[4]) < len(df) [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(int(i[10]),i[1]) for i in sord if i[11] == stockName and i[1] == 'AboveAsk(BUY)']]
     
     indsBelow = [i for i in OptionTimeFrame if round(i[7],2) >= ccheck and int(i[4]) < len(df) and float(i[3]) >= (sum([i[3]+i[2] for i in OptionTimeFrame]) / len(OptionTimeFrame))]#  float(sms[i[4]]) # and int(i[4]) < len(df) imbalance = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[13] == 'Imbalance' and i[1] != 'BelowBid(SELL)' and i[1] != 'AboveAsk(BUY)']]
-
     
-        
 
-    '''
-    for i in OptionTimeFrame:
-        tvy = ''
-        for xp in i[10]:
-            mks = ''
-            for vb in i[10][xp]:
-                mks+= str(vb)+' '
-            
-            tvy += str(xp) +' | ' + mks + '<br>' 
-        i.append(tvy)
-        #i.append('\n'.join([f'{key}: {value}\n' for key, value in i[10].items()]))
-    '''
-    #print(OptionTimeFrame[0])
     for i in OptionTimeFrame:
         mks = ''
         tobuyss =  sum([x[1] for x in [t for t in i[10] if t[3] == 'B']])
         tosellss = sum([x[1] for x in [t for t in i[10] if t[3] == 'A']])
-        lenbuys = len([t for t in i[10] if t[3] == 'B'])
-        lensells = len([t for t in i[10] if t[3] == 'A'])
-        
+        #lenbuys = len([t for t in i[10] if t[3] == 'B'])
+        #lensells = len([t for t in i[10] if t[3] == 'A'])
         try:
-            tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) ' + str(lenbuys+lensells) +' '+  str(tobuyss+tosellss)+'<br>' 
+            tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) ' + str(tobuyss-tosellss)+'<br>' #str(lenbuys+lensells) +
         except(ZeroDivisionError):
             tpStrings =' '
+        
         
         for xp in i[10]:#sorted(i[10], key=lambda x: x[0], reverse=True):
             try:
@@ -1009,8 +992,36 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         except(ZeroDivisionError):
             troBelow.append(tro+[troSells, troBuys, 0])
     
-         
+    '''     
+    #textPerCandle = []
+    ctn = 0
+    for i in troPerCandle:
+        mks = ''
+        tobuyss =  sum([x[1] for x in [t for t in i[1] if t[5] == 'B']])
+        tosellss = sum([x[1] for x in [t for t in i[1] if t[5] == 'A']])
 
+        try:
+            tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) '+'<br>' +'Top100OrdersPerCandle: '+ str(tobuyss-tosellss)+'<br>' #str(lenbuys+lensells) +
+        except(ZeroDivisionError):
+            tpStrings =' '
+        
+        
+        for xp in i[1][:20]:
+            #print(xp)
+            try:
+                taag = 'Buy' if xp[5] == 'B' else 'Sell' if xp[5] == 'A' else 'Mid'
+                mks += str(xp[0]) + ' | ' + str(xp[1]) + ' ' + taag + ' ' + xp[6] + '<br>' 
+            except(IndexError):
+                pass
+        
+        OptionTimeFrame[ctn].append(mks + tpStrings)
+        #textPerCandle.append([ctn,mks + tpStrings])
+        ctn+=1
+        
+    putCand = [i for i in OptionTimeFrame if int(i[2]) > int(i[3]) if int(i[4]) < len(df)] # if int(i[4]) < len(df)
+    callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df) +i[3]+i[5] +i[2]+i[5]
+    MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
+    
     
     if len(MidCand) > 0:
        fig.add_trace(go.Candlestick(
@@ -1021,7 +1032,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
            close=[df['close'][i[4]] for i in MidCand],
            increasing={'line': {'color': 'gray'}},
            decreasing={'line': {'color': 'gray'}},
-           hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' +  '<br>' +i[11]+ str(i[2]-i[3])   for i in MidCand], #+ i[11] + str(sum([i[10][x][2] for x in i[10]]))
+           hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' +  '<br>' +i[11]+ 'AllOrders: '+str(i[2]-i[3])   for i in MidCand], #+ i[11] + str(sum([i[10][x][2] for x in i[10]]))
            hoverlabel=dict(
                 bgcolor="gray",
                 font=dict(color="black", size=10),
@@ -1039,7 +1050,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             close=[df['close'][i[4]] for i in putCand],
             increasing={'line': {'color': 'teal'}},
             decreasing={'line': {'color': 'teal'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ str(i[2]-i[3]) for i in putCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ 'AllOrders: '+str(i[2]-i[3]) for i in putCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
             hoverlabel=dict(
                  bgcolor="teal",
                  font=dict(color="white", size=10),
@@ -1057,7 +1068,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             close=[df['close'][i[4]] for i in callCand],
             increasing={'line': {'color': 'pink'}},
             decreasing={'line': {'color': 'pink'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ str(i[2]-i[3]) for i in callCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ 'AllOrders: '+str(i[2]-i[3]) for i in callCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
             hoverlabel=dict(
                  bgcolor="pink",
                  font=dict(color="black", size=10),
@@ -1065,7 +1076,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             name='' ),
         row=1, col=1)
         trcount+=1
-  
+    '''
     if len(indsAbove) > 0:
         fig.add_trace(go.Candlestick(
             x=[df['time'][i[4]] for i in indsAbove],
@@ -1102,7 +1113,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         row=1, col=1)
         trcount+=1
      
-    '''
+    
     if len(tpCandle) > 0:
         fig.add_trace(go.Candlestick(
             x=[df['time'][i[4]] for i in tpCandle],
@@ -1169,7 +1180,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             close=[df['close'][i[0]] for i in tmpdict['low_spikes']],
             increasing={'line': {'color': 'crimson'}},
             decreasing={'line': {'color': 'crimson'}}, 
-            hovertext=['('+str(OptionTimeFrame[i[0]][2])+')'+str(round(OptionTimeFrame[i[0]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[0]][3])+')'+str(round(OptionTimeFrame[i[0]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[0]][11])+ str(OptionTimeFrame[i[0]][2]-OptionTimeFrame[i[0]][3]) for i in tmpdict['low_spikes']],
+            hovertext=['('+str(OptionTimeFrame[i[0]][2])+')'+str(round(OptionTimeFrame[i[0]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[0]][3])+')'+str(round(OptionTimeFrame[i[0]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[0]][11])+ 'AllOrders: '+ str(OptionTimeFrame[i[0]][2]-OptionTimeFrame[i[0]][3]) for i in tmpdict['low_spikes']],
             hoverlabel=dict(
                  bgcolor="crimson",
                  font=dict(color="white", size=10),
@@ -1187,7 +1198,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             close=[df['close'][i[0]] for i in tmpdict['high_spikes']],
             increasing={'line': {'color': '#16FF32'}},
             decreasing={'line': {'color': '#16FF32'}},
-            hovertext=['('+str(OptionTimeFrame[i[0]][2])+')'+str(round(OptionTimeFrame[i[0]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[0]][3])+')'+str(round(OptionTimeFrame[i[0]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[0]][11])+ str(OptionTimeFrame[i[0]][2]-OptionTimeFrame[i[0]][3]) for i in tmpdict['high_spikes']], 
+            hovertext=['('+str(OptionTimeFrame[i[0]][2])+')'+str(round(OptionTimeFrame[i[0]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[0]][3])+')'+str(round(OptionTimeFrame[i[0]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[0]][11])+ 'AllOrders: '+ str(OptionTimeFrame[i[0]][2]-OptionTimeFrame[i[0]][3]) for i in tmpdict['high_spikes']], 
             hoverlabel=dict(
                  bgcolor="#2CA02C",
                  font=dict(color="white", size=10),
@@ -2904,12 +2915,15 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
             make.append([dtimeEpoch[ttm],dtime[ttm],bisect.bisect_left(tradeEpoch, dtimeEpoch[ttm])])
             timeDict[dtime[ttm]] = [0,0,0]
-            
+        
+        troPerCandle = []
         for tr in range(len(make)):
             if tr+1 < len(make):
                 tempList = AllTrades[make[tr][2]:make[tr+1][2]]
             else:
                 tempList = AllTrades[make[tr][2]:len(AllTrades)]
+                
+            troPerCandle.append([make[tr][1],sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]])
             for i in tempList:
                 if i[5] == 'B':
                     timeDict[make[tr][1]][0] += i[1]
@@ -2933,6 +2947,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
             
         stored_data['timeFrame'] = stored_data['timeFrame'][:len(stored_data['timeFrame'])-1] + timeFrame
+        stored_data['troPerCandle'] = stored_data['troPerCandle'][:len(stored_data['troPerCandle'])-1] + troPerCandle
         
         bful = []
         valist = []
@@ -2986,14 +3001,16 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             timeDict[dtime[ttm]] = [0,0,0]
             
             
-        
+        troPerCandle = []
         for tr in range(len(make)):
             if tr+1 < len(make):
+                #print(make[tr][2],make[tr+1][2])
                 tempList = AllTrades[make[tr][2]:make[tr+1][2]]
             else:
                 tempList = AllTrades[make[tr][2]:len(AllTrades)]
             
             #secList = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
+            troPerCandle.append([make[tr][1],sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]])
             for i in tempList:
                 if i[5] == 'B':
                     timeDict[make[tr][1]][0] += i[1]
@@ -3048,7 +3065,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
         dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row], bful[row][3], bful[row][4]] for row in  range(len(bful))]
             
-        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist} 
+        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle} 
         
     
     
@@ -3355,7 +3372,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     
     
-    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
  
     return stored_data, fg, previous_stkName, previous_interv, interval_time
 
