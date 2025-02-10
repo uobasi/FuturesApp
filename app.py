@@ -1830,10 +1830,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     text='<b>' + 'Buy' + '</b>',
                                     showarrow=True,
                                     arrowhead=4,
-                                    arrowcolor='green',
+                                    arrowcolor='black',
                                     font=dict(
                                         size=12,
-                                        color='green',
+                                        color='black',
                                     ),)
         
         # Check if the value of cross_below changed from the previous row
@@ -1846,10 +1846,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     text='<b>' + 'Sell' + '</b>',
                                     showarrow=True,
                                     arrowhead=4,
-                                    arrowcolor='red',
+                                    arrowcolor='black',
                                     font=dict(
                                         size=12,
-                                        color='red'
+                                        color='black'
                                     ),)
     
     
