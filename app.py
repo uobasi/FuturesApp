@@ -2594,7 +2594,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     tpoNum = '500'
 
-    curvature = '0.6'
+    curvature = '0.3'
     
     curvatured2 = '0.7'
 
