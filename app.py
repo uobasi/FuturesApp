@@ -1830,10 +1830,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     text='<b>' + 'Buy' + '</b>',
                                     showarrow=True,
                                     arrowhead=4,
-                                    arrowcolor='black',
+                                    arrowcolor='green',
                                     font=dict(
                                         size=12,
-                                        color='black',
+                                        color='green',
                                     ),)
         
         # Check if the value of cross_below changed from the previous row
@@ -1846,10 +1846,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     text='<b>' + 'Sell' + '</b>',
                                     showarrow=True,
                                     arrowhead=4,
-                                    arrowcolor='black',
+                                    arrowcolor='red',
                                     font=dict(
                                         size=12,
-                                        color='black'
+                                        color='red'
                                     ),)
     
     
@@ -2594,7 +2594,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     tpoNum = '500'
 
-    curvature = '0.3'
+    curvature = '0.6'
     
     curvatured2 = '0.7'
 
@@ -3155,7 +3155,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         #df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
-        df['smoothed_1ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#double_exponential_smoothing(df['1ema'], 0.5, 0.01)#random_walk_filter(df['1ema'], alpha=alpha)
+        df['smoothed_1ema'] = double_exponential_smoothing(df['1ema'], 0.5, 0.01)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
         df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
         df['vwapDistance'] = (df['smoothed_1ema'] - df['vwap']) / df['vwap'] * 100
