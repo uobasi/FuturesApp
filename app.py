@@ -2379,6 +2379,36 @@ def vwapDistanceCheckSell(df):
         return df['smoothed_1ema'] < df['vwap']
     return True
 
+def uppervwapDistanceCheckBuy(df):
+    if abs(df['uppervwapDistance']) <= 0.28:
+        return df['smoothed_1ema'] > df['uppervwapAvg']
+    return True
+
+def uppervwapDistanceCheckSell(df):
+    if abs(df['uppervwapDistance']) <= 0.28:
+        return df['smoothed_1ema'] < df['uppervwapAvg']
+    return True
+
+def lowervwapDistanceCheckBuy(df):
+    if abs(df['lowervwapDistance']) <= 0.28:
+        return df['smoothed_1ema'] > df['lowervwapAvg']
+    return True
+
+def lowervwapDistanceCheckSell(df):
+    if abs(df['lowervwapDistance']) <= 0.28:
+        return df['smoothed_1ema'] < df['lowervwapAvg'] 
+    return True
+
+def vwapAvgDistanceCheckBuy(df):
+    if abs(df['vwapAvgDistance']) <= 0.28:
+        return df['smoothed_1ema'] > df['vwapAvg']
+    return True
+
+def vwapAvgDistanceCheckSell(df):
+    if abs(df['vwapAvgDistance']) <= 0.28:
+        return df['smoothed_1ema'] < df['vwapAvg'] 
+    return True
+
 def double_exponential_smoothing(X, alpha, beta):
     """
     Applies double exponential smoothing (Holt's linear trend method) to a pandas Series.
@@ -2588,9 +2618,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '10'
+        interv = '5'
         
-    clustNum = '20'
+    clustNum = '15'
         
     tpoNum = '500'
 
@@ -3155,10 +3185,13 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         #df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
-        df['smoothed_1ema'] = double_exponential_smoothing(df['1ema'], 0.5, 0.01)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
+        df['smoothed_1ema'] = double_exponential_smoothing(df['1ema'], 0.5, 0.013)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
         df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
-        df['vwapDistance'] = (df['smoothed_1ema'] - df['vwap']) / df['vwap'] * 100
+        df['vwapDistance'] = (df['smoothed_1ema'] - df['vwap']) / df['vwap'] * 100 
+        df['uppervwapDistance'] = (df['smoothed_1ema'] - df['uppervwapAvg']) / df['uppervwapAvg'] * 100
+        df['lowervwapDistance'] = (df['smoothed_1ema'] - df['lowervwapAvg']) / df['lowervwapAvg'] * 100
+        df['vwapAvgDistance'] = (df['smoothed_1ema'] - df['vwapAvg']) / df['vwapAvg'] * 100
         #df['POCDistanceEMA'] = df['POCDistanceEMA'].ewm(span=2, adjust=False).mean()#gaussian_filter1d(df['POCDistanceEMA'], sigma=int(1))##
         #df['POCDistanceEMA'] = exponential_median(df['POCDistanceEMA'].values, span=2)
         
@@ -3226,8 +3259,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
         
 
-        df['slope_degrees'] = [calculate_slope_rolling(i, df['smoothed_1ema'].values, int(15)) for i in range(len(df))]
-        df['polyfit_slope'] = [calculate_polyfit_slope_rolling(i, df['smoothed_1ema'].values, int(15)) for i in range(len(df))]
+        df['slope_degrees'] = [calculate_slope_rolling(i, df['smoothed_1ema'].values, int(10)) for i in range(len(df))]
+        df['polyfit_slope'] = [calculate_polyfit_slope_rolling(i, df['smoothed_1ema'].values, int(10)) for i in range(len(df))]
         #df['hybrid'] = [calculate_hybrid_slope(i, df['smoothed_1ema'].values, int(30)) for i in range(len(df))]
         
         slope = str(df['slope_degrees'].iloc[-1]) + ' ' + str(df['polyfit_slope'].iloc[-1])
@@ -3246,6 +3279,15 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
                 
         df['vwap_signalBuy'] = df.apply(vwapDistanceCheckBuy, axis=1)
         df['vwap_signalSell'] = df.apply(vwapDistanceCheckSell, axis=1)
+        
+        df['uppervwap_signalBuy'] = df.apply(uppervwapDistanceCheckBuy, axis=1)
+        df['uppervwap_signalSell'] = df.apply(uppervwapDistanceCheckSell, axis=1) 
+        
+        df['lowervwap_signalBuy'] = df.apply(lowervwapDistanceCheckBuy, axis=1)
+        df['lowervwap_signalSell'] = df.apply(lowervwapDistanceCheckSell, axis=1) 
+        
+        df['vwapAvg_signalBuy'] = df.apply(vwapAvgDistanceCheckBuy, axis=1)
+        df['vwapAvg_signalSell'] = df.apply(vwapAvgDistanceCheckSell, axis=1)  
         
         #df['buy_signal'] = (df['POCDistanceEMA'].abs() <= 0.021) & (df['smoothed_derivative'] > 0) & ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0))#(df['smoothed_1ema'] >= df['POC']) & (df['POCDistanceEMA'] > 0.048) & (df['smoothed_derivative'] > 0)& ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['vwap_signalBuy'])#0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
         
@@ -3335,7 +3377,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] < -0.048) and 
             (df.at[p, 'smoothed_derivative'] < 0) and 
             ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
-            (df.at[p, 'vwap_signalSell'])
+            (df.at[p, 'vwap_signalSell']) and
+            (df.at[p, 'uppervwap_signalSell']) and
+            (df.at[p, 'lowervwap_signalSell']) and
+            (df.at[p, 'vwapAvg_signalSell']) 
         ):
             df.at[p, 'sell_signal'] = True  # Trigger sell
             stillbuy = False  # Stop buy tracking
@@ -3348,7 +3393,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] > 0.048) and 
             (df.at[p, 'smoothed_derivative'] > 0) and 
             ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
-            (df.at[p, 'vwap_signalBuy'])
+            (df.at[p, 'vwap_signalBuy']) and
+            (df.at[p, 'uppervwap_signalBuy']) and
+            (df.at[p, 'lowervwap_signalBuy']) and
+            (df.at[p, 'vwapAvg_signalBuy'])
         ):
             df.at[p, 'buy_signal'] = True  # Trigger buy
             stillsell = False  # Stop sell tracking
@@ -3361,7 +3409,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] > 0.048) and 
             (df.at[p, 'smoothed_derivative'] > 0) and 
             ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
-            (df.at[p, 'vwap_signalBuy'])
+            (df.at[p, 'vwap_signalBuy']) and
+            (df.at[p, 'uppervwap_signalBuy']) and
+            (df.at[p, 'lowervwap_signalBuy'])and
+            (df.at[p, 'vwapAvg_signalBuy']) 
         ):
             df.at[p, 'buy_signal'] = True  # Trigger buy
             stillsell = False  # Stop sell tracking
@@ -3373,7 +3424,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] < -0.048) and 
             (df.at[p, 'smoothed_derivative'] < 0) and 
             ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
-            (df.at[p, 'vwap_signalSell'])
+            (df.at[p, 'vwap_signalSell']) and
+            (df.at[p, 'uppervwap_signalSell'])and
+            (df.at[p, 'lowervwap_signalSell']) and
+            (df.at[p, 'vwapAvg_signalSell']) 
         ):
             df.at[p, 'sell_signal'] = True  # Trigger sell
             stillbuy = False  # Stop buy tracking
