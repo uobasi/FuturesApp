@@ -2535,7 +2535,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Input(id='input-on-interv', type='text', style=styles['input']),
             html.Button('Submit', id='submit-interv', n_clicks=0, style=styles['button']),
-            html.Div(id='interv-button-basic',children="Enter interval from 3-30, Default 10 mins", style=styles['label']),
+            html.Div(id='interv-button-basic',children="Enter interval from 3-30, Default 5 mins", style=styles['label']),
         ], style=styles['sub_container']),
         dcc.Store(id='interv-value'),
         
