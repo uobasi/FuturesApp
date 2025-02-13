@@ -2370,43 +2370,43 @@ def calculate_polyfit_slope_weighted(index, values, window_size):
         return 0.0
 
 def vwapDistanceCheckBuy(df):
-    if abs(df['vwapDistance']) <= 0.18:
+    if abs(df['vwapDistance']) <= 0.16:
         return df['smoothed_1ema'] > df['vwap']
     return True
 
 def vwapDistanceCheckSell(df):
-    if abs(df['vwapDistance']) <= 0.18:#0.09
+    if abs(df['vwapDistance']) <= 0.16:#0.09
         return df['smoothed_1ema'] < df['vwap']
     return True
 
 
 def uppervwapDistanceCheckBuy(df):
-    if abs(df['uppervwapDistance']) <= 0.18:
+    if abs(df['uppervwapDistance']) <= 0.16:
         return df['smoothed_1ema'] > df['uppervwapAvg']
     return True
 
 def uppervwapDistanceCheckSell(df):
-    if abs(df['uppervwapDistance']) <= 0.18:
+    if abs(df['uppervwapDistance']) <= 0.16:
         return df['smoothed_1ema'] < df['uppervwapAvg']
     return True
 
 def lowervwapDistanceCheckBuy(df):
-    if abs(df['lowervwapDistance']) <= 0.18:
+    if abs(df['lowervwapDistance']) <= 0.16:
         return df['smoothed_1ema'] > df['lowervwapAvg']
     return True
 
 def lowervwapDistanceCheckSell(df):
-    if abs(df['lowervwapDistance']) <= 0.18:
+    if abs(df['lowervwapDistance']) <= 0.16:
         return df['smoothed_1ema'] < df['lowervwapAvg'] 
     return True
 
 def vwapAvgDistanceCheckBuy(df):
-    if abs(df['vwapAvgDistance']) <= 0.18:
+    if abs(df['vwapAvgDistance']) <= 0.16:
         return df['smoothed_1ema'] > df['vwapAvg']
     return True
 
 def vwapAvgDistanceCheckSell(df):
-    if abs(df['vwapAvgDistance']) <= 0.18:
+    if abs(df['vwapAvgDistance']) <= 0.16:
         return df['smoothed_1ema'] < df['vwapAvg'] 
     return True
 
