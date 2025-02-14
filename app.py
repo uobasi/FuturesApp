@@ -825,7 +825,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         
     #fig.add_trace(go.Scatter(x=df['time'], y=df['rolling_imbalance'], mode='lines',name='rolling_imbalance'), row=3, col=1)
         
-    fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_1ema'], mode='lines',name='smoothed_1ema',marker_color='rgba(0,0,0)'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_1ema'], mode='lines',name='smoothed_1ema',marker_color='rgba(0,0,0)'))
 
 
         #fig.add_trace(go.Scatter(x=df['time'], y=df['close'].rolling(window=clusterNum).mean(), mode='lines',name=str(clusterNum)+'ema'), row=2, col=1)
@@ -843,7 +843,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     
     #if 'POC' in df.columns:
-    fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
@@ -853,25 +853,25 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.3, name='150ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['200ema'], mode='lines', opacity=0.3, name='200emaa', line=dict(color='black')))
     
-    fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', opacity=0.30,name='uppervwapAvg', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',opacity=0.30,name='lowervwapAvg', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', opacity=0.30,name='vwapAvg', ))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', opacity=0.30,name='uppervwapAvg', ))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',opacity=0.30,name='lowervwapAvg', ))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', opacity=0.30,name='vwapAvg', ))
     
     
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.1, name='UPPERVWAP2', line=dict(color='black')))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N2'], mode='lines', opacity=0.1, name='LOWERVWAP2', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.1, name='UPPERVWAP2', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N2'], mode='lines', opacity=0.1, name='LOWERVWAP2', line=dict(color='black')))
 
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_25'], mode='lines', opacity=0.15, name='UPPERVWAP2.5', line=dict(color='black')))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N25'], mode='lines', opacity=0.15, name='LOWERVWAP2.5', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_25'], mode='lines', opacity=0.15, name='UPPERVWAP2.5', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N25'], mode='lines', opacity=0.15, name='LOWERVWAP2.5', line=dict(color='black')))
    
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_1'], mode='lines', opacity=0.1, name='UPPERVWAP1', line=dict(color='black')))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N1'], mode='lines', opacity=0.1, name='LOWERVWAP1', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_1'], mode='lines', opacity=0.1, name='UPPERVWAP1', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N1'], mode='lines', opacity=0.1, name='LOWERVWAP1', line=dict(color='black')))
             
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_15'], mode='lines', opacity=0.1, name='UPPERVWAP1.5', line=dict(color='black')))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N15'], mode='lines', opacity=0.1, name='LOWERVWAP1.5', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_15'], mode='lines', opacity=0.1, name='UPPERVWAP1.5', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N15'], mode='lines', opacity=0.1, name='LOWERVWAP1.5', line=dict(color='black')))
 
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_0'], mode='lines', opacity=0.1, name='UPPERVWAP0.5', line=dict(color='black')))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N0'], mode='lines', opacity=0.1, name='LOWERVWAP0.5', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_0'], mode='lines', opacity=0.1, name='UPPERVWAP0.5', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N0'], mode='lines', opacity=0.1, name='LOWERVWAP0.5', line=dict(color='black')))
     
     #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', opacity=0.19, name='1ema',marker_color='rgba(0,0,0)'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', name='UPPERVWAP'))
@@ -2370,43 +2370,43 @@ def calculate_polyfit_slope_weighted(index, values, window_size):
         return 0.0
 
 def vwapDistanceCheckBuy(df):
-    if abs(df['vwapDistance']) <= 0.16:
+    if abs(df['vwapDistance']) <= 0.25:
         return df['smoothed_1ema'] > df['vwap']
     return True
 
 def vwapDistanceCheckSell(df):
-    if abs(df['vwapDistance']) <= 0.16:#0.09
+    if abs(df['vwapDistance']) <= 0.25:#0.09
         return df['smoothed_1ema'] < df['vwap']
     return True
 
 
 def uppervwapDistanceCheckBuy(df):
-    if abs(df['uppervwapDistance']) <= 0.16:
+    if abs(df['uppervwapDistance']) <= 0.25:
         return df['smoothed_1ema'] > df['uppervwapAvg']
     return True
 
 def uppervwapDistanceCheckSell(df):
-    if abs(df['uppervwapDistance']) <= 0.16:
+    if abs(df['uppervwapDistance']) <= 0.25:
         return df['smoothed_1ema'] < df['uppervwapAvg']
     return True
 
 def lowervwapDistanceCheckBuy(df):
-    if abs(df['lowervwapDistance']) <= 0.16:
+    if abs(df['lowervwapDistance']) <= 0.25:
         return df['smoothed_1ema'] > df['lowervwapAvg']
     return True
 
 def lowervwapDistanceCheckSell(df):
-    if abs(df['lowervwapDistance']) <= 0.16:
+    if abs(df['lowervwapDistance']) <= 0.25:
         return df['smoothed_1ema'] < df['lowervwapAvg'] 
     return True
 
 def vwapAvgDistanceCheckBuy(df):
-    if abs(df['vwapAvgDistance']) <= 0.16:
+    if abs(df['vwapAvgDistance']) <= 0.25:
         return df['smoothed_1ema'] > df['vwapAvg']
     return True
 
 def vwapAvgDistanceCheckSell(df):
-    if abs(df['vwapAvgDistance']) <= 0.16:
+    if abs(df['vwapAvgDistance']) <= 0.25:
         return df['smoothed_1ema'] < df['vwapAvg'] 
     return True
 
@@ -2614,8 +2614,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         stkName = sname
         symbolNum = symbolNumList[symbolNameList.index(stkName)]   
     else:
-        stkName = 'ES' 
-        sname = 'ES'
+        stkName = 'NQ' 
+        sname = 'NQ'
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
@@ -3361,12 +3361,12 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     for p in range(len(df)):
         # Initial trade entry conditions (fixed for better execution) not stillsell and
-        if ((abs(df.at[p, 'POCDistanceEMA']) <= 0.009)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
+        if not stillsell and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
             df.at[p, 'buy_signal'] = True
             stillbuy = True
             stillsell = False  
     #not stillbuy and
-        if ((abs(df.at[p, 'POCDistanceEMA']) <= 0.009) & (df.at[p, 'smoothed_derivative'] < 0) & ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0))):
+        if not stillbuy and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021) & (df.at[p, 'smoothed_derivative'] < 0) & ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0))):
             df.at[p, 'sell_signal'] = True
             stillsell = True
             stillbuy = False  
