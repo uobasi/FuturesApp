@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Sun Feb 16 03:50:19 2025
+
+@author: uobas
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Mon Jan 27 09:35:54 2025
 
 @author: UOBASUB
@@ -45,6 +52,7 @@ from scipy.signal import savgol_filter
 from scipy.stats import linregress
 from scipy.ndimage import gaussian_filter1d
 from numpy.polynomial import Polynomial
+from scipy.stats import percentileofscore
 #import yfinance as yf
 #import dateutil.parser
 
@@ -843,7 +851,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     
     #if 'POC' in df.columns:
-    fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
@@ -1015,6 +1023,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                 pass
         
         OptionTimeFrame[ctn].append(mks + tpStrings)
+        OptionTimeFrame[ctn].append([tobuyss,round(tobuyss/(tobuyss+tosellss),2),tosellss,round(tosellss/(tobuyss+tosellss),2)])
         #textPerCandle.append([ctn,mks + tpStrings])
         ctn+=1
         
@@ -1022,6 +1031,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df) +i[3]+i[5] +i[2]+i[5]
     MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
     
+    putCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and df['percentile_topBuys'][i[4]]> 96 and float(i[12][1]) >= 0.65] #float(i[4]) > 0.65 and df['topBuys'][i[0]] > df['topBuysAvg'][i[0]] and 
+    callCandImb = [i for i in OptionTimeFrame if int(i[12][2]) > int(i[12][0])and  df['percentile_topSells'][i[4]]> 96 and float(i[12][3]) >= 0.65]
+    
+    #putCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and float(i[12][1]) > 0.65 and int(i[4]) < len(df)]
+    #callCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and float(i[12][1]) > 0.65 and int(i[4]) < len(df)]
     
     if len(MidCand) > 0:
        fig.add_trace(go.Candlestick(
@@ -1170,17 +1184,17 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         row=1, col=1)
         trcount+=1
     '''
-    tmpdict = find_spikes(df['weights'])
-    if len(tmpdict['low_spikes']) > 0:
+    #tmpdict = find_spikes(df['weights'])
+    if len(callCandImb) > 0:
         fig.add_trace(go.Candlestick(
-            x=[df['time'][i[0]] for i in tmpdict['low_spikes']],
-            open=[df['open'][i[0]] for i in tmpdict['low_spikes']],
-            high=[df['high'][i[0]] for i in tmpdict['low_spikes']],
-            low=[df['low'][i[0]] for i in tmpdict['low_spikes']],
-            close=[df['close'][i[0]] for i in tmpdict['low_spikes']],
+            x=[df['time'][i[4]] for i in callCandImb],
+            open=[df['open'][i[4]] for i in callCandImb],
+            high=[df['high'][i[4]] for i in callCandImb],
+            low=[df['low'][i[4]] for i in callCandImb],
+            close=[df['close'][i[4]] for i in callCandImb],
             increasing={'line': {'color': 'crimson'}},
             decreasing={'line': {'color': 'crimson'}}, 
-            hovertext=['('+str(OptionTimeFrame[i[0]][2])+')'+str(round(OptionTimeFrame[i[0]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[0]][3])+')'+str(round(OptionTimeFrame[i[0]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[0]][11])+ 'AllOrders: '+ str(OptionTimeFrame[i[0]][2]-OptionTimeFrame[i[0]][3]) for i in tmpdict['low_spikes']],
+            hovertext=['('+str(OptionTimeFrame[i[4]][2])+')'+str(round(OptionTimeFrame[i[4]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[4]][3])+')'+str(round(OptionTimeFrame[i[4]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[4]][11])+ 'AllOrders: '+ str(OptionTimeFrame[i[4]][2]-OptionTimeFrame[i[4]][3]) for i in callCandImb],
             hoverlabel=dict(
                  bgcolor="crimson",
                  font=dict(color="white", size=10),
@@ -1189,16 +1203,16 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         row=1, col=1)
         trcount+=1
         
-    if len(tmpdict['high_spikes']) > 0:
+    if len(putCandImb) > 0:
         fig.add_trace(go.Candlestick(
-            x=[df['time'][i[0]] for i in tmpdict['high_spikes']],
-            open=[df['open'][i[0]] for i in tmpdict['high_spikes']],
-            high=[df['high'][i[0]] for i in tmpdict['high_spikes']],
-            low=[df['low'][i[0]] for i in tmpdict['high_spikes']],
-            close=[df['close'][i[0]] for i in tmpdict['high_spikes']],
+            x=[df['time'][i[4]] for i in putCandImb],
+            open=[df['open'][i[4]] for i in putCandImb],
+            high=[df['high'][i[4]] for i in putCandImb],
+            low=[df['low'][i[4]] for i in putCandImb],
+            close=[df['close'][i[4]] for i in putCandImb],
             increasing={'line': {'color': '#16FF32'}},
             decreasing={'line': {'color': '#16FF32'}},
-            hovertext=['('+str(OptionTimeFrame[i[0]][2])+')'+str(round(OptionTimeFrame[i[0]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[0]][3])+')'+str(round(OptionTimeFrame[i[0]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[0]][11])+ 'AllOrders: '+ str(OptionTimeFrame[i[0]][2]-OptionTimeFrame[i[0]][3]) for i in tmpdict['high_spikes']], 
+            hovertext=['('+str(OptionTimeFrame[i[4]][2])+')'+str(round(OptionTimeFrame[i[4]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[4]][3])+')'+str(round(OptionTimeFrame[i[4]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[4]][11])+ 'AllOrders: '+ str(OptionTimeFrame[i[4]][2]-OptionTimeFrame[i[4]][3]) for i in putCandImb], 
             hoverlabel=dict(
                  bgcolor="#2CA02C",
                  font=dict(color="white", size=10),
@@ -3100,7 +3114,23 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     
     
+    topBuys = []
+    topSells = []
     
+    # Iterate through troPerCandle and compute values
+    for i in stored_data['troPerCandle']:
+        tobuyss = sum(x[1] for x in i[1] if x[5] == 'B')  # Sum buy orders
+        tosellss = sum(x[1] for x in i[1] if x[5] == 'A')  # Sum sell orders
+        
+        topBuys.append(tobuyss)  # Store buy values
+        topSells.append(tosellss)  # Store sell values
+    
+    # Add to the DataFrame
+    df['topBuys'] = topBuys
+    df['topSells'] = topSells
+    
+    df['percentile_topBuys'] =  [percentileofscore(df['topBuys'][:i+1], df['topBuys'][i], kind='mean') for i in range(len(df))]
+    df['percentile_topSells'] =  [percentileofscore(df['topSells'][:i+1], df['topSells'][i], kind='mean') for i in range(len(df))] 
     
         
     #OptionTimeFrame = stored_data['timeFrame']   
