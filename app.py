@@ -821,10 +821,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_hline(y=70, row=2, col=1)
     #fig.add_hline(y=30, row=2, col=1)
     
-    fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
-    fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
-    fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
-    
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
+    fig.add_trace(go.Bar(x=df.index, y=df['percentile_Posdiff'], marker_color='teal'), row=3, col=1)
+    fig.add_trace(go.Bar(x=df.index, y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
     
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
@@ -3133,9 +3134,14 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     # Add to the DataFrame
     df['topBuys'] = topBuys
     df['topSells'] = topSells
+    df['topDiffNega'] = ((df['topBuys'] - df['topSells']).apply(lambda x: x if x < 0 else np.nan)).abs()
+    df['topDiffPost'] = (df['topBuys'] - df['topSells']).apply(lambda x: x if x > 0 else np.nan)
     
     df['percentile_topBuys'] =  [percentileofscore(df['topBuys'][:i+1], df['topBuys'][i], kind='mean') for i in range(len(df))]
     df['percentile_topSells'] =  [percentileofscore(df['topSells'][:i+1], df['topSells'][i], kind='mean') for i in range(len(df))] 
+    
+    df['percentile_Posdiff'] =  [percentileofscore(df['topDiffPost'][:i+1].dropna(), df['topDiffPost'][i], kind='mean') if not np.isnan(df['topDiffPost'][i]) else None for i in range(len(df))]
+    df['percentile_Negdiff'] =  [percentileofscore(df['topDiffNega'][:i+1].dropna(), df['topDiffNega'][i], kind='mean') if not np.isnan(df['topDiffNega'][i]) else None for i in range(len(df))]
     
         
     #OptionTimeFrame = stored_data['timeFrame']   
