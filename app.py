@@ -2534,7 +2534,7 @@ from google.api_core.exceptions import NotFound
 from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 1800000  # Initial interval #210000#250000#80001
-subsequent_inter = 96000  # Subsequent interval
+subsequent_inter = 80000  # Subsequent interval
 app = Dash()
 app.title = "EnVisage"
 app.layout = html.Div([
