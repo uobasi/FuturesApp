@@ -2471,9 +2471,35 @@ def double_exponential_smoothing(X, alpha, beta):
         S[t] = A[t] + B[t]
     
     return S
-   
+
+
+def download_new_data(symbolNum, last_byte=0):
+    blob = bucket.blob(symbolNum)  
+
+    # Get Blob Size
+    blob.reload()  # Refresh metadata
+    blob_size = blob.size  # Total file size in bytes
+
+    if blob_size is None or blob_size == 0:
+        #print("⚠️ File is empty or does not exist.")
+        return None, 0  # Reset last_byte to prevent further errors
+
+    if last_byte >= blob_size:
+        #print("✅ No new data available. Waiting for updates...")
+        return None, last_byte  # No new data to fetch
+
+    # Download only new data from last known byte
+    new_data = blob.download_as_bytes(start=last_byte)
+
+    if new_data:
+        last_byte += len(new_data)  # Update last byte position
+        return new_data.decode("utf-8"), last_byte
+    return None, last_byte
+
 symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
+
+
 
 intList = [str(i) for i in range(3,30)]
 
@@ -2534,7 +2560,7 @@ from google.api_core.exceptions import NotFound
 from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 1800000  # Initial interval #210000#250000#80001
-subsequent_inter = 80000  # Subsequent interval
+subsequent_inter = 30000  # Subsequent interval
 app = Dash()
 app.title = "EnVisage"
 app.layout = html.Div([
@@ -2567,6 +2593,8 @@ app.layout = html.Div([
     dcc.Store(id='data-store'),
     dcc.Store(id='previous-interv'),
     dcc.Store(id='previous-stkName'),
+    dcc.Store(id='last_byte_OHLC'),
+    dcc.Store(id='last_byte_Trades'),
     dcc.Store(id='interval-time', data=initial_inter),
   
 ])
@@ -2613,6 +2641,8 @@ def update_interval(n_clicks, value):
         Output('graph', 'figure'),
         Output('previous-stkName', 'data'),
         Output('previous-interv', 'data'),
+        Output('last_byte_OHLC', 'data'),
+        Output('last_byte_Trades', 'data'),
         Output('interval', 'interval')],
     [Input('interval', 'n_intervals')],
     [State('stkName-value', 'data'),
@@ -2620,13 +2650,14 @@ def update_interval(n_clicks, value):
         State('data-store', 'data'),
         State('previous-stkName', 'data'),
         State('previous-interv', 'data'),
+        State('last_byte_OHLC', 'data'),
+        State('last_byte_Trades', 'data'),
         State('interval-time', 'data'),
         
     ],
 )
     
-def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, interval_time): #interv
-    
+def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, last_byte_OHLC, last_byte_Trades, interval_time): #interv
     #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
 
@@ -2652,15 +2683,44 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
         
     if sname != previous_stkName or interv != previous_interv:
-        stored_data = None
-        
+        stored_data = {}
+        last_byte_OHLC = 0
+        last_byte_Trades = 0
 
-
-    
+    print(last_byte_OHLC, last_byte_Trades)	
         
         
     print('inFunction '+sname)	
     
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = [
+            executor.submit(download_new_data, 'FuturesOHLC' + str(symbolNum), last_byte_OHLC),
+            executor.submit(download_new_data, 'FuturesTrades' + str(symbolNum), last_byte_Trades)
+        ]
+        
+        new_OHLC, new_Trades = [future.result() for future in futures]
+
+    if 'FuturesOHLC' not in stored_data:
+        if new_OHLC[0]:  # If new data exists
+            FuturesOHLC = pd.read_csv(io.StringIO(new_OHLC[0]), header=None)
+            stored_data['FuturesOHLC'] = FuturesOHLC.values.tolist()
+    elif 'FuturesOHLC' in stored_data:
+        if new_OHLC[0]:  # If new data exists
+            FuturesOHLC = pd.read_csv(io.StringIO(new_OHLC[0]), header=None).values.tolist()
+            stored_data['FuturesOHLC'] += FuturesOHLC
+    
+    if 'FuturesTrades' not in stored_data:
+        if new_Trades[0]:  # If new data exists
+            FuturesTrades = pd.read_csv(io.StringIO(new_Trades[0]), header=None)
+            stored_data['FuturesTrades'] = FuturesTrades.values.tolist()
+    elif 'FuturesTrades' in stored_data:
+        if new_Trades[0]:  # If new data exists
+            FuturesTrades = pd.read_csv(io.StringIO(new_Trades[0]), header=None).values.tolist()
+            stored_data['FuturesTrades'] += FuturesTrades
+
+    last_byte_OHLC = new_OHLC[1]  # Update last byte position
+    last_byte_Trades = new_Trades[1]  # Update last byte position
+    '''
     with ThreadPoolExecutor(max_workers=3) as executor:
         #if sname != previous_stkName:
         # Download everything when stock name changes
@@ -2670,54 +2730,18 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             #executor.submit(download_daily_data, bucket, stkName)]
         
         FuturesOHLC, FuturesTrades = [future.result() for future in futures] #, prevDf
-        '''
-        else:
-            # Skip daily data when stock name is unchanged
-            futures = [
-                executor.submit(download_data, bucket, 'FuturesOHLC' + str(symbolNum)),
-                executor.submit(download_data, bucket, 'FuturesTrades' + str(symbolNum))]
-            
-            FuturesOHLC, FuturesTrades = [future.result() for future in futures]
-            prevDf = None  # No new daily data download
-        '''
+
     
     # Process data with pandas directly
     FuturesOHLC = pd.read_csv(io.StringIO(FuturesOHLC), header=None)
     FuturesTrades = pd.read_csv(io.StringIO(FuturesTrades), header=None)
     
+    stored_data['FuturesOHLC'] = FuturesOHLC.values.tolist()
+    stored_data['FuturesTrades'] = FuturesTrades.values.tolist()
     '''
-    blob = Blob('FuturesOHLC'+str(symbolNum), bucket) 
-    FuturesOHLC = blob.download_as_text()
-        
-
-    csv_reader  = csv.reader(io.StringIO(FuturesOHLC))
+    FuturesOHLC = pd.DataFrame(stored_data['FuturesOHLC'])
+    FuturesTrades = pd.DataFrame(stored_data['FuturesTrades'])
     
-    csv_rows = []
-    for row in csv_reader:
-        csv_rows.append(row)
-        
-    
-    newOHLC = [i for i in csv_rows]
-     
-    
-    aggs = [ ] 
-    for i in FuturesOHLC.values.tolist():
-        hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
-        if hourss < 10:
-            hourss = '0'+str(hourss)
-        minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
-        if minss < 10:
-            minss = '0'+str(minss)
-        opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
-        aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
-        
-            
-    newAggs = []
-    for i in aggs:
-        if i not in newAggs:
-            newAggs.append(i)
-    
-    '''
     aggs = [ ] 
     for row in FuturesOHLC.itertuples(index=False):
         # Extract values from the row, where row[0] corresponds to the first column, row[1] to the second, etc.
@@ -2773,48 +2797,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
     
-    '''
-    # Apply TEMA calculation to the DataFrame
-    if prevDf is not None:
-        columns_to_keep = ['open', 'high', 'low', 'close', 'volume']
-        prevDf_filtered = prevDf[columns_to_keep]
-        #df_filtered = df[columns_to_keep]
-        
-        # Combine the two DataFrames row-wise
-        #combined_df = pd.concat([prevDf_filtered, df_filtered], ignore_index=True)
-        
-        #vwapCum(combined_df)
-        #PPPCum(combined_df)    
-    '''
 
-    '''
-    blob = Blob('FuturesTrades'+str(symbolNum), bucket) 
-    FuturesTrades = blob.download_as_text()
-    
-    
-    csv_reader  = csv.reader(io.StringIO(FuturesTrades))
-    
-    csv_rows = []
-    for row in csv_reader:
-        csv_rows.append(row)
-       
-
-    #STrades = [i for i in csv_rows]
-    start_time_itertuples = time.time()
-    AllTrades = []
-    for i in FuturesTrades.values.tolist():
-        hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
-        if hourss < 10:
-            hourss = '0'+str(hourss)
-        minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
-        if minss < 10:
-            minss = '0'+str(minss)
-        opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
-        AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
-    time_itertuples = time.time() - start_time_itertuples
-       
-    #AllTrades = [i for i in AllTrades if i[1] > 1]
-    '''
 
     AllTrades = []
     for row in FuturesTrades.itertuples(index=False):
@@ -2858,77 +2841,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
 
     
     
-    '''
-    
-    
-    
-    kf = KalmanFilter(dim_x=3, dim_z=1)
 
-    # State transition matrix (F) for position, velocity, and acceleration
-    dt = 1  # Time step
-    kf.F = np.array([[1, dt, 0.5 * dt**2],
-                     [0, 1, dt],
-                     [0, 0, 1]])
-    
-    # Measurement function (H): We only observe the position (30 EMA)
-    kf.H = np.array([[1, 0, 0]])
-    
-    # Covariance matrix (P): Initial uncertainty in the estimates
-    kf.P *= 1000  # High initial uncertainty in all states
-    
-    # Measurement noise (R): Uncertainty in observations
-    kf.R = np.array([[5]])
-    
-    # Process noise (Q): Uncertainty in the model dynamics
-    kf.Q = np.array([[0.1, 0, 0],
-                     [0, 0.1, 0],
-                     [0, 0, 0.1]])
-    
-    # Initial state estimate: [position, velocity, acceleration]
-    kf.x = np.array([[df[clustNum+'ema'].iloc[0]], [0], [0]])  # Start with initial position, zero velocity, and zero acceleration
-    
-    # Lists to store the estimates
-    positions = []
-    velocities = []
-    accelerations = []
-    
-    # Iterate over each data point in '30ema'
-    for emaa in df[clustNum+'ema']:
-        kf.predict()  # Predict next state
-        kf.update([emaa])  # Update state with new measurement (position)
-        
-        # Store the estimated position, velocity, and acceleration
-        positions.append(kf.x[0][0])  # Position estimate (smoothed 30 EMA)
-        velocities.append(kf.x[1][0])  # Velocity (first derivative) estimate
-        accelerations.append(kf.x[2][0])  # Acceleration (second derivative) estimate
-    
-    # Add the estimates to the DataFrame
-    df['kalman_position'] = positions
-    df['kalman_velocity'] = velocities
-    df['kalman_acceleration'] = accelerations
-    
-    df['kalman_velocity'] = df['kalman_velocity'].ewm(span=1, adjust=False).mean()
-    '''
-    
-    '''
-    order = 1     # Filter order
-    cutoff = 0.04  # Cutoff frequency, adjust based on desired smoothness
-    
-    # Design a low-pass Butterworth filter
-    b, a = butter(N=order, Wn=cutoff, btype='low')
-    
-    # Apply the filtfilt filter to df['30ema']
-    df['filtfilt'] = filtfilt(b, a, df['close'])
-    #df['lfilter'] = lfilter(b, a, df['close'])
-    
-    from scipy.signal import lfilter_zi
-
-    # Get initial conditions for the filter
-    zi = lfilter_zi(b, a) * df['close'].iloc[0]  # Scale initial conditions to match data
-    
-    # Apply lfilter with the initialized conditions
-    df['lfilter'], _ = lfilter(b, a, df['close'], zi=zi)
-    '''
 
     window_size = 3  # Define the window size
     poly_order = 1   # Polynomial order (e.g., 2 for quadratic fit)
@@ -2957,7 +2870,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     tradeEpoch = [i[2] for i in AllTrades]
     
     
-    if stored_data is not None:
+    if 'timeFrame' in stored_data: #stored_data is not None and 
         print('NotNew')
         startIndex = next(iter(df.index[df['time'] == stored_data['timeFrame'][len(stored_data['timeFrame'])-1][0]]), None)#df['timestamp'].searchsorted(stored_data['timeFrame'][len(stored_data['timeFrame'])-1][9])
         timeDict = {}
@@ -3042,7 +2955,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
     
     
-    if stored_data is None:
+    if 'timeFrame' not in stored_data: #stored_data is None or 
         print('Newstored')
         timeDict = {}
         make = []
@@ -3116,8 +3029,11 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
         dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row], bful[row][3], bful[row][4]] for row in  range(len(bful))]
             
-        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle} 
-        
+        #stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle} 
+        stored_data['timeFrame'] = timeFrame
+        stored_data['tro'] = dst
+        stored_data['pdata'] = valist
+        stored_data['troPerCandle'] = troPerCandle
     
     
     topBuys = []
@@ -3484,7 +3400,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
 
     #calculate_ttm_squeeze(df)
     
-    
+    print(last_byte_OHLC, last_byte_Trades)
         
     if interval_time == initial_inter:
         interval_time = subsequent_inter
@@ -3496,7 +3412,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
  
-    return stored_data, fg, previous_stkName, previous_interv, interval_time
+    return stored_data, fg, previous_stkName, previous_interv, last_byte_OHLC, last_byte_Trades, interval_time
 
 #[(i[2]-i[3],i[0]) for i in timeFrame ]valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2]])
 if __name__ == '__main__':
