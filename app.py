@@ -620,7 +620,7 @@ def find_spikes(data, high_percentile=97, low_percentile=3):
     
     return spikes
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5, troInterval:list=[]):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5, troInterval:list=[], footPrint:list=[]):
   
     notround = np.average(df_dx)
     average = round(np.average(df_dx), 3)
@@ -1006,10 +1006,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     ctn = 0
     for i in troPerCandle:
         mks = ''
+        ftp = ''
         tobuyss =  sum([x[1] for x in [t for t in i[1] if t[5] == 'B']])
         tosellss = sum([x[1] for x in [t for t in i[1] if t[5] == 'A']])
 
         try:
+            
             tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) '+'<br>' +'Top100OrdersPerCandle: '+ str(tobuyss-tosellss)+'<br>' #str(lenbuys+lensells) +
         except(ZeroDivisionError):
             tpStrings =' '
@@ -1023,7 +1025,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             except(IndexError):
                 pass
         
-        OptionTimeFrame[ctn].append(mks + tpStrings)
+        for xe in footPrint[ctn][1]:
+            ftp += xe[0] + ' | ' + str(xe[1])  + '<br>' 
+            
+            
+        
+        OptionTimeFrame[ctn].append(ftp + tpStrings) #mks
         OptionTimeFrame[ctn].append([tobuyss,round(tobuyss/(tobuyss+tosellss),2),tosellss,round(tosellss/(tobuyss+tosellss),2)])
         #textPerCandle.append([ctn,mks + tpStrings])
         ctn+=1
@@ -2881,11 +2888,41 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             timeDict[dtime[ttm]] = [0,0,0]
         
         troPerCandle = []
+        footPrint = []
         for tr in range(len(make)):
             if tr+1 < len(make):
                 tempList = AllTrades[make[tr][2]:make[tr+1][2]]
             else:
                 tempList = AllTrades[make[tr][2]:len(AllTrades)]
+            
+            prices = np.array([row[0] for row in tempList])
+
+            # Determine number of bins based on price range
+            price_min = min(prices)
+            price_max = max(prices)
+            num_bins = int((price_max - price_min) / 1.5) + 1
+            
+            bin_edges = np.linspace(price_min, price_max, num_bins + 1)[::-1]
+            
+            tdf = pd.DataFrame(tempList, columns=["Price", "Qty", "Timestamp", "Col4", "Col5", "Type", "Time"])
+            
+            bin_results = []
+
+            for i in range(len(bin_edges) - 1):
+                lower_bound = bin_edges[i + 1]
+                upper_bound = bin_edges[i]
+                
+                # Filter DataFrame based on price range
+                filtered_df = tdf[(tdf["Price"] >= lower_bound) & (tdf["Price"] < upper_bound)]
+                
+                # Count occurrences of 'A' and 'B'
+                count_A = (filtered_df["Type"] == "A").sum()
+                count_B = (filtered_df["Type"] == "B").sum()
+                
+                # Store results
+                bin_results.append([f"{round(upper_bound,3)} - {round(lower_bound,3)}", count_B - count_A, ])
+                
+            footPrint.append([make[tr][1],bin_results])
                 
             troPerCandle.append([make[tr][1],sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]])
             for i in tempList:
@@ -2912,6 +2949,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
         stored_data['timeFrame'] = stored_data['timeFrame'][:len(stored_data['timeFrame'])-1] + timeFrame
         stored_data['troPerCandle'] = stored_data['troPerCandle'][:len(stored_data['troPerCandle'])-1] + troPerCandle
+        stored_data['footPrint'] = stored_data['footPrint'][:len(stored_data['footPrint'])-1] + footPrint
         
         bful = []
         valist = []
@@ -2966,6 +3004,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
             
         troPerCandle = []
+        footPrint = []
         for tr in range(len(make)):
             if tr+1 < len(make):
                 #print(make[tr][2],make[tr+1][2])
@@ -2973,7 +3012,35 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             else:
                 tempList = AllTrades[make[tr][2]:len(AllTrades)]
             
-            #secList = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
+            prices = np.array([row[0] for row in tempList])
+
+            # Determine number of bins based on price range
+            price_min = min(prices)
+            price_max = max(prices)
+            num_bins = int((price_max - price_min) / 1.5) + 1
+            
+            bin_edges = np.linspace(price_min, price_max, num_bins + 1)[::-1]
+            
+            tdf = pd.DataFrame(tempList, columns=["Price", "Qty", "Timestamp", "Col4", "Col5", "Type", "Time"])
+            
+            bin_results = []
+
+            for i in range(len(bin_edges) - 1):
+                lower_bound = bin_edges[i + 1]
+                upper_bound = bin_edges[i]
+                
+                # Filter DataFrame based on price range
+                filtered_df = tdf[(tdf["Price"] >= lower_bound) & (tdf["Price"] < upper_bound)]
+                
+                # Count occurrences of 'A' and 'B'
+                count_A = (filtered_df["Type"] == "A").sum()
+                count_B = (filtered_df["Type"] == "B").sum()
+                
+                # Store results
+                bin_results.append([f"{round(upper_bound,3)} - {round(lower_bound,3)}", count_B - count_A, ])
+            footPrint.append([make[tr][1],bin_results])
+            
+            
             troPerCandle.append([make[tr][1],sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]])
             for i in tempList:
                 if i[5] == 'B':
@@ -2987,7 +3054,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             except(ZeroDivisionError):
                 timeDict[make[tr][1]]  += [0,0,0] 
     
-                          
+            
+    
         timeFrame = [[i,'']+timeDict[i] for i in timeDict]
     
         for i in range(len(timeFrame)):
@@ -3034,6 +3102,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         stored_data['tro'] = dst
         stored_data['pdata'] = valist
         stored_data['troPerCandle'] = troPerCandle
+        stored_data['footPrint'] = footPrint
     
     
     topBuys = []
@@ -3410,7 +3479,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     
     
-    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro'], footPrint=stored_data['footPrint'] ) #trends=FindTrends(df,n=10)
  
     return stored_data, fg, previous_stkName, previous_interv, last_byte_OHLC, last_byte_Trades, interval_time
 
