@@ -2482,11 +2482,14 @@ def double_exponential_smoothing(X, alpha, beta):
 
 def download_new_data(symbolNum, last_byte=0):
     blob = bucket.blob(symbolNum)  
-
-    # Get Blob Size
     blob.reload()  # Refresh metadata
     blob_size = blob.size  # Total file size in bytes
-
+    
+    
+    if not blob.exists():
+        print(f"⚠️ Blob {blob_name} does not exist. Skipping download.")
+        return None, last_byte  # Prevent error
+    
     if blob_size is None or blob_size == 0:
         #print("⚠️ File is empty or does not exist.")
         return None, 0  # Reset last_byte to prevent further errors
@@ -2515,6 +2518,8 @@ vaildClust = [str(i) for i in range(0,200)]
 vaildTPO = [str(i) for i in range(1,500)]
 
 covarianceList = [str(round(i, 2)) for i in [x * 0.01 for x in range(1, 1000)]]
+
+doubl = ['NQ']
 
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
@@ -2875,6 +2880,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     #tempTrades = sorted(AllTrades, key=lambda d: d[6], reverse=False) 
     #tradeTimes = [i[6] for i in AllTrades]
     tradeEpoch = [i[2] for i in AllTrades]
+    dv = 2 * 4 if stkName in doubl else 2 * 1
     
     
     if 'timeFrame' in stored_data: #stored_data is not None and 
@@ -2900,7 +2906,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             # Determine number of bins based on price range
             price_min = min(prices)
             price_max = max(prices)
-            num_bins = int((price_max - price_min) / 2) + 1
+            num_bins = int((price_max - price_min) / dv) + 1
             
             bin_edges = np.linspace(price_min, price_max, num_bins + 1)[::-1]
             
@@ -3005,6 +3011,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
         troPerCandle = []
         footPrint = []
+        
         for tr in range(len(make)):
             if tr+1 < len(make):
                 #print(make[tr][2],make[tr+1][2])
@@ -3017,7 +3024,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             # Determine number of bins based on price range
             price_min = min(prices)
             price_max = max(prices)
-            num_bins = int((price_max - price_min) / 2) + 1
+            num_bins = int((price_max - price_min) / dv) + 1
             
             bin_edges = np.linspace(price_min, price_max, num_bins + 1)[::-1]
             
