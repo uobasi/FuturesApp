@@ -824,8 +824,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
     #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=3, col=1)
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
+    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=2, col=1)
+    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=2, col=1)
     
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
@@ -1619,8 +1619,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistanceEMA'], marker_color=colors), row=2, col=1)
     '''  
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=2, col=1)
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=2, col=1)
+    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=3, col=1)
+    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=3, col=1)
         
         
 
@@ -2900,7 +2900,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             # Determine number of bins based on price range
             price_min = min(prices)
             price_max = max(prices)
-            num_bins = int((price_max - price_min) / 1.5) + 1
+            num_bins = int((price_max - price_min) / 2) + 1
             
             bin_edges = np.linspace(price_min, price_max, num_bins + 1)[::-1]
             
@@ -3017,7 +3017,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             # Determine number of bins based on price range
             price_min = min(prices)
             price_max = max(prices)
-            num_bins = int((price_max - price_min) / 1.5) + 1
+            num_bins = int((price_max - price_min) / 2) + 1
             
             bin_edges = np.linspace(price_min, price_max, num_bins + 1)[::-1]
             
