@@ -53,6 +53,7 @@ from scipy.stats import linregress
 from scipy.ndimage import gaussian_filter1d
 from numpy.polynomial import Polynomial
 from scipy.stats import percentileofscore
+from google.api_core.exceptions import NotFound
 #import yfinance as yf
 #import dateutil.parser
 
@@ -2485,25 +2486,29 @@ def download_new_data(symbolNum, last_byte=0):
     blob.reload()  # Refresh metadata
     blob_size = blob.size  # Total file size in bytes
     
+    try:
+        if not blob.exists():
+            print(f"⚠️ Blob {blob_name} does not exist. Skipping download.")
+            return None, last_byte  # Prevent error
+        
+        if blob_size is None or blob_size == 0:
+            #print("⚠️ File is empty or does not exist.")
+            return None, 0  # Reset last_byte to prevent further errors
     
-    if not blob.exists():
-        print(f"⚠️ Blob {blob_name} does not exist. Skipping download.")
-        return None, last_byte  # Prevent error
+        if last_byte >= blob_size:
+            #print("✅ No new data available. Waiting for updates...")
+            return None, last_byte  # No new data to fetch
     
-    if blob_size is None or blob_size == 0:
-        #print("⚠️ File is empty or does not exist.")
-        return None, 0  # Reset last_byte to prevent further errors
-
-    if last_byte >= blob_size:
-        #print("✅ No new data available. Waiting for updates...")
-        return None, last_byte  # No new data to fetch
-
-    # Download only new data from last known byte
-    new_data = blob.download_as_bytes(start=last_byte)
-
-    if new_data:
-        last_byte += len(new_data)  # Update last byte position
-        return new_data.decode("utf-8"), last_byte
+        # Download only new data from last known byte
+        new_data = blob.download_as_bytes(start=last_byte)
+    
+        if new_data:
+            last_byte += len(new_data)  # Update last byte position
+            return new_data.decode("utf-8"), last_byte
+    except NotFound:
+        print(f"❌ Error: Blob {blob_name} not found in bucket.")
+        return None, last_byte
+    
     return None, last_byte
 
 symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
@@ -2568,7 +2573,7 @@ styles = {
 #import pandas_ta as ta
 #from collections import Counter
 #from filterpy.kalman import KalmanFilter
-from google.api_core.exceptions import NotFound
+
 from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 1800000  # Initial interval #210000#250000#80001
