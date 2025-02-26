@@ -2480,7 +2480,7 @@ def double_exponential_smoothing(X, alpha, beta):
     
     return S
 
-
+'''
 def download_new_data(symbolNum, last_byte=0):
     blob = bucket.blob(symbolNum)  
     blob.reload()  # Refresh metadata
@@ -2488,7 +2488,7 @@ def download_new_data(symbolNum, last_byte=0):
     
     try:
         if not blob.exists():
-            print(f"⚠️ Blob {blob_name} does not exist. Skipping download.")
+            print(f"⚠️ Blob {symbolNum} does not exist. Skipping download.")
             return None, last_byte  # Prevent error
         
         if blob_size is None or blob_size == 0:
@@ -2506,10 +2506,49 @@ def download_new_data(symbolNum, last_byte=0):
             last_byte += len(new_data)  # Update last byte position
             return new_data.decode("utf-8"), last_byte
     except NotFound:
-        print(f"❌ Error: Blob {blob_name} not found in bucket.")
+        print(f"❌ Error: Blob {symbolNum} not found in bucket.")
         return None, last_byte
     
     return None, last_byte
+'''
+import time as ti
+def download_new_data(symbolNum, last_byte=0, max_retries=3):
+    blob = bucket.blob(symbolNum)  
+    attempts = 0  # Track retry attempts
+
+    while attempts < max_retries:
+        try:
+            blob.reload()  # Refresh metadata
+            blob_size = blob.size  # Get total file size in bytes
+            
+            if not blob.exists():
+                print(f"⚠️ Blob {symbolNum} does not exist. Retrying ({attempts+1}/{max_retries})...")
+                attempts += 1
+                time.sleep(2)  # Short delay before retrying
+                continue  # Retry again
+            
+            if blob_size is None or blob_size == 0:
+                print(f"⚠️ File {symbolNum} is empty or does not exist. Skipping download.")
+                return None, 0  # Reset last_byte
+            
+            if last_byte >= blob_size:
+                print(f"✅ No new data available for {symbolNum}. Waiting for updates...")
+                return None, last_byte  # No new data to fetch
+            
+            # Download only new data from last known byte
+            new_data = blob.download_as_bytes(start=last_byte)
+            
+            if new_data:
+                last_byte += len(new_data)  # Update last byte position
+                return new_data.decode("utf-8"), last_byte
+            
+        except NotFound:
+            print(f"❌ Error: Blob {symbolNum} not found in bucket. Retrying ({attempts+1}/{max_retries})...")
+            attempts += 1
+            ti.sleep(1)  # Wait before retrying
+    
+    print(f"❌ Blob {symbolNum} not found after {max_retries} attempts. Skipping.")
+    return None, last_byte  # Return after all retries fail
 
 symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
