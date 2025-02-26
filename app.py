@@ -1040,8 +1040,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df) +i[3]+i[5] +i[2]+i[5]
     MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
     
-    putCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and df['percentile_topBuys'][i[4]]> 96 and float(i[12][1]) >= 0.65] #float(i[4]) > 0.65 and df['topBuys'][i[0]] > df['topBuysAvg'][i[0]] and 
-    callCandImb = [i for i in OptionTimeFrame if int(i[12][2]) > int(i[12][0])and  df['percentile_topSells'][i[4]]> 96 and float(i[12][3]) >= 0.65]
+    putCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and df['percentile_topBuys'][i[4]]> 95 and float(i[12][1]) >= 0.64] #float(i[4]) > 0.65 and df['topBuys'][i[0]] > df['topBuysAvg'][i[0]] and 
+    callCandImb = [i for i in OptionTimeFrame if int(i[12][2]) > int(i[12][0])and  df['percentile_topSells'][i[4]]> 95 and float(i[12][3]) >= 0.64]
     
     #putCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and float(i[12][1]) > 0.65 and int(i[4]) < len(df)]
     #callCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and float(i[12][1]) > 0.65 and int(i[4]) < len(df)]
@@ -2524,7 +2524,7 @@ def download_new_data(symbolNum, last_byte=0, max_retries=3):
             if not blob.exists():
                 print(f"⚠️ Blob {symbolNum} does not exist. Retrying ({attempts+1}/{max_retries})...")
                 attempts += 1
-                time.sleep(2)  # Short delay before retrying
+                ti.sleep(2)  # Short delay before retrying
                 continue  # Retry again
             
             if blob_size is None or blob_size == 0:
@@ -2616,7 +2616,7 @@ styles = {
 from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 1800000  # Initial interval #210000#250000#80001
-subsequent_inter = 40000  # Subsequent interval
+subsequent_inter = 45000  # Subsequent interval
 app = Dash()
 app.title = "EnVisage"
 app.layout = html.Div([
