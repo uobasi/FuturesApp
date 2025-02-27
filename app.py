@@ -2616,7 +2616,7 @@ styles = {
 from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 1800000  # Initial interval #210000#250000#80001
-subsequent_inter = 55000  # Subsequent interval
+subsequent_inter = 45000  # Subsequent interval
 app = Dash()
 app.title = "EnVisage"
 app.layout = html.Div([
@@ -3457,8 +3457,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
             (df.at[p, 'vwap_signalSell']) and
             (df.at[p, 'uppervwap_signalSell']) and
-            (df.at[p, 'lowervwap_signalSell']) and
-            (df.at[p, 'vwapAvg_signalSell']) 
+            (df.at[p, 'lowervwap_signalSell']) #and
+            #(df.at[p, 'vwapAvg_signalSell']) 
         ):
             df.at[p, 'sell_signal'] = True  # Trigger sell
             stillbuy = False  # Stop buy tracking
@@ -3473,8 +3473,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
             (df.at[p, 'vwap_signalBuy']) and
             (df.at[p, 'uppervwap_signalBuy']) and
-            (df.at[p, 'lowervwap_signalBuy']) and
-            (df.at[p, 'vwapAvg_signalBuy'])
+            (df.at[p, 'lowervwap_signalBuy']) #and
+            #(df.at[p, 'vwapAvg_signalBuy'])
         ):
             df.at[p, 'buy_signal'] = True  # Trigger buy
             stillsell = False  # Stop sell tracking
@@ -3489,8 +3489,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
             (df.at[p, 'vwap_signalBuy']) and
             (df.at[p, 'uppervwap_signalBuy']) and
-            (df.at[p, 'lowervwap_signalBuy'])and
-            (df.at[p, 'vwapAvg_signalBuy']) 
+            (df.at[p, 'lowervwap_signalBuy']) #and
+            #(df.at[p, 'vwapAvg_signalBuy']) 
         ):
             df.at[p, 'buy_signal'] = True  # Trigger buy
             stillsell = False  # Stop sell tracking
@@ -3504,8 +3504,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
             (df.at[p, 'vwap_signalSell']) and
             (df.at[p, 'uppervwap_signalSell'])and
-            (df.at[p, 'lowervwap_signalSell']) and
-            (df.at[p, 'vwapAvg_signalSell']) 
+            (df.at[p, 'lowervwap_signalSell']) #and
+            #(df.at[p, 'vwapAvg_signalSell']) 
         ):
             df.at[p, 'sell_signal'] = True  # Trigger sell
             stillbuy = False  # Stop buy tracking
@@ -3538,3 +3538,21 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
 if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0', port=8080)
     #app.run_server(debug=False, use_reloader=False)
+
+'''
+from scipy.signal import find_peaks
+price_levels = np.array([i[0] for i in hs[0]])
+volume_at_price = np.array([i[1] for i in hs[0]])
+
+# Detect peaks (high volume nodes)
+peaks, _ = find_peaks(volume_at_price, distance=50, prominence=50)
+
+# Find valleys (low volume areas) between peaks
+valleys, _ = find_peaks(-volume_at_price, distance=50)
+
+# Filter valleys that exist between peaks
+filtered_valleys = [v for v in valleys if any(p > v for p in peaks) and any(p < v for p in peaks)]
+'''
+
+    
+    
