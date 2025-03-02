@@ -856,7 +856,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='P',marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
       
     #fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.3, name='100ema', line=dict(color='black')))
@@ -1031,7 +1031,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             
             
         
-        OptionTimeFrame[ctn].append(ftp + tpStrings) #mks
+        OptionTimeFrame[ctn].append(mks + tpStrings) #mks ftp
         OptionTimeFrame[ctn].append([tobuyss,round(tobuyss/(tobuyss+tosellss),2),tosellss,round(tosellss/(tobuyss+tosellss),2)])
         #textPerCandle.append([ctn,mks + tpStrings])
         ctn+=1
@@ -3455,9 +3455,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] < -0.048) and 
             (df.at[p, 'smoothed_derivative'] < 0) and 
             ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
-            (df.at[p, 'vwap_signalSell']) and
-            (df.at[p, 'uppervwap_signalSell']) and
-            (df.at[p, 'lowervwap_signalSell']) #and
+            (df.at[p, 'vwap_signalSell']) #and
+            #(df.at[p, 'uppervwap_signalSell']) and
+            #(df.at[p, 'lowervwap_signalSell']) #and
             #(df.at[p, 'vwapAvg_signalSell']) 
         ):
             df.at[p, 'sell_signal'] = True  # Trigger sell
@@ -3471,9 +3471,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] > 0.048) and 
             (df.at[p, 'smoothed_derivative'] > 0) and 
             ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
-            (df.at[p, 'vwap_signalBuy']) and
-            (df.at[p, 'uppervwap_signalBuy']) and
-            (df.at[p, 'lowervwap_signalBuy']) #and
+            (df.at[p, 'vwap_signalBuy']) #and
+            #(df.at[p, 'uppervwap_signalBuy']) and
+            #(df.at[p, 'lowervwap_signalBuy']) #and
             #(df.at[p, 'vwapAvg_signalBuy'])
         ):
             df.at[p, 'buy_signal'] = True  # Trigger buy
@@ -3487,9 +3487,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] > 0.048) and 
             (df.at[p, 'smoothed_derivative'] > 0) and 
             ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
-            (df.at[p, 'vwap_signalBuy']) and
-            (df.at[p, 'uppervwap_signalBuy']) and
-            (df.at[p, 'lowervwap_signalBuy']) #and
+            (df.at[p, 'vwap_signalBuy']) #and
+            #(df.at[p, 'uppervwap_signalBuy']) and
+            #(df.at[p, 'lowervwap_signalBuy']) #and
             #(df.at[p, 'vwapAvg_signalBuy']) 
         ):
             df.at[p, 'buy_signal'] = True  # Trigger buy
@@ -3502,9 +3502,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] < -0.048) and 
             (df.at[p, 'smoothed_derivative'] < 0) and 
             ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
-            (df.at[p, 'vwap_signalSell']) and
-            (df.at[p, 'uppervwap_signalSell'])and
-            (df.at[p, 'lowervwap_signalSell']) #and
+            (df.at[p, 'vwap_signalSell']) #and
+            #(df.at[p, 'uppervwap_signalSell'])and
+            #(df.at[p, 'lowervwap_signalSell']) #and
             #(df.at[p, 'vwapAvg_signalSell']) 
         ):
             df.at[p, 'sell_signal'] = True  # Trigger sell
