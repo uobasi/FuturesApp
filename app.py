@@ -3230,7 +3230,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     try:
         df['LowVA'] = pd.Series([i[0] for i in stored_data['pdata']])
         df['HighVA'] = pd.Series([i[1] for i in stored_data['pdata']])
-        df['POC'] = pd.Series([i[2] for i in stored_data['pdata']])
+        df['POC'] = pd.Series([i[5] for i in stored_data['pdata']])
         df['POC2'] = pd.Series([i[5] for i in stored_data['pdata']])
         df['weights'] = [i[2]-i[3] for i in stored_data['timeFrame']]
         '''
