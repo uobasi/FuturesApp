@@ -621,7 +621,7 @@ def find_spikes(data, high_percentile=97, low_percentile=3):
     
     return spikes
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5, troInterval:list=[], footPrint:list=[]):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterList:list=[], troInterval:list=[], footPrint:list=[]):
   
     notround = np.average(df_dx)
     average = round(np.average(df_dx), 3)
@@ -1755,6 +1755,23 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     )
     '''
     
+    sorted_list = sorted(clusterList, key=len, reverse=True)
+    for i in sorted_list[:40]:
+    
+
+        fig.add_trace(go.Scatter(x=df['time'],
+                             y= [i[len(i)-1]]*len(df.index) ,
+                             line_color='gray',
+                             text =  str(i[len(i)-1])+ '<br>Count: ' + str(len(i)),
+                             textposition="bottom left",
+                             name= str(i[len(i)-1]),
+                             showlegend=False,
+                             mode= 'lines',
+                             opacity=0.2
+                            
+                            ),
+                  row=1, col=1)
+
 
     
     # Add a table in the second column
@@ -1918,7 +1935,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     '''
 
 
-    fig.update_layout(height=890, xaxis_rangeslider_visible=False, showlegend=False)
+    fig.update_layout(height=890, xaxis_rangeslider_visible=False, showlegend=False, xaxis=dict(showgrid=False))
     fig.update_xaxes(autorange="reversed", row=1, col=2)
     #fig.update_xaxes(autorange="reversed", row=1, col=3)
     #fig.update_layout(plot_bgcolor='gray')
@@ -2912,6 +2929,12 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     [mTrade[i].insert(4,i) for i in range(len(mTrade))] 
     
+    data =  [i[0] for i in AllTrades]#[:500]
+    data.sort(reverse=True)
+    differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
+    average_difference = (sum(differences) / len(differences))
+    cdata = find_clusters(data, average_difference)
+    
     newwT = []
     for i in mTrade:
         newwT.append([i[0],i[1],i[2],i[5], i[4],i[3],i[6]])
@@ -3531,7 +3554,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     
     
-    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro'], footPrint=stored_data['footPrint'] ) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterList=cdata, troInterval=stored_data['tro'], footPrint=stored_data['footPrint'] ) #trends=FindTrends(df,n=10)
  
     return stored_data, fg, previous_stkName, previous_interv, last_byte_OHLC, last_byte_Trades, interval_time
 
