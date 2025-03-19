@@ -53,7 +53,6 @@ from scipy.stats import linregress
 from scipy.ndimage import gaussian_filter1d
 from numpy.polynomial import Polynomial
 from scipy.stats import percentileofscore
-from google.api_core.exceptions import NotFound
 #import yfinance as yf
 #import dateutil.parser
 
@@ -621,7 +620,7 @@ def find_spikes(data, high_percentile=97, low_percentile=3):
     
     return spikes
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterList:list=[], troInterval:list=[], footPrint:list=[]):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterList:list=[], troInterval:list=[]):
   
     notround = np.average(df_dx)
     average = round(np.average(df_dx), 3)
@@ -679,7 +678,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                [{"colspan": 1},{"type": "table", "rowspan": 2},],
                                [{"colspan": 1},{},],], #[{"colspan": 1},{},][{}, {}, ]'+ '<br>' +' ( Put:'+str(putDecHalf)+'('+str(NumPutHalf)+') | '+'Call:'+str(CallDecHalf)+'('+str(NumCallHalf)+') ' (Sell:'+str(sum(sells))+') (Buy:'+str(sum(buys))+') 
                          horizontal_spacing=0.01, vertical_spacing=0.00, subplot_titles=(stockName + ' '+ '('+str(average)+') '+ str(now)+ ' '+ tpString, 'VP ' + str(datetime.now().time()) ), #' (Sell:'+str(putDec)+' ('+str(round(NumPut,2))+') | '+'Buy:'+str(CallDec)+' ('+str(round(NumCall,2))+') \n '+' (Sell:'+str(thputDec)+' ('+str(round(thNumPut,2))+') | '+'Buy:'+str(thCallDec)+' ('+str(round(thNumCall,2))+') \n '
-                         column_widths=[0.80,0.20], row_width=[0.12, 0.15, 0.73,] ) #,row_width=[0.30, 0.70,]
+                         column_widths=[0.85,0.15], row_width=[0.12, 0.15, 0.73,] ) #,row_width=[0.30, 0.70,]
 
     
             
@@ -825,8 +824,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
     #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=2, col=1)
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=2, col=1)
+    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=3, col=1)
+    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
+
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.50, name='P',marker_color='#0000FF')) # #0000FF
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30,name='HighVA',marker_color='rgba(0,0,0)'))
     
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
@@ -844,9 +847,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'), row=2, col=1)
 
 
-    fig.add_hline(y=0, row=3, col=1)
+    #fig.add_hline(y=0, row=3, col=1)
 
-    fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP',opacity=0.50, line=dict(color='crimson')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['9ema'], mode='lines',name='9ema'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['20ema'], mode='lines',name='20ema'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2'))
@@ -856,9 +859,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.50, name='P',marker_color='#0000FF')) # #0000FF
-    fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30,name='HighVA',marker_color='rgba(0,0,0)'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
       
     #fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.3, name='100ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.3, name='150ema', line=dict(color='black')))
@@ -1008,12 +1010,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     ctn = 0
     for i in troPerCandle:
         mks = ''
-        ftp = ''
         tobuyss =  sum([x[1] for x in [t for t in i[1] if t[5] == 'B']])
         tosellss = sum([x[1] for x in [t for t in i[1] if t[5] == 'A']])
 
         try:
-            
             tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) '+'<br>' +'Top100OrdersPerCandle: '+ str(tobuyss-tosellss)+'<br>' #str(lenbuys+lensells) +
         except(ZeroDivisionError):
             tpStrings =' '
@@ -1027,12 +1027,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             except(IndexError):
                 pass
         
-        for xe in footPrint[ctn][1]:
-            ftp += xe[0] + ' | ' + str(xe[1])  + '<br>' 
-            
-            
-        
-        OptionTimeFrame[ctn].append(mks + tpStrings) #mks ftp
+        OptionTimeFrame[ctn].append(mks + tpStrings)
         OptionTimeFrame[ctn].append([tobuyss,round(tobuyss/(tobuyss+tosellss),2),tosellss,round(tosellss/(tobuyss+tosellss),2)])
         #textPerCandle.append([ctn,mks + tpStrings])
         ctn+=1
@@ -1041,8 +1036,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df) +i[3]+i[5] +i[2]+i[5]
     MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
     
-    putCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and df['percentile_topBuys'][i[4]]> 93 and float(i[12][1]) >= 0.64] #float(i[4]) > 0.65 and df['topBuys'][i[0]] > df['topBuysAvg'][i[0]] and 
-    callCandImb = [i for i in OptionTimeFrame if int(i[12][2]) > int(i[12][0])and  df['percentile_topSells'][i[4]]> 93 and float(i[12][3]) >= 0.64]
+    putCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and df['percentile_topBuys'][i[4]]> 94 and float(i[12][1]) >= 0.64] #float(i[4]) > 0.65 and df['topBuys'][i[0]] > df['topBuysAvg'][i[0]] and 
+    callCandImb = [i for i in OptionTimeFrame if int(i[12][2]) > int(i[12][0])and  df['percentile_topSells'][i[4]]> 94 and float(i[12][3]) >= 0.64]
     
     #putCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and float(i[12][1]) > 0.65 and int(i[4]) < len(df)]
     #callCandImb = [i for i in OptionTimeFrame if int(i[12][0]) > int(i[12][2]) and float(i[12][1]) > 0.65 and int(i[4]) < len(df)]
@@ -1375,14 +1370,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                             ))
     '''
     
-    '''
     if '19:00:00' in df['time'].values or '19:01:00' in df['time'].values:
         if '19:00:00' in df['time'].values:
             opstr = '19:00:00'
         elif '19:01:00' in df['time'].values:
             opstr = '19:01:00'
             
-        fig.add_vline(x=df[df['time'] == opstr].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top right', row=1, col=1)
+        fig.add_vline(x=df[df['time'] == opstr].index[0], line_width=1, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top left', row=1, col=1)
         
         fig.add_trace(go.Scatter(x=df['time'],
                                 y= [df['open'][df[df['time'] == '19:00:00'].index[0]]]*len(df['time']) ,
@@ -1394,9 +1388,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                 visible=False,
                                 mode= 'lines',
                                 ))
-        
+        '''
         if '01:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '01:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Sydney Close', annotation_position='top left', row=1, col=1)
+            #fig.add_vline(x=df[df['time'] == '01:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Sydney Close', annotation_position='top left', row=1, col=1)
             
             tempDf = df.loc[:df[df['time'] == '01:00:00'].index[0]]
             min_low = tempDf['low'].min()
@@ -1423,21 +1417,21 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     mode= 'lines',
                                     ))
             
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [df['close'][df[df['time'] == '00:58:00'].index[0]]]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(df['close'][df[df['time'] == '00:58:00'].index[0]]),
-                                    textposition="bottom left",
-                                    name='Sydney Close',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
+            #fig.add_trace(go.Scatter(x=df['time'],
+                                    #y= [df['close'][df[df['time'] == '00:58:00'].index[0]]]*len(df['time']) ,
+                                    #line_color='black',
+                                    #text = str(df['close'][df[df['time'] == '00:58:00'].index[0]]),
+                                    #textposition="bottom left",
+                                    #name='Sydney Close',
+                                    #showlegend=False,
+                                    #visible=False,
+                                    #mode= 'lines',
+                                    #))
+            '''
             
 
         if '02:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '02:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='London Open', annotation_position='top right', row=1, col=1)
+            fig.add_vline(x=df[df['time'] == '02:00:00'].index[0], line_width=1, line_dash="dash", line_color="green", annotation_text='London Open', annotation_position='top left', row=1, col=1)
             
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [df['open'][df[df['time'] == '02:00:00'].index[0]]]*len(df['time']) ,
@@ -1452,7 +1446,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             
     
         if '04:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top right', row=1, col=1)
+            fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=1, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top left', row=1, col=1)
             
             tempDf = df.loc[df[df['time'] == opstr].index[0]:df[df['time'] == '04:00:00'].index[0]]
             max_high = tempDf['high'].max()
@@ -1480,22 +1474,22 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     ))
             
             
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [df['close'][df[df['time'] == '03:58:00'].index[0]]]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(df['close'][df[df['time'] == '03:58:00'].index[0]]),
-                                    textposition="bottom left",
-                                    name='Toyko Close',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
+            #fig.add_trace(go.Scatter(x=df['time'],
+                                    #y= [df['close'][df[df['time'] == '03:58:00'].index[0]]]*len(df['time']) ,
+                                    #line_color='black',
+                                    #text = str(df['close'][df[df['time'] == '03:58:00'].index[0]]),
+                                    #textposition="bottom left",
+                                    #name='Toyko Close',
+                                    #showlegend=False,
+                                    #visible=False,
+                                    #mode= 'lines',
+                                    #))
             
             
 
             
         if '08:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '08:00:00'].index[0], line_width=2, line_dash="dash", line_color="green", annotation_text='NewYork Open', annotation_position='top left', row=1, col=1)
+            fig.add_vline(x=df[df['time'] == '08:00:00'].index[0], line_width=1, line_dash="dash", line_color="green", annotation_text='NewYork Open', annotation_position='top left', row=1, col=1)
             
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [df['open'][df[df['time'] == '08:00:00'].index[0]]]*len(df['time']) ,
@@ -1510,7 +1504,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             
     
         if '11:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '11:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='London Close', annotation_position='top left', row=1, col=1)
+            fig.add_vline(x=df[df['time'] == '11:00:00'].index[0], line_width=1, line_dash="dash", line_color="red", annotation_text='London Close', annotation_position='top left', row=1, col=1)
             
             tempDf = df.loc[df[df['time'] == '02:00:00'].index[0]:df[df['time'] == '11:00:00'].index[0]]
             max_high = tempDf['high'].max()
@@ -1537,19 +1531,16 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     mode= 'lines',
                                     ))
             
-            fig.add_trace(go.Scatter(x=df['time'],
-                                    y= [df['close'][df[df['time'] == '10:58:00'].index[0]]]*len(df['time']) ,
-                                    line_color='black',
-                                    text = str(df['close'][df[df['time'] == '10:58:00'].index[0]]),
-                                    textposition="bottom left",
-                                    name='London Close',
-                                    showlegend=False,
-                                    visible=False,
-                                    mode= 'lines',
-                                    ))
-            
-            
-    '''  
+            #fig.add_trace(go.Scatter(x=df['time'],
+                                    #y= [df['close'][df[df['time'] == '10:58:00'].index[0]]]*len(df['time']) ,
+                                    #line_color='black',
+                                    #text = str(df['close'][df[df['time'] == '10:58:00'].index[0]]),
+                                    #textposition="bottom left",
+                                    #name='London Close',
+                                    #showlegend=False,
+                                    #visible=False,
+                                    #mode= 'lines',
+                                    #)) 
 
     '''      
     if '02:00:00' in df['time'].values:
@@ -1621,8 +1612,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistanceEMA'], marker_color=colors), row=2, col=1)
     '''  
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=3, col=1)
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=3, col=1)
+    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=2, col=1)
+    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=2, col=1)
         
         
 
@@ -1754,7 +1745,6 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         sliders=sliders
     )
     '''
-    
     sorted_list = sorted(clusterList, key=len, reverse=True)
     for i in sorted_list[:40]:
     
@@ -1804,8 +1794,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     fig.add_trace(
         go.Table(
-            header=dict(values=["Time", "Buyers", "Buyers Change", "Sellers", "Sellers Change","Buyers per Interval", "Sellers per Interval"], font=dict(size=9)),
-            cells=dict(values=transposed_data, fill_color=color_matrix, font=dict(color=textColor_matrix,size=9)),  # Transpose data to fit the table
+            header=dict(values=["Time", "Buyers", "Buyers Change", "Sellers", "Sellers Change","Buyers per Interval", "Sellers per Interval"], font=dict(size=5)),
+            cells=dict(values=transposed_data, fill_color=color_matrix, font=dict(color=textColor_matrix,size=6)),  # Transpose data to fit the table
         ),
         row=2, col=2
     )
@@ -2497,80 +2487,12 @@ def double_exponential_smoothing(X, alpha, beta):
         S[t] = A[t] + B[t]
     
     return S
+   
+#symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
+#symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
-'''
-def download_new_data(symbolNum, last_byte=0):
-    blob = bucket.blob(symbolNum)  
-    blob.reload()  # Refresh metadata
-    blob_size = blob.size  # Total file size in bytes
-    
-    try:
-        if not blob.exists():
-            print(f"⚠️ Blob {symbolNum} does not exist. Skipping download.")
-            return None, last_byte  # Prevent error
-        
-        if blob_size is None or blob_size == 0:
-            #print("⚠️ File is empty or does not exist.")
-            return None, 0  # Reset last_byte to prevent further errors
-    
-        if last_byte >= blob_size:
-            #print("✅ No new data available. Waiting for updates...")
-            return None, last_byte  # No new data to fetch
-    
-        # Download only new data from last known byte
-        new_data = blob.download_as_bytes(start=last_byte)
-    
-        if new_data:
-            last_byte += len(new_data)  # Update last byte position
-            return new_data.decode("utf-8"), last_byte
-    except NotFound:
-        print(f"❌ Error: Blob {symbolNum} not found in bucket.")
-        return None, last_byte
-    
-    return None, last_byte
-'''
-import time as ti
-def download_new_data(symbolNum, last_byte=0, max_retries=3):
-    blob = bucket.blob(symbolNum)  
-    attempts = 0  # Track retry attempts
-
-    while attempts < max_retries:
-        try:
-            blob.reload()  # Refresh metadata
-            blob_size = blob.size  # Get total file size in bytes
-            
-            if not blob.exists():
-                print(f"⚠️ Blob {symbolNum} does not exist. Retrying ({attempts+1}/{max_retries})...")
-                attempts += 1
-                ti.sleep(2)  # Short delay before retrying
-                continue  # Retry again
-            
-            if blob_size is None or blob_size == 0:
-                print(f"⚠️ File {symbolNum} is empty or does not exist. Skipping download.")
-                return None, 0  # Reset last_byte
-            
-            if last_byte >= blob_size:
-                print(f"✅ No new data available for {symbolNum}. Waiting for updates...")
-                return None, last_byte  # No new data to fetch
-            
-            # Download only new data from last known byte
-            new_data = blob.download_as_bytes(start=last_byte)
-            
-            if new_data:
-                last_byte += len(new_data)  # Update last byte position
-                return new_data.decode("utf-8"), last_byte
-            
-        except NotFound:
-            print(f"❌ Error: Blob {symbolNum} not found in bucket. Retrying ({attempts+1}/{max_retries})...")
-            attempts += 1
-            ti.sleep(1)  # Wait before retrying
-    
-    print(f"❌ Blob {symbolNum} not found after {max_retries} attempts. Skipping.")
-    return None, last_byte  # Return after all retries fail
-
-symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
-symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
-
+symbolNumList =  ['4916', '42005804', '42003068', '423318', '19604', '42009162', '42021396', '42075294']
+symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'RTY', 'MBT', 'MET']
 
 
 intList = [str(i) for i in range(3,30)]
@@ -2580,8 +2502,6 @@ vaildClust = [str(i) for i in range(0,200)]
 vaildTPO = [str(i) for i in range(1,500)]
 
 covarianceList = [str(round(i, 2)) for i in [x * 0.01 for x in range(1, 1000)]]
-
-doubl = ['NQ']
 
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
@@ -2630,11 +2550,11 @@ styles = {
 #import pandas_ta as ta
 #from collections import Counter
 #from filterpy.kalman import KalmanFilter
-
+from google.api_core.exceptions import NotFound
 from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
-initial_inter = 2000000  # Initial interval #210000#250000#80001
-subsequent_inter = 60000  # Subsequent interval
+initial_inter = 1800000  # Initial interval #210000#250000#80001
+subsequent_inter = 80000  # Subsequent interval
 app = Dash()
 app.title = "EnVisage"
 app.layout = html.Div([
@@ -2667,8 +2587,6 @@ app.layout = html.Div([
     dcc.Store(id='data-store'),
     dcc.Store(id='previous-interv'),
     dcc.Store(id='previous-stkName'),
-    dcc.Store(id='last_byte_OHLC'),
-    dcc.Store(id='last_byte_Trades'),
     dcc.Store(id='interval-time', data=initial_inter),
   
 ])
@@ -2715,8 +2633,6 @@ def update_interval(n_clicks, value):
         Output('graph', 'figure'),
         Output('previous-stkName', 'data'),
         Output('previous-interv', 'data'),
-        Output('last_byte_OHLC', 'data'),
-        Output('last_byte_Trades', 'data'),
         Output('interval', 'interval')],
     [Input('interval', 'n_intervals')],
     [State('stkName-value', 'data'),
@@ -2724,14 +2640,13 @@ def update_interval(n_clicks, value):
         State('data-store', 'data'),
         State('previous-stkName', 'data'),
         State('previous-interv', 'data'),
-        State('last_byte_OHLC', 'data'),
-        State('last_byte_Trades', 'data'),
         State('interval-time', 'data'),
         
     ],
 )
     
-def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, last_byte_OHLC, last_byte_Trades, interval_time): #interv
+def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, interval_time): #interv
+    
     #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
 
@@ -2757,44 +2672,15 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
         
     if sname != previous_stkName or interv != previous_interv:
-        stored_data = {}
-        last_byte_OHLC = 0
-        last_byte_Trades = 0
+        stored_data = None
+        
 
-    print(last_byte_OHLC, last_byte_Trades)	
+
+    
         
         
     print('inFunction '+sname)	
     
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        futures = [
-            executor.submit(download_new_data, 'FuturesOHLC' + str(symbolNum), last_byte_OHLC),
-            executor.submit(download_new_data, 'FuturesTrades' + str(symbolNum), last_byte_Trades)
-        ]
-        
-        new_OHLC, new_Trades = [future.result() for future in futures]
-
-    if 'FuturesOHLC' not in stored_data:
-        if new_OHLC[0]:  # If new data exists
-            FuturesOHLC = pd.read_csv(io.StringIO(new_OHLC[0]), header=None)
-            stored_data['FuturesOHLC'] = FuturesOHLC.values.tolist()
-    elif 'FuturesOHLC' in stored_data:
-        if new_OHLC[0]:  # If new data exists
-            FuturesOHLC = pd.read_csv(io.StringIO(new_OHLC[0]), header=None).values.tolist()
-            stored_data['FuturesOHLC'] += FuturesOHLC
-    
-    if 'FuturesTrades' not in stored_data:
-        if new_Trades[0]:  # If new data exists
-            FuturesTrades = pd.read_csv(io.StringIO(new_Trades[0]), header=None)
-            stored_data['FuturesTrades'] = FuturesTrades.values.tolist()
-    elif 'FuturesTrades' in stored_data:
-        if new_Trades[0]:  # If new data exists
-            FuturesTrades = pd.read_csv(io.StringIO(new_Trades[0]), header=None).values.tolist()
-            stored_data['FuturesTrades'] += FuturesTrades
-
-    last_byte_OHLC = new_OHLC[1]  # Update last byte position
-    last_byte_Trades = new_Trades[1]  # Update last byte position
-    '''
     with ThreadPoolExecutor(max_workers=3) as executor:
         #if sname != previous_stkName:
         # Download everything when stock name changes
@@ -2804,18 +2690,54 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             #executor.submit(download_daily_data, bucket, stkName)]
         
         FuturesOHLC, FuturesTrades = [future.result() for future in futures] #, prevDf
-
+        '''
+        else:
+            # Skip daily data when stock name is unchanged
+            futures = [
+                executor.submit(download_data, bucket, 'FuturesOHLC' + str(symbolNum)),
+                executor.submit(download_data, bucket, 'FuturesTrades' + str(symbolNum))]
+            
+            FuturesOHLC, FuturesTrades = [future.result() for future in futures]
+            prevDf = None  # No new daily data download
+        '''
     
     # Process data with pandas directly
     FuturesOHLC = pd.read_csv(io.StringIO(FuturesOHLC), header=None)
     FuturesTrades = pd.read_csv(io.StringIO(FuturesTrades), header=None)
     
-    stored_data['FuturesOHLC'] = FuturesOHLC.values.tolist()
-    stored_data['FuturesTrades'] = FuturesTrades.values.tolist()
     '''
-    FuturesOHLC = pd.DataFrame(stored_data['FuturesOHLC'])
-    FuturesTrades = pd.DataFrame(stored_data['FuturesTrades'])
+    blob = Blob('FuturesOHLC'+str(symbolNum), bucket) 
+    FuturesOHLC = blob.download_as_text()
+        
+
+    csv_reader  = csv.reader(io.StringIO(FuturesOHLC))
     
+    csv_rows = []
+    for row in csv_reader:
+        csv_rows.append(row)
+        
+    
+    newOHLC = [i for i in csv_rows]
+     
+    
+    aggs = [ ] 
+    for i in FuturesOHLC.values.tolist():
+        hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
+        if hourss < 10:
+            hourss = '0'+str(hourss)
+        minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
+        if minss < 10:
+            minss = '0'+str(minss)
+        opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
+        aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
+        
+            
+    newAggs = []
+    for i in aggs:
+        if i not in newAggs:
+            newAggs.append(i)
+    
+    '''
     aggs = [ ] 
     for row in FuturesOHLC.itertuples(index=False):
         # Extract values from the row, where row[0] corresponds to the first column, row[1] to the second, etc.
@@ -2871,7 +2793,48 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
     
+    '''
+    # Apply TEMA calculation to the DataFrame
+    if prevDf is not None:
+        columns_to_keep = ['open', 'high', 'low', 'close', 'volume']
+        prevDf_filtered = prevDf[columns_to_keep]
+        #df_filtered = df[columns_to_keep]
+        
+        # Combine the two DataFrames row-wise
+        #combined_df = pd.concat([prevDf_filtered, df_filtered], ignore_index=True)
+        
+        #vwapCum(combined_df)
+        #PPPCum(combined_df)    
+    '''
 
+    '''
+    blob = Blob('FuturesTrades'+str(symbolNum), bucket) 
+    FuturesTrades = blob.download_as_text()
+    
+    
+    csv_reader  = csv.reader(io.StringIO(FuturesTrades))
+    
+    csv_rows = []
+    for row in csv_reader:
+        csv_rows.append(row)
+       
+
+    #STrades = [i for i in csv_rows]
+    start_time_itertuples = time.time()
+    AllTrades = []
+    for i in FuturesTrades.values.tolist():
+        hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
+        if hourss < 10:
+            hourss = '0'+str(hourss)
+        minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
+        if minss < 10:
+            minss = '0'+str(minss)
+        opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
+        AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
+    time_itertuples = time.time() - start_time_itertuples
+       
+    #AllTrades = [i for i in AllTrades if i[1] > 1]
+    '''
 
     AllTrades = []
     for row in FuturesTrades.itertuples(index=False):
@@ -2915,7 +2878,77 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
 
     
     
+    '''
+    
+    
+    
+    kf = KalmanFilter(dim_x=3, dim_z=1)
 
+    # State transition matrix (F) for position, velocity, and acceleration
+    dt = 1  # Time step
+    kf.F = np.array([[1, dt, 0.5 * dt**2],
+                     [0, 1, dt],
+                     [0, 0, 1]])
+    
+    # Measurement function (H): We only observe the position (30 EMA)
+    kf.H = np.array([[1, 0, 0]])
+    
+    # Covariance matrix (P): Initial uncertainty in the estimates
+    kf.P *= 1000  # High initial uncertainty in all states
+    
+    # Measurement noise (R): Uncertainty in observations
+    kf.R = np.array([[5]])
+    
+    # Process noise (Q): Uncertainty in the model dynamics
+    kf.Q = np.array([[0.1, 0, 0],
+                     [0, 0.1, 0],
+                     [0, 0, 0.1]])
+    
+    # Initial state estimate: [position, velocity, acceleration]
+    kf.x = np.array([[df[clustNum+'ema'].iloc[0]], [0], [0]])  # Start with initial position, zero velocity, and zero acceleration
+    
+    # Lists to store the estimates
+    positions = []
+    velocities = []
+    accelerations = []
+    
+    # Iterate over each data point in '30ema'
+    for emaa in df[clustNum+'ema']:
+        kf.predict()  # Predict next state
+        kf.update([emaa])  # Update state with new measurement (position)
+        
+        # Store the estimated position, velocity, and acceleration
+        positions.append(kf.x[0][0])  # Position estimate (smoothed 30 EMA)
+        velocities.append(kf.x[1][0])  # Velocity (first derivative) estimate
+        accelerations.append(kf.x[2][0])  # Acceleration (second derivative) estimate
+    
+    # Add the estimates to the DataFrame
+    df['kalman_position'] = positions
+    df['kalman_velocity'] = velocities
+    df['kalman_acceleration'] = accelerations
+    
+    df['kalman_velocity'] = df['kalman_velocity'].ewm(span=1, adjust=False).mean()
+    '''
+    
+    '''
+    order = 1     # Filter order
+    cutoff = 0.04  # Cutoff frequency, adjust based on desired smoothness
+    
+    # Design a low-pass Butterworth filter
+    b, a = butter(N=order, Wn=cutoff, btype='low')
+    
+    # Apply the filtfilt filter to df['30ema']
+    df['filtfilt'] = filtfilt(b, a, df['close'])
+    #df['lfilter'] = lfilter(b, a, df['close'])
+    
+    from scipy.signal import lfilter_zi
+
+    # Get initial conditions for the filter
+    zi = lfilter_zi(b, a) * df['close'].iloc[0]  # Scale initial conditions to match data
+    
+    # Apply lfilter with the initialized conditions
+    df['lfilter'], _ = lfilter(b, a, df['close'], zi=zi)
+    '''
 
     window_size = 3  # Define the window size
     poly_order = 1   # Polynomial order (e.g., 2 for quadratic fit)
@@ -2928,7 +2961,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     mTrade = sorted(AllTrades, key=lambda d: d[1], reverse=True)
     
     [mTrade[i].insert(4,i) for i in range(len(mTrade))] 
-    
+
     data =  [i[0] for i in AllTrades]#[:500]
     data.sort(reverse=True)
     differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
@@ -2948,10 +2981,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     #tempTrades = sorted(AllTrades, key=lambda d: d[6], reverse=False) 
     #tradeTimes = [i[6] for i in AllTrades]
     tradeEpoch = [i[2] for i in AllTrades]
-    dv = 2 * 4 if stkName in doubl else 2 * 1
     
     
-    if 'timeFrame' in stored_data: #stored_data is not None and 
+    if stored_data is not None:
         print('NotNew')
         startIndex = next(iter(df.index[df['time'] == stored_data['timeFrame'][len(stored_data['timeFrame'])-1][0]]), None)#df['timestamp'].searchsorted(stored_data['timeFrame'][len(stored_data['timeFrame'])-1][9])
         timeDict = {}
@@ -2962,41 +2994,11 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             timeDict[dtime[ttm]] = [0,0,0]
         
         troPerCandle = []
-        footPrint = []
         for tr in range(len(make)):
             if tr+1 < len(make):
                 tempList = AllTrades[make[tr][2]:make[tr+1][2]]
             else:
                 tempList = AllTrades[make[tr][2]:len(AllTrades)]
-            
-            prices = np.array([row[0] for row in tempList])
-
-            # Determine number of bins based on price range
-            price_min = min(prices)
-            price_max = max(prices)
-            num_bins = int((price_max - price_min) / dv) + 1
-            
-            bin_edges = np.linspace(price_min, price_max, num_bins + 1)[::-1]
-            
-            tdf = pd.DataFrame(tempList, columns=["Price", "Qty", "Timestamp", "Col4", "Col5", "Type", "Time"])
-            
-            bin_results = []
-
-            for i in range(len(bin_edges) - 1):
-                lower_bound = bin_edges[i + 1]
-                upper_bound = bin_edges[i]
-                
-                # Filter DataFrame based on price range
-                filtered_df = tdf[(tdf["Price"] >= lower_bound) & (tdf["Price"] < upper_bound)]
-                
-                # Count occurrences of 'A' and 'B'
-                count_A = (filtered_df["Type"] == "A").sum()
-                count_B = (filtered_df["Type"] == "B").sum()
-                
-                # Store results
-                bin_results.append([f"{round(upper_bound,3)} - {round(lower_bound,3)}", count_B - count_A, ])
-                
-            footPrint.append([make[tr][1],bin_results])
                 
             troPerCandle.append([make[tr][1],sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]])
             for i in tempList:
@@ -3023,7 +3025,6 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
         stored_data['timeFrame'] = stored_data['timeFrame'][:len(stored_data['timeFrame'])-1] + timeFrame
         stored_data['troPerCandle'] = stored_data['troPerCandle'][:len(stored_data['troPerCandle'])-1] + troPerCandle
-        stored_data['footPrint'] = stored_data['footPrint'][:len(stored_data['footPrint'])-1] + footPrint
         
         bful = []
         valist = []
@@ -3067,7 +3068,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
     
     
-    if 'timeFrame' not in stored_data: #stored_data is None or 
+    if stored_data is None:
         print('Newstored')
         timeDict = {}
         make = []
@@ -3078,8 +3079,6 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
             
         troPerCandle = []
-        footPrint = []
-        
         for tr in range(len(make)):
             if tr+1 < len(make):
                 #print(make[tr][2],make[tr+1][2])
@@ -3087,35 +3086,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             else:
                 tempList = AllTrades[make[tr][2]:len(AllTrades)]
             
-            prices = np.array([row[0] for row in tempList])
-
-            # Determine number of bins based on price range
-            price_min = min(prices)
-            price_max = max(prices)
-            num_bins = int((price_max - price_min) / dv) + 1
-            
-            bin_edges = np.linspace(price_min, price_max, num_bins + 1)[::-1]
-            
-            tdf = pd.DataFrame(tempList, columns=["Price", "Qty", "Timestamp", "Col4", "Col5", "Type", "Time"])
-            
-            bin_results = []
-
-            for i in range(len(bin_edges) - 1):
-                lower_bound = bin_edges[i + 1]
-                upper_bound = bin_edges[i]
-                
-                # Filter DataFrame based on price range
-                filtered_df = tdf[(tdf["Price"] >= lower_bound) & (tdf["Price"] < upper_bound)]
-                
-                # Count occurrences of 'A' and 'B'
-                count_A = (filtered_df["Type"] == "A").sum()
-                count_B = (filtered_df["Type"] == "B").sum()
-                
-                # Store results
-                bin_results.append([f"{round(upper_bound,3)} - {round(lower_bound,3)}", count_B - count_A, ])
-            footPrint.append([make[tr][1],bin_results])
-            
-            
+            #secList = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
             troPerCandle.append([make[tr][1],sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]])
             for i in tempList:
                 if i[5] == 'B':
@@ -3129,8 +3100,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             except(ZeroDivisionError):
                 timeDict[make[tr][1]]  += [0,0,0] 
     
-            
-    
+                          
         timeFrame = [[i,'']+timeDict[i] for i in timeDict]
     
         for i in range(len(timeFrame)):
@@ -3172,12 +3142,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
         dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row], bful[row][3], bful[row][4]] for row in  range(len(bful))]
             
-        #stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle} 
-        stored_data['timeFrame'] = timeFrame
-        stored_data['tro'] = dst
-        stored_data['pdata'] = valist
-        stored_data['troPerCandle'] = troPerCandle
-        stored_data['footPrint'] = footPrint
+        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle} 
+        
     
     
     topBuys = []
@@ -3253,7 +3219,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     try:
         df['LowVA'] = pd.Series([i[0] for i in stored_data['pdata']])
         df['HighVA'] = pd.Series([i[1] for i in stored_data['pdata']])
-        df['POC'] = pd.Series([i[5] for i in stored_data['pdata']])
+        df['POC'] = pd.Series([i[2] for i in stored_data['pdata']])
         df['POC2'] = pd.Series([i[5] for i in stored_data['pdata']])
         df['weights'] = [i[2]-i[3] for i in stored_data['timeFrame']]
         '''
@@ -3479,10 +3445,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] < -0.048) and 
             (df.at[p, 'smoothed_derivative'] < 0) and 
             ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
-            (df.at[p, 'vwap_signalSell']) #and
-            #(df.at[p, 'uppervwap_signalSell']) and
-            #(df.at[p, 'lowervwap_signalSell']) #and
-            #(df.at[p, 'vwapAvg_signalSell']) 
+            (df.at[p, 'vwap_signalSell']) and
+            (df.at[p, 'uppervwap_signalSell']) and
+            (df.at[p, 'lowervwap_signalSell']) and
+            (df.at[p, 'vwapAvg_signalSell']) 
         ):
             df.at[p, 'sell_signal'] = True  # Trigger sell
             stillbuy = False  # Stop buy tracking
@@ -3495,10 +3461,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] > 0.048) and 
             (df.at[p, 'smoothed_derivative'] > 0) and 
             ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
-            (df.at[p, 'vwap_signalBuy']) #and
-            #(df.at[p, 'uppervwap_signalBuy']) and
-            #(df.at[p, 'lowervwap_signalBuy']) #and
-            #(df.at[p, 'vwapAvg_signalBuy'])
+            (df.at[p, 'vwap_signalBuy']) and
+            (df.at[p, 'uppervwap_signalBuy']) and
+            (df.at[p, 'lowervwap_signalBuy']) and
+            (df.at[p, 'vwapAvg_signalBuy'])
         ):
             df.at[p, 'buy_signal'] = True  # Trigger buy
             stillsell = False  # Stop sell tracking
@@ -3511,10 +3477,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] > 0.048) and 
             (df.at[p, 'smoothed_derivative'] > 0) and 
             ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
-            (df.at[p, 'vwap_signalBuy']) #and
-            #(df.at[p, 'uppervwap_signalBuy']) and
-            #(df.at[p, 'lowervwap_signalBuy']) #and
-            #(df.at[p, 'vwapAvg_signalBuy']) 
+            (df.at[p, 'vwap_signalBuy']) and
+            (df.at[p, 'uppervwap_signalBuy']) and
+            (df.at[p, 'lowervwap_signalBuy'])and
+            (df.at[p, 'vwapAvg_signalBuy']) 
         ):
             df.at[p, 'buy_signal'] = True  # Trigger buy
             stillsell = False  # Stop sell tracking
@@ -3526,10 +3492,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             (df.at[p, 'POCDistanceEMA'] < -0.048) and 
             (df.at[p, 'smoothed_derivative'] < 0) and 
             ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
-            (df.at[p, 'vwap_signalSell']) #and
-            #(df.at[p, 'uppervwap_signalSell'])and
-            #(df.at[p, 'lowervwap_signalSell']) #and
-            #(df.at[p, 'vwapAvg_signalSell']) 
+            (df.at[p, 'vwap_signalSell']) and
+            (df.at[p, 'uppervwap_signalSell'])and
+            (df.at[p, 'lowervwap_signalSell']) and
+            (df.at[p, 'vwapAvg_signalSell']) 
         ):
             df.at[p, 'sell_signal'] = True  # Trigger sell
             stillbuy = False  # Stop buy tracking
@@ -3544,7 +3510,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
 
     #calculate_ttm_squeeze(df)
     
-    print(last_byte_OHLC, last_byte_Trades)
+    
         
     if interval_time == initial_inter:
         interval_time = subsequent_inter
@@ -3554,29 +3520,11 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     
     
-    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterList=cdata, troInterval=stored_data['tro'], footPrint=stored_data['footPrint'] ) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterList=cdata, troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
  
-    return stored_data, fg, previous_stkName, previous_interv, last_byte_OHLC, last_byte_Trades, interval_time
+    return stored_data, fg, previous_stkName, previous_interv, interval_time
 
 #[(i[2]-i[3],i[0]) for i in timeFrame ]valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2]])
 if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0', port=8080)
     #app.run_server(debug=False, use_reloader=False)
-
-'''
-from scipy.signal import find_peaks
-price_levels = np.array([i[0] for i in hs[0]])
-volume_at_price = np.array([i[1] for i in hs[0]])
-
-# Detect peaks (high volume nodes)
-peaks, _ = find_peaks(volume_at_price, distance=50, prominence=50)
-
-# Find valleys (low volume areas) between peaks
-valleys, _ = find_peaks(-volume_at_price, distance=50)
-
-# Filter valleys that exist between peaks
-filtered_valleys = [v for v in valleys if any(p > v for p in peaks) and any(p < v for p in peaks)]
-'''
-
-    
-    
