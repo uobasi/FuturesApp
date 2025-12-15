@@ -1037,15 +1037,16 @@ def add_swing_profiles_time_aligned(fig, swing_profiles, df):
         fig.add_trace(go.Scatter(
             x=[poc_x],
             y=[profile.poc],
-            mode="markers+text",
+            mode="markers",  # markers only, no text drawn
             marker=dict(size=10, color="orange"),
-            hovertemplate=label_text,
-            #text=[label_text],
-            #textposition="middle right",
-            #textfont=dict(color="white", size=10),
+            hovertemplate=(
+                "Price: %{y:,.2f}<br>"       # default y value
+                + label_text +         # your custom block
+                "<extra></extra>"      # hides the trace name in hover
+            ),
             showlegend=False
         ))
-                
+                        
     return fig
 def add_swing_profiles_overlaid(fig, swing_profiles, df):
     """
