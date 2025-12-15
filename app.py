@@ -1147,7 +1147,7 @@ bucket = gclient.get_bucket("stockapp-storage-east1")
 #from google.api_core.exceptions import NotFound
 from dash import Dash, dcc, html, Input, Output, callback, State, callback_context
 initial_inter = 500000  # Initial interval #210000#250000#80001
-subsequent_inter = 300000  # Subsequent interval
+subsequent_inter = 180000#300000  # Subsequent interval
 app = Dash()
 app.title = "EnVisage"
 app.layout = html.Div([
