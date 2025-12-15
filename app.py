@@ -733,13 +733,13 @@ def plot_nbe_combined(df, profile: NodeProfile, poc_path, pov_path, vah_path, va
     ), row=1, col=1)
     
     
-    try:
-        #pass
-        fig.add_trace(go.Scatter(x=df.index, y=df['PreviousDayPOC'], mode='lines', name='PreviousDayPOC'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['PreviousDayHVA'], mode='lines', name='PreviousDayHVA'))
-        fig.add_trace(go.Scatter(x=df.index, y=df['PreviousDayLVA'], mode='lines', name='PreviousDayLVA'))
-    except(KeyError):
-        pass
+    # try:
+    #     #pass
+    #     fig.add_trace(go.Scatter(x=df.index, y=df['PreviousDayPOC'], mode='lines', name='PreviousDayPOC'))
+    #     fig.add_trace(go.Scatter(x=df.index, y=df['PreviousDayHVA'], mode='lines', name='PreviousDayHVA'))
+    #     fig.add_trace(go.Scatter(x=df.index, y=df['PreviousDayLVA'], mode='lines', name='PreviousDayLVA'))
+    # except(KeyError):
+    #     pass
 
     # ======================================================================
     # Final layout
@@ -869,13 +869,88 @@ def download_data(bucket_name, blob_name):
 #plot_candles_with_poc_pov(df, poc_path, pov_path, "NQ — Developing POC & PoV")
 
 
+# def build_swing_profiles(engine, trades, df, swing_highs, swing_lows):
+#     pivots = sorted(swing_highs + swing_lows)
+#     swing_profiles = []
+
+#     for i in range(len(pivots)-1):
+#         start_idx = pivots[i]
+#         end_idx   = pivots[i+1]
+
+#         t_start = df['timestamp'].iloc[start_idx]
+#         t_end   = df['timestamp'].iloc[end_idx]
+
+#         swing_low  = df['low'].iloc[start_idx:end_idx+1].min()
+#         swing_high = df['high'].iloc[start_idx:end_idx+1].max()
+
+#         swing_trades = [
+#             t for t in trades
+#             if (t.raw[2] >= t_start and t.raw[2] <= t_end)
+#             and (swing_low <= t.price <= swing_high)
+#         ]
+
+#         if len(swing_trades) == 0:
+#             swing_profiles.append(None)
+#             continue
+
+#         profile = engine.build_profile(swing_trades)
+
+#         profile.meta = {
+#             "start_idx": start_idx,
+#             "end_idx": end_idx,
+#             "start_time": df.index[start_idx],
+#             "end_time": df.index[end_idx],
+#             "swing_low": swing_low,
+#             "swing_high": swing_high
+#         }
+
+#         swing_profiles.append(profile)
+
+#     # -----------------------------------------------------
+#     # ADD LAST / ACTIVE SWING:
+#     # final pivot → dataframe end (developing swing)
+#     # -----------------------------------------------------
+#     last_idx = pivots[-1]
+#     start_idx = last_idx
+#     end_idx = len(df) - 1
+
+#     t_start = df['timestamp'].iloc[start_idx]
+#     t_end   = df['timestamp'].iloc[end_idx]
+
+#     swing_low  = df['low'].iloc[start_idx:end_idx+1].min()
+#     swing_high = df['high'].iloc[start_idx:end_idx+1].max()
+
+#     swing_trades = [
+#         t for t in trades
+#         if (t.raw[2] >= t_start and t.raw[2] <= t_end)
+#         and (swing_low <= t.price <= swing_high)
+#     ]
+
+#     if len(swing_trades) > 0:
+#         profile = engine.build_profile(swing_trades)
+#         profile.meta = {
+#             "start_idx": start_idx,
+#             "end_idx": end_idx,
+#             "start_time": df.index[start_idx],
+#             "end_time": df.index[end_idx],   # <- right edge = last candle
+#             "swing_low": swing_low,
+#             "swing_high": swing_high
+#         }
+
+#         swing_profiles.append(profile)
+#     else:
+#         swing_profiles.append(None)
+
+#     return swing_profiles
+
+
 def build_swing_profiles(engine, trades, df, swing_highs, swing_lows):
     pivots = sorted(swing_highs + swing_lows)
     swing_profiles = []
 
-    for i in range(len(pivots)-1):
+    for i in range(len(pivots) - 1):
         start_idx = pivots[i]
-        end_idx   = pivots[i+1]
+        end_idx   = pivots[i + 1]
 
         t_start = df['timestamp'].iloc[start_idx]
         t_end   = df['timestamp'].iloc[end_idx]
@@ -883,6 +958,7 @@ def build_swing_profiles(engine, trades, df, swing_highs, swing_lows):
         swing_low  = df['low'].iloc[start_idx:end_idx+1].min()
         swing_high = df['high'].iloc[start_idx:end_idx+1].max()
 
+        # Select trades inside this swing
         swing_trades = [
             t for t in trades
             if (t.raw[2] >= t_start and t.raw[2] <= t_end)
@@ -893,23 +969,33 @@ def build_swing_profiles(engine, trades, df, swing_highs, swing_lows):
             swing_profiles.append(None)
             continue
 
+        # --- NEW: build developing POC path for this swing ---
+        swing_poc_path = []
+        partial_trades = []
+
+        for t in swing_trades:
+            partial_trades.append(t)
+            p = engine.build_profile(partial_trades)
+            swing_poc_path.append(p.poc)
+
+        # Final full-profile
         profile = engine.build_profile(swing_trades)
 
+        # Store metadata AND poc-path
         profile.meta = {
             "start_idx": start_idx,
             "end_idx": end_idx,
             "start_time": df.index[start_idx],
             "end_time": df.index[end_idx],
             "swing_low": swing_low,
-            "swing_high": swing_high
+            "swing_high": swing_high,
+            "swing_poc_path": swing_poc_path,   # <<<<<<<<<<
+            "swing_poc_final": profile.poc
         }
 
         swing_profiles.append(profile)
 
-    # -----------------------------------------------------
-    # ADD LAST / ACTIVE SWING:
-    # final pivot → dataframe end (developing swing)
-    # -----------------------------------------------------
+    # --- ADD LAST DEVELOPING SWING (same update logic) ---
     last_idx = pivots[-1]
     start_idx = last_idx
     end_idx = len(df) - 1
@@ -926,15 +1012,26 @@ def build_swing_profiles(engine, trades, df, swing_highs, swing_lows):
         and (swing_low <= t.price <= swing_high)
     ]
 
-    if len(swing_trades) > 0:
+    if len(swing_trades):
+        swing_poc_path = []
+        partial_trades = []
+
+        for t in swing_trades:
+            partial_trades.append(t)
+            p = engine.build_profile(partial_trades)
+            swing_poc_path.append(p.poc)
+
         profile = engine.build_profile(swing_trades)
+        
         profile.meta = {
             "start_idx": start_idx,
             "end_idx": end_idx,
             "start_time": df.index[start_idx],
-            "end_time": df.index[end_idx],   # <- right edge = last candle
+            "end_time": df.index[end_idx],
             "swing_low": swing_low,
-            "swing_high": swing_high
+            "swing_high": swing_high,
+            "swing_poc_path": swing_poc_path,
+            "swing_poc_final": profile.poc
         }
 
         swing_profiles.append(profile)
@@ -942,6 +1039,7 @@ def build_swing_profiles(engine, trades, df, swing_highs, swing_lows):
         swing_profiles.append(None)
 
     return swing_profiles
+
     
 def add_swing_profiles_time_aligned(fig, swing_profiles, df):
     """
@@ -1044,6 +1142,17 @@ def add_swing_profiles_time_aligned(fig, swing_profiles, df):
                 + label_text +         # your custom block
                 "<extra></extra>"      # hides the trace name in hover
             ),
+            showlegend=False
+        ))
+        
+        poc_path = profile.meta["swing_poc_path"]
+        times = np.linspace(x_left, x_right, len(poc_path))
+        
+        fig.add_trace(go.Scatter(
+            x=times,
+            y=poc_path,
+            mode="lines",
+            line=dict(color="orange", width=2),
             showlegend=False
         ))
                         
@@ -1348,16 +1457,16 @@ def update_graph_live(n_intervals, relayout_data, sname, interv, stored_data, pr
     for row in csv_reader:
         csv_rows.append(row)
         
-    try:
-        df['PreviousDayLVA'] = csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0]
-        df['PreviousDayHVA'] = csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1]
-        df['PreviousDayPOC'] = csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]
-        # previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0], 
-        #                 csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1], 
-        #                 csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2],
-        #                 ]
-    except(ValueError):
-         pass
+    # try:
+    #     df['PreviousDayLVA'] = csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0]
+    #     df['PreviousDayHVA'] = csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1]
+    #     df['PreviousDayPOC'] = csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]
+    #     # previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0], 
+    #     #                 csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1], 
+    #     #                 csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2],
+    #     #                 ]
+    # except(ValueError):
+    #      pass
     
     
     
