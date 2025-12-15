@@ -1,90 +1,104 @@
-/* Main Container */
-.main-container {
-    display: flex;
-    flex-direction: row; /* Align items in a row */
-    justify-content: space-around;
-    flex-wrap: wrap; /* Wrap items if screen is too small */
-    background: #E5ECF6; /* Soft light blue background */
-    padding: 20px;
+/* ============= GLOBAL DARK THEME ============= */
+body {
+    background: #1e1e1e;   /* Match Plotly dark background */
+    color: #e6e6e6;
+    font-family: Arial, sans-serif;
 }
 
-/* Sub-container */
+/* ============= MAIN CONTAINER ============= */
+.main-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    background: #1c1c1c;   /* Dark gray */
+    border-top: 1px solid #333;
+    padding: 25px;
+}
+
+/* ============= INPUT BLOCK ============= */
 .sub-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 10px;
+    background: #242424;          /* Card-like block */
+    padding: 15px 25px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.6);
 }
 
 /* Input Fields */
 .input-field {
-    width: 150px;
-    height: 35px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
+    width: 160px;
+    height: 38px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #1a1a1a;
+    color: #e6e6e6;
     padding: 0 10px;
 }
 
-/* Buttons */
+.input-field:focus {
+    outline: none;
+    border-color: #00ccff; /* Cyan glow */
+    box-shadow: 0 0 6px #00ccff;
+}
+
+/* ============= BUTTONS ============= */
 .submit-button {
-    width: 100px;
-    height: 35px;
-    border-radius: 10px;
+    width: 110px;
+    height: 38px;
+    border-radius: 8px;
     border: none;
-    color: white;
-    background: #333333; /* Dark gray */
+    color: #ffffff;
+    background: #303030;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: 0.25s;
+    font-weight: bold;
 }
 
 .submit-button:hover {
-    background: #555555; /* Lighter gray on hover */
+    background: #00aaff;
+    color: black;
+    box-shadow: 0 0 10px #00aaff;
 }
 
-/* Labels */
+/* Label text under inputs */
 .label-text {
+    margin-top: 10px;
     text-align: center;
     font-weight: bold;
-    color: #333;
+    color: #cccccc;
+    font-size: 14px;
 }
 
-/* Toggle Button */
-.toggle-container {
-    text-align: center;
-    margin-top: 10px;
-    font-size: 16px;
-}
-
-
-/* Move toggle button above the bottom bar charts */
+/* ============= TOGGLE SECTION ============= */
 .toggle-wrapper {
-    position: relative;
     width: 100%;
     text-align: center;
-    margin-top: -50px; /* Adjust this value to move up/down */
+    margin-top: -40px;
 }
 
-/* Style the Toggle Button */
 .toggle-container-bottom {
     font-size: 16px;
     font-weight: bold;
-    color: #333;
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 5px;
+    color: #e0e0e0;
+    padding: 6px 10px;
+    background: #242424;
+    border-radius: 8px;
+    border: 1px solid #333;
     display: inline-block;
-    background: #E5ECF6; /* Soft light blue background */
 }
 
-/* Style the Toggle Switch */
 .toggle-switch {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: bold;
-    color: #333;
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 5px;
+    color: #00ccff;
+    padding: 6px 10px;
+    background: #1a1a1a;
+    border-radius: 6px;
+    border: 1px solid #333;
     display: inline-block;
 }
-
