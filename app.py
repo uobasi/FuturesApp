@@ -734,7 +734,7 @@ def plot_nbe_combined(df, profile: NodeProfile, poc_path, pov_path, vah_path, va
     
     
     try:
-        pass
+        #pass
         fig.add_trace(go.Scatter(x=df.index, y=df['PreviousDayPOC'], mode='lines', name='PreviousDayPOC'))
         fig.add_trace(go.Scatter(x=df.index, y=df['PreviousDayHVA'], mode='lines', name='PreviousDayHVA'))
         fig.add_trace(go.Scatter(x=df.index, y=df['PreviousDayLVA'], mode='lines', name='PreviousDayLVA'))
@@ -1338,6 +1338,26 @@ def update_graph_live(n_intervals, relayout_data, sname, interv, stored_data, pr
     df.reset_index(drop=True, inplace=True) 
     
     
+    blob = Blob('PrevDay', bucket) 
+    PrevDay = blob.download_as_text()
+        
+
+    csv_reader  = csv.reader(io.StringIO(PrevDay))
+
+    csv_rows = []
+    for row in csv_reader:
+        csv_rows.append(row)
+        
+    try:
+        df['PreviousDayLVA'] = csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0]
+        df['PreviousDayHVA'] = csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1]
+        df['PreviousDayPOC'] = csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]
+        # previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0], 
+        #                 csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1], 
+        #                 csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2],
+        #                 ]
+    except(ValueError):
+         pass
     
     
     
