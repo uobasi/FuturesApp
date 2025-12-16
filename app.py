@@ -1339,8 +1339,7 @@ def add_swing_profiles_overlaid(fig, swing_profiles, df):
 
 
 
-
-symbolNumList =  ['294973', '158704', '42004629']
+symbolNumList =  ['42140878', '42002475', '42005850']
 symbolNameList = ['ES', 'NQ', 'YM']
 
 
@@ -1449,7 +1448,7 @@ def update_interval(n_clicks, value):
 def update_graph_live(n_intervals, relayout_data, sname, interv, stored_data, previous_stkName, previous_interv, interval_time, layout_data): #interv
 
 
-    symbolNumList =  ['294973', '158704', '42004629']
+    symbolNumList =  ['42140878', '42002475', '42005850']
     symbolNameList = ['ES', 'NQ', 'YM']
     
     future_tick = {
