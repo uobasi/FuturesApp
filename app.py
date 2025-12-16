@@ -1087,7 +1087,7 @@ def add_swing_profiles_time_aligned(fig, swing_profiles, df):
             y=y_plot,
             mode="lines",
             line=dict(color="yellow", width=2),
-            opacity=0.4,
+            opacity=0.2,
             showlegend=False
         ))
 
