@@ -797,193 +797,58 @@ def download_data(bucket_name, blob_name):
 
 
 
-def build_swing_profiles(engine, trades, df, swing_highs, swing_lows):
-    pivots = sorted(swing_highs + swing_lows)
-    swing_profiles = []
-
-    for i in range(len(pivots) - 1):
-
-        start_idx = pivots[i]
-        end_idx   = pivots[i + 1]
-
-        t_start = df['timestamp'].iloc[start_idx]
-        t_end   = df['timestamp'].iloc[end_idx]
-
-        swing_low  = df['low'].iloc[start_idx:end_idx+1].min()
-        swing_high = df['high'].iloc[start_idx:end_idx+1].max()
-
-        # Filter trades for this swing
-        swing_trades = [
-            t for t in trades
-            if (t.raw[2] >= t_start and t.raw[2] <= t_end)
-            and (swing_low <= t.price <= swing_high)
-        ]
-
-        if not swing_trades:
-            swing_profiles.append(None)
-            continue
-
-        # ----------------------------------------------------------
-        # Use SAME binning logic as engine.build_profile
-        # ----------------------------------------------------------
-        swing_prices = [t.price for t in swing_trades]
-        p_min = min(swing_prices)
-
-        hist = {}
-        swing_poc_path = []
-        current_poc = None
-        current_poc_vol = 0.0
-
-        for t in swing_trades:
-            b = engine._round_to_bin(t.price, p_min)   # <<< key change
-
-            hist[b] = hist.get(b, 0.0) + t.size
-
-            # update POC incrementally
-            if hist[b] >= current_poc_vol:
-                current_poc = b
-                current_poc_vol = hist[b]
-
-            swing_poc_path.append(current_poc)
-
-        # Build final full profile using engine (will use same p_min)
-        profile = engine.build_profile(swing_trades)
-
-        profile.meta = {
-            "start_idx": start_idx,
-            "end_idx": end_idx,
-            "start_time": df.index[start_idx],
-            "end_time": df.index[end_idx],
-            "swing_low": swing_low,
-            "swing_high": swing_high,
-            "swing_poc_path": swing_poc_path,
-            "swing_poc_final": current_poc
-        }
-
-        swing_profiles.append(profile)
-
-    # ----------------------------------------------------------
-    # ADD LAST DEVELOPING SWING (same logic)
-    # ----------------------------------------------------------
-    last_idx = pivots[-1]
-    start_idx = last_idx
-    end_idx   = len(df) - 1
-
-    t_start = df['timestamp'].iloc[start_idx]
-    t_end   = df['timestamp'].iloc[end_idx]
-
-    swing_low  = df['low'].iloc[start_idx:end_idx+1].min()
-    swing_high = df['high'].iloc[start_idx:end_idx+1].max()
-
-    swing_trades = [
-        t for t in trades
-        if (t.raw[2] >= t_start and t.raw[2] <= t_end)
-        and (swing_low <= t.price <= swing_high)
-    ]
-
-    if swing_trades:
-
-        swing_prices = [t.price for t in swing_trades]
-        p_min = min(swing_prices)
-
-        hist = {}
-        swing_poc_path = []
-        current_poc = None
-        current_poc_vol = 0.0
-
-        for t in swing_trades:
-            b = engine._round_to_bin(t.price, p_min)
-
-            hist[b] = hist.get(b, 0.0) + t.size
-
-            if hist[b] >= current_poc_vol:
-                current_poc = b
-                current_poc_vol = hist[b]
-
-            swing_poc_path.append(current_poc)
-
-        profile = engine.build_profile(swing_trades)
-
-        profile.meta = {
-            "start_idx": start_idx,
-            "end_idx": end_idx,
-            "start_time": df.index[start_idx],
-            "end_time": df.index[end_idx],
-            "swing_low": swing_low,
-            "swing_high": swing_high,
-            "swing_poc_path": swing_poc_path,
-            "swing_poc_final": current_poc
-        }
-
-        swing_profiles.append(profile)
-    else:
-        swing_profiles.append(None)
-
-    return swing_profiles
-
-
-    
 # def build_swing_profiles(engine, trades, df, swing_highs, swing_lows):
 #     pivots = sorted(swing_highs + swing_lows)
 #     swing_profiles = []
 
-#     bin_size = engine.bin_size
+#     for i in range(len(pivots) - 1):
 
-#     def price_to_bin(price, p_min):
-#         return p_min + round((price - p_min) / bin_size) * bin_size
+#         start_idx = pivots[i]
+#         end_idx   = pivots[i + 1]
 
-#     # ----------------------------------------------------
-#     # Helper: compute swing profile
-#     # ----------------------------------------------------
-#     def compute_swing(start_idx, end_idx):
-        
 #         t_start = df['timestamp'].iloc[start_idx]
 #         t_end   = df['timestamp'].iloc[end_idx]
 
 #         swing_low  = df['low'].iloc[start_idx:end_idx+1].min()
 #         swing_high = df['high'].iloc[start_idx:end_idx+1].max()
 
-#         # Select trades in this swing
+#         # Filter trades for this swing
 #         swing_trades = [
 #             t for t in trades
 #             if (t.raw[2] >= t_start and t.raw[2] <= t_end)
 #             and (swing_low <= t.price <= swing_high)
 #         ]
-#         if not swing_trades:
-#             return None
 
+#         if not swing_trades:
+#             swing_profiles.append(None)
+#             continue
+
+#         # ----------------------------------------------------------
+#         # Use SAME binning logic as engine.build_profile
+#         # ----------------------------------------------------------
 #         swing_prices = [t.price for t in swing_trades]
 #         p_min = min(swing_prices)
 
 #         hist = {}
-#         current_poc = None
-#         current_poc_vol = 0
-
 #         swing_poc_path = []
-#         trade_pos = 0
-#         n_trades = len(swing_trades)
+#         current_poc = None
+#         current_poc_vol = 0.0
 
-#         for bar_idx in range(start_idx, end_idx + 1):
+#         for t in swing_trades:
+#             b = engine._round_to_bin(t.price, p_min)   # <<< key change
 
-#             if bar_idx < end_idx:
-#                 boundary_time = df['timestamp'].iloc[bar_idx + 1]
-#             else:
-#                 boundary_time = df['timestamp'].iloc[end_idx]
+#             hist[b] = hist.get(b, 0.0) + t.size
 
-#             while trade_pos < n_trades and swing_trades[trade_pos].raw[2] < boundary_time:
-#                 t = swing_trades[trade_pos]
-#                 trade_pos += 1
-
-#                 b = price_to_bin(t.price, p_min)
-#                 hist[b] = hist.get(b, 0) + t.size
-
-#                 if hist[b] >= current_poc_vol:
-#                     current_poc = b
-#                     current_poc_vol = hist[b]
+#             # update POC incrementally
+#             if hist[b] >= current_poc_vol:
+#                 current_poc = b
+#                 current_poc_vol = hist[b]
 
 #             swing_poc_path.append(current_poc)
 
+#         # Build final full profile using engine (will use same p_min)
 #         profile = engine.build_profile(swing_trades)
+
 #         profile.meta = {
 #             "start_idx": start_idx,
 #             "end_idx": end_idx,
@@ -995,34 +860,169 @@ def build_swing_profiles(engine, trades, df, swing_highs, swing_lows):
 #             "swing_poc_final": current_poc
 #         }
 
-#         return profile
+#         swing_profiles.append(profile)
 
-#     # ----------------------------------------------------
-#     # CASE 0: NO PIVOTS FOUND
-#     # ----------------------------------------------------
-#     if len(pivots) == 0:
-#         return [ compute_swing(0, len(df) - 1) ]
+#     # ----------------------------------------------------------
+#     # ADD LAST DEVELOPING SWING (same logic)
+#     # ----------------------------------------------------------
+#     last_idx = pivots[-1]
+#     start_idx = last_idx
+#     end_idx   = len(df) - 1
 
-#     # ----------------------------------------------------
-#     # CASE 1: ONLY ONE PIVOT
-#     # ----------------------------------------------------
-#     if len(pivots) == 1:
-#         start_idx = pivots[0]
-#         end_idx   = len(df) - 1
-#         return [ compute_swing(start_idx, end_idx) ]
+#     t_start = df['timestamp'].iloc[start_idx]
+#     t_end   = df['timestamp'].iloc[end_idx]
 
-#     # ----------------------------------------------------
-#     # CASE 2: NORMAL MULTIPLE PIVOTS
-#     # ----------------------------------------------------
-#     for i in range(len(pivots) - 1):
-#         start_idx = pivots[i]
-#         end_idx   = pivots[i + 1]
-#         swing_profiles.append(compute_swing(start_idx, end_idx))
+#     swing_low  = df['low'].iloc[start_idx:end_idx+1].min()
+#     swing_high = df['high'].iloc[start_idx:end_idx+1].max()
 
-#     # Final developing swing
-#     swing_profiles.append(compute_swing(pivots[-1], len(df) - 1))
+#     swing_trades = [
+#         t for t in trades
+#         if (t.raw[2] >= t_start and t.raw[2] <= t_end)
+#         and (swing_low <= t.price <= swing_high)
+#     ]
+
+#     if swing_trades:
+
+#         swing_prices = [t.price for t in swing_trades]
+#         p_min = min(swing_prices)
+
+#         hist = {}
+#         swing_poc_path = []
+#         current_poc = None
+#         current_poc_vol = 0.0
+
+#         for t in swing_trades:
+#             b = engine._round_to_bin(t.price, p_min)
+
+#             hist[b] = hist.get(b, 0.0) + t.size
+
+#             if hist[b] >= current_poc_vol:
+#                 current_poc = b
+#                 current_poc_vol = hist[b]
+
+#             swing_poc_path.append(current_poc)
+
+#         profile = engine.build_profile(swing_trades)
+
+#         profile.meta = {
+#             "start_idx": start_idx,
+#             "end_idx": end_idx,
+#             "start_time": df.index[start_idx],
+#             "end_time": df.index[end_idx],
+#             "swing_low": swing_low,
+#             "swing_high": swing_high,
+#             "swing_poc_path": swing_poc_path,
+#             "swing_poc_final": current_poc
+#         }
+
+#         swing_profiles.append(profile)
+#     else:
+#         swing_profiles.append(None)
 
 #     return swing_profiles
+
+
+    
+def build_swing_profiles(engine, trades, df, swing_highs, swing_lows):
+    pivots = sorted(swing_highs + swing_lows)
+    swing_profiles = []
+
+    bin_size = engine.bin_size
+
+    def price_to_bin(price, p_min):
+        return p_min + round((price - p_min) / bin_size) * bin_size
+
+    # ----------------------------------------------------
+    # Helper: compute swing profile
+    # ----------------------------------------------------
+    def compute_swing(start_idx, end_idx):
+        
+        t_start = df['timestamp'].iloc[start_idx]
+        t_end   = df['timestamp'].iloc[end_idx]
+
+        swing_low  = df['low'].iloc[start_idx:end_idx+1].min()
+        swing_high = df['high'].iloc[start_idx:end_idx+1].max()
+
+        # Select trades in this swing
+        swing_trades = [
+            t for t in trades
+            if (t.raw[2] >= t_start and t.raw[2] <= t_end)
+            and (swing_low <= t.price <= swing_high)
+        ]
+        if not swing_trades:
+            return None
+
+        swing_prices = [t.price for t in swing_trades]
+        p_min = min(swing_prices)
+
+        hist = {}
+        current_poc = None
+        current_poc_vol = 0
+
+        swing_poc_path = []
+        trade_pos = 0
+        n_trades = len(swing_trades)
+
+        for bar_idx in range(start_idx, end_idx + 1):
+
+            if bar_idx < end_idx:
+                boundary_time = df['timestamp'].iloc[bar_idx + 1]
+            else:
+                boundary_time = df['timestamp'].iloc[end_idx]
+
+            while trade_pos < n_trades and swing_trades[trade_pos].raw[2] < boundary_time:
+                t = swing_trades[trade_pos]
+                trade_pos += 1
+
+                b = price_to_bin(t.price, p_min)
+                hist[b] = hist.get(b, 0) + t.size
+
+                if hist[b] >= current_poc_vol:
+                    current_poc = b
+                    current_poc_vol = hist[b]
+
+            swing_poc_path.append(current_poc)
+
+        profile = engine.build_profile(swing_trades)
+        profile.meta = {
+            "start_idx": start_idx,
+            "end_idx": end_idx,
+            "start_time": df.index[start_idx],
+            "end_time": df.index[end_idx],
+            "swing_low": swing_low,
+            "swing_high": swing_high,
+            "swing_poc_path": swing_poc_path,
+            "swing_poc_final": current_poc
+        }
+
+        return profile
+
+    # ----------------------------------------------------
+    # CASE 0: NO PIVOTS FOUND
+    # ----------------------------------------------------
+    if len(pivots) == 0:
+        return [ compute_swing(0, len(df) - 1) ]
+
+    # ----------------------------------------------------
+    # CASE 1: ONLY ONE PIVOT
+    # ----------------------------------------------------
+    if len(pivots) == 1:
+        start_idx = pivots[0]
+        end_idx   = len(df) - 1
+        return [ compute_swing(start_idx, end_idx) ]
+
+    # ----------------------------------------------------
+    # CASE 2: NORMAL MULTIPLE PIVOTS
+    # ----------------------------------------------------
+    for i in range(len(pivots) - 1):
+        start_idx = pivots[i]
+        end_idx   = pivots[i + 1]
+        swing_profiles.append(compute_swing(start_idx, end_idx))
+
+    # Final developing swing
+    swing_profiles.append(compute_swing(pivots[-1], len(df) - 1))
+
+    return swing_profiles
     
 def add_swing_profiles_time_aligned(fig, swing_profiles, df):
     """
