@@ -1333,8 +1333,8 @@ def update_interval(n_clicks, value):
 def update_graph_live(n_intervals, relayout_data, sname, interv, stored_data, previous_stkName, previous_interv, interval_time, layout_data): #interv
 
 
-    symbolNumList =  ['42140878', '42002475', '42005850']
-    symbolNameList = ['ES', 'NQ', 'YM']
+    symbolNumList =  ['42140878', '42002475', '42005850', '42001025']
+    symbolNameList = ['ES', 'NQ', 'YM', 'GC'] 
     
     future_tick = {
         'ES':0.25, 
