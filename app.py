@@ -1224,8 +1224,8 @@ def add_swing_profiles_overlaid(fig, swing_profiles, df):
 
 
 
-symbolNumList =  ['42140878', '42002475', '42005850']
-symbolNameList = ['ES', 'NQ', 'YM']
+symbolNumList =  ['42140878', '42002475', '42005850', '42001025']
+symbolNameList = ['ES', 'NQ', 'YM', 'GC'] 
 
 
 intList = [str(i) for i in range(3,70)]
